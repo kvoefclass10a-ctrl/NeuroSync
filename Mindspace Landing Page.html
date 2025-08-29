@@ -3,206 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mindspace Landing Page</title>
-  <link rel="stylesheet" href="style.css">  <!-- Linking CSS file -->
+  <title>Mindspace – Focus & Wellbeing</title>
   <style>
-   body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg, #040720 0%, #2e0854 50%, #1a0b2e 100%);
-  font-family: Arial, sans-serif;
-}
-
-
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #e6ecf8);
+      color: #222;
     }
-    .header {
+
+    /* Header Navigation */
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(255,255,255,0.9);
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      padding: 20px 60px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header-text {
-      max-width: 50%;
+    header .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2e3a8c;
     }
-    .header h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-      color: #222;
-    }
-    .header p {
-      font-size: 16px;
-      margin-bottom: 20px;
-      color: #444;
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
     }
     .btn {
-      padding: 12px 24px;
-      background: linear-gradient(90deg, #ff512f, #dd2476);
-      color: #fff;
+      padding: 10px 20px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #4a6cf7, #5f9ef7);
+      color: white;
       transition: 0.3s;
     }
-    .btn:hover {
-      transform: scale(1.05);
-      background: linear-gradient(90deg, #dd2476, #ff512f);
-    }
-    .illustration {
-      width: 40%;
-      height: 150px;
-      background: #eee;
+    .btn:hover { opacity: 0.9; }
+
+    /* Hero */
+    .hero {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      border-radius: 12px;
-      font-size: 14px;
-      color: #777;
+      padding: 60px;
+    }
+    .hero-text {
+      max-width: 500px;
+    }
+    .hero-text h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+    .hero-text p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+    .hero img {
+      width: 450px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    /* Features Grid */
+    .section {
+      padding: 60px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 40px;
+      color: #2e3a8c;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      margin-bottom: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
     }
     .card {
-      background: rgba(255,255,255,0.9);
+      background: #fff;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: 0.3s;
+    }
+    .card:hover { transform: translateY(-6px); }
+
+    /* Sidebar Style Section */
+    .dashboard-preview {
+      background: #f9fafe;
+      padding: 50px;
+      display: flex;
+      gap: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    }
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      border-radius: 14px;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    }
-    .card h3 {
-      margin-bottom: 10px;
-      font-size: 18px;
-      color: #222;
-    }
-    .section-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 30px 0 15px;
-      color: #fff;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    }
-    .progress-bar {
-      background: #ddd;
+    .sidebar a {
+      display: block;
+      padding: 12px;
       border-radius: 8px;
-      overflow: hidden;
-      height: 10px;
-      margin: 10px 0;
+      margin-bottom: 10px;
+      color: #333;
+      text-decoration: none;
+      font-weight: 500;
     }
-    .progress-fill {
-      width: 50%;
-      background: linear-gradient(90deg, #36d1dc, #5b86e5);
-      height: 100%;
-    }
-    .stars {
-      display: flex;
-      gap: 10px;
-      font-size: 20px;
-      color: gold;
-    }
-    .resources {
-      display: flex;
-      gap: 15px;
-      justify-content: space-around;
-    }
-    .resource-box {
+    .sidebar a:hover { background: #eef2ff; }
+
+    .dashboard {
       flex: 1;
-      background: rgba(255,255,255,0.9);
-      padding: 15px;
-      text-align: center;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.3s, background 0.3s;
+      background: #fff;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .resource-box:hover {
-      background: #f0f0ff;
-      transform: scale(1.05);
+    .dashboard h3 { margin-bottom: 20px; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      background: #2e3a8c;
+      color: #fff;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-text">
-        <h1>Track Your Mind.<br>Reduce Stress.<br>Stay Motivated.</h1>
-        <p>Mindspace helps students manage stress & anxiety with gamified check-ins and wellness tools.</p>
-        <button class="btn">Get Started Free</button>
-      </div>
-      <div class="illustration">ILLUSTRATION</div>
-    </div>
+  <!-- Header -->
+  <header>
+    <div class="logo">Mindspace</div>
+    <nav>
+      <a href="#">Features</a>
+      <a href="#">Solutions</a>
+      <a href="#">Resources</a>
+      <a href="#">Pricing</a>
+    </nav>
+    <button class="btn">Get Demo</button>
+  </header>
 
-    <!-- Features & Study Material -->
-    <div class="grid">
-      <div class="card">
-        <h3>Daily Mood Journal</h3>
-        <p>log your emotions with emojis</p>
-      </div>
-      <div class="card">
-        <h3>Study Material</h3>
-        <p>access notes, PYQs & resources</p>
-      </div>
-      <div class="card">
-        <h3>Relaxation Exercises</h3>
-        <p>quick meditation & breathing guides</p>
-      </div>
-      <div class="card">
-        <h3>Peer Support Forum</h3>
-        <p>connect with other students safely</p>
-      </div>
-      <div class="card">
-        <h3>Resource Library</h3>
-        <p>articles, videos, helplines</p>
-      </div>
-      <div class="card">
-        <h3>AI Suggestions</h3>
-        <p>coping tips based on your mood trends</p>
-      </div>
-    </div>
-
-    <!-- Gamification & Community -->
-    <div class="grid">
-      <div class="card">
-        <h3>Your 7-day streak unlocked the Calm Achiever Badge!</h3>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-        <div class="stars">★ ★ ★ ☆ ☆</div>
-      </div>
-      <div class="card">
-        <div class="illustration" style="height: 100px;">SCREENSHOT</div>
-        <p>“This app helped me manage exam stress - Student, Class 10”</p>
-      </div>
-    </div>
-
-    <!-- Resources -->
-    <div class="section-title">Resources</div>
-    <div class="resources">
-      <div class="resource-box">Articles</div>
-      <div class="resource-box">Videos</div>
-      <div class="resource-box">Helplines</div>
-    </div>
-
-    <!-- Call to Action -->
-    <div class="section-title">Call to Action</div>
-    <div class="card">
-      <p>Join thousands of students taking control of their wellbeing today.</p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Think, plan, and track <br> all in one place</h1>
+      <p>Manage stress, stay focused, and organize your study life with AI-powered tools and integrations.</p>
       <button class="btn">Get Started Free</button>
     </div>
-  </div>
+    <img src="L1.png" alt="App Preview">
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <h2 class="section-title">Features that keep you productive</h2>
+    <div class="grid">
+      <div class="card"><h3>Daily Mood Journal</h3><p>Track emotions with ease</p></div>
+      <div class="card"><h3>Smart Reminders</h3><p>Never miss deadlines & tasks</p></div>
+      <div class="card"><h3>AI Meeting Notes</h3><p>Auto-capture discussions</p></div>
+      <div class="card"><h3>Integrations</h3><p>Works with Gmail, Slack, Calendar</p></div>
+    </div>
+  </section>
+
+  <!-- Dashboard Style Section -->
+  <section class="section">
+    <h2 class="section-title">Modern Dashboard Experience</h2>
+    <div class="dashboard-preview">
+      <div class="sidebar">
+        <a href="#">Home</a>
+        <a href="#">Meetings</a>
+        <a href="#">Tasks</a>
+        <a href="#">Analytics</a>
+      </div>
+      <div class="dashboard">
+        <h3>Today’s Schedule</h3>
+        <p>✔ Product Marketing Meeting – 11 AM</p>
+        <p>✔ User Research Discussion – 12:30 PM</p>
+        <p>✔ Design Review Session – 2:15 PM</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Mindspace. All rights reserved.</p>
+  </footer>
 </body>
 </html>

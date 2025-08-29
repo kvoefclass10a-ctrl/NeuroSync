@@ -1,60 +1,139 @@
-/* Background animation */
+/* ===== Global ===== */
 body {
   margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg, #040720 0%, #2e0854 50%, #1a0b2e 100%);
-  font-family: Arial, sans-serif;
-  animation: gradientMove 12s ease infinite alternate;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa, #e6ecf8);
+  color: #222;
 }
 
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+/* ===== Header ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-
-/* Fade-in for sections */
-.container > * {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.8s ease forwards;
+header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2e3a8c;
 }
-.container > *:nth-child(1) { animation-delay: 0.2s; }
-.container > *:nth-child(2) { animation-delay: 0.4s; }
-.container > *:nth-child(3) { animation-delay: 0.6s; }
-.container > *:nth-child(4) { animation-delay: 0.8s; }
-
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
 }
-
-/* Glow hover for cards */
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(150, 80, 255, 0.5);
-  border: 1px solid rgba(150, 80, 255, 0.6);
-}
-
-/* Buttons with glow */
 .btn {
-  padding: 12px 24px;
-  background: linear-gradient(90deg, #ff512f, #dd2476);
-  color: #fff;
+  padding: 10px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #4a6cf7, #5f9ef7);
+  color: white;
   transition: 0.3s;
-  box-shadow: 0 0 10px rgba(221, 36, 118, 0.5);
 }
-.btn:hover {
-  transform: scale(1.08);
-  background: linear-gradient(90deg, #dd2476, #ff512f);
-  box-shadow: 0 0 18px rgba(221, 36, 118, 0.8);
+.btn:hover { opacity: 0.9; }
+
+/* ===== Hero Section ===== */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px;
+}
+.hero-text {
+  max-width: 500px;
+}
+.hero-text h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+.hero-text p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #555;
+}
+.hero img {
+  width: 450px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
-/* Resource hover with neon effect */
-.resource-box:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: scale(1.08);
-  box-shadow: 0 0 12px rgba(80, 200, 255, 0.7);
+/* ===== Sections ===== */
+.section {
+  padding: 60px;
+}
+.section-title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 40px;
+  color: #2e3a8c;
+}
+
+/* ===== Features Grid ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+.card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+.card:hover { transform: translateY(-6px); }
+
+/* ===== Dashboard Preview Section ===== */
+.dashboard-preview {
+  background: #f9fafe;
+  padding: 50px;
+  display: flex;
+  gap: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+}
+.sidebar {
+  width: 200px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.sidebar a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+.sidebar a:hover { background: #eef2ff; }
+
+.dashboard {
+  flex: 1;
+  background: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.dashboard h3 { margin-bottom: 20px; }
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 40px;
+  background: #2e3a8c;
+  color: #fff;
+  margin-top: 40px;
 }
