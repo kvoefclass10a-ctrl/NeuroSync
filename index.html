@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NeuroSync</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics-compat.js"></script>
 </head>
 <body>
   <!-- Particles Background -->
@@ -180,6 +184,30 @@
   </div>
 
   <script>
+    // Firebase Configuration and Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+      authDomain: "neurosync-5173b.firebaseapp.com",
+      projectId: "neurosync-5173b",
+      storageBucket: "neurosync-5173b.firebasestorage.app",
+      messagingSenderId: "855780859936",
+      appId: "1:855780859936:web:3044309100db9a61fa1c45",
+      measurementId: "G-75S5GWYEDK"
+    };
+
+    // Initialize Firebase
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      const analytics = firebase.analytics();
+      console.log('Firebase initialized successfully');
+      
+      // Log app initialization event
+      analytics.logEvent('app_initialized');
+      
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
     // Dark Mode Toggle Functionality
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.querySelector('.theme-icon');
