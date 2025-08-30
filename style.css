@@ -1,5 +1,5 @@
 /* Google Font Import */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.comcss2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* CSS Variables for consistent theming */
 :root {
@@ -38,20 +38,21 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  padding: 2rem;
+  padding: 0; /* Removed all padding */
   text-align: center;
 }
 
 /* Main Title with Enhanced Animation */
 h1 {
+  font-family: 'Story Script', cursive;
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 700;
-  margin-bottom: 2rem;
+  margin: 0 0 1rem 0; /* Removed top/left/right margins, added bottom margin */
   position: relative;
-  border-right: 3px solid var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  animation: typing 2s steps(12) forwards, blink 0.8s infinite step-end alternate;
+  border-right: none;
+  white-space: normal;
+  overflow: visible;
+  animation: none;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -123,7 +124,8 @@ h1::after {
 
 /* NeuroSync Logo with Gradient */
 .nav-logo .logo-text {
-  font-size: 1.5rem;
+  font-family: 'Story Script', cursive;
+  font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 30%, #4a154b 70%, #000000 100%);
   -webkit-background-clip: text;
@@ -177,24 +179,30 @@ h1::after {
 }
 
 .theme-toggle-fixed .theme-toggle {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-border);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--accent-color);
+  color: var(--accent-color);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: var(--transition);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 
 .theme-toggle-fixed .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--accent-color);
+  color: var(--text-primary);
+  box-shadow: 0 8px 30px rgba(255, 107, 107, 0.7);
   transform: scale(1.1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle-fixed .theme-toggle:active {
+  transform: scale(0.95);
 }
 
 .theme-toggle-fixed .theme-icon {
@@ -422,4 +430,331 @@ html {
 .navbar div:focus {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  padding: 0.5rem 2rem 2rem 2rem; /* Reduced top padding */
+  margin-top: 0;
+  min-height: auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 0; /* Ensure no extra space on top */
+}
+
+
+.dashboard-tab {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  margin-bottom: 0;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  font-size: 0.85rem; /* Adjust font size to fit text */
+  padding: 0.8rem 1rem; /* Reduce padding to fit content */
+  height: 180px; /* Slightly reduce height to avoid scroll */
+  overflow: hidden; /* Hide scroll */
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Break long words */
+}
+
+.dashboard-tab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust tab content scroll */
+.tab-content {
+  overflow-y: auto;
+  max-height: 160px;
+  padding-right: 0.5rem;
+}
+
+.tab-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Scrollbar for tab content */
+.tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Timetable Grid */
+.timetable-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.day-column {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.day-column h3 {
+  text-align: center;
+  margin-bottom: 0.8rem;
+  color: var(--accent-color);
+  font-size: 1rem;
+}
+
+.time-slot {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.6rem;
+  margin: 0.3rem 0;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  cursor: grab;
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.time-slot:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(3px);
+}
+
+/* Notifications */
+.notifications-list {
+  margin-bottom: 1rem;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 0.8rem;
+  border: 1px solid var(--glass-border);
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+  margin-right: 0.8rem;
+}
+
+.notification-content p {
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.notification-content small {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+/* Emoji Picker */
+.emoji-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.emoji-category h4 {
+  color: var(--accent-color);
+  margin-bottom: 0.8rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+}
+
+.emoji {
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.emoji:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.selected-emoji {
+  text-align: center;
+  font-size: 1rem;
+}
+
+#current-moji {
+  font-size: 1.5rem;
+  vertical-align: middle;
+}
+
+/* Streaks & Rewards */
+.streak-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.streak-display {
+  text-align: center;
+}
+
+.streak-count {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+  height: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.progress-fill {
+  background: var(--accent-color);
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+
+.achievements {
+  text-align: center;
+}
+
+.achievements h4 {
+  color: var(--accent-color);
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+.achievement-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 0.8rem;
+  margin: 0.3rem;
+  border-radius: 15px;
+  border: 1px solid var(--glass-border);
+  font-size: 0.8rem;
+}
+
+/* Buttons */
+.add-schedule-btn,
+.set-reminder-btn {
+  background: var(--accent-color);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: block;
+  margin: 0 auto;
+  font-size: 0.9rem;
+}
+
+.add-schedule-btn:hover,
+.set-reminder-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+}
+
+/* Light Mode Adjustments */
+body.light-mode .dashboard-tab,
+body.light-mode .day-column,
+body.light-mode .time-slot,
+body.light-mode .notification,
+body.light-mode .emoji,
+body.light-mode .achievement-badge {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .time-slot:hover,
+body.light-mode .emoji:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body.light-mode .progress-bar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design for Dashboard */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dashboard-tab {
+    height: auto;
+    min-height: 180px;
+  }
+  
+  .timetable-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .streak-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .emoji-picker {
+    grid-template-columns: 1fr;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tab-content h2 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-tab {
+    padding: 0.8rem;
+  }
+  
+  .day-column {
+    padding: 0.8rem;
+  }
+  
+  .streak-count {
+    font-size: 1.5rem;
+  }
+  
+  .emoji {
+    font-size: 1.2rem;
+  }
 }
