@@ -3,114 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign In Page</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      height: 100vh;
-      background: linear-gradient(135deg, #f5af19, #f12711);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .signin-container {
-      background-color: white;
-      padding: 40px 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .signin-container h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      color: #444;
-      font-weight: 500;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .buttons input[type="submit"],
-    .buttons a {
-      flex: 1;
-      text-align: center;
-      padding: 12px;
-      background-color: #4a90e2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .buttons input[type="submit"]:hover,
-    .buttons a:hover {
-      background-color: #357ABD;
-    }
-
-    .more-options {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    select {
-      padding: 8px;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 13px;
-      color: #777;
-    }
-  </style>
+  <title>Sign In - NeuroSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="auth-page">
+  <!-- Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
 
+  <!-- Auth Navbar -->
+  <div class="auth-navbar">
+    <div class="logo-text">NeuroSync</div>
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </div>
+
+  <!-- Theme Toggle -->
   <div class="theme-toggle-fixed" id="themeToggleFixed">
     <button class="theme-toggle" id="themeToggle">
       <span class="theme-icon">🌙</span>
     </button>
   </div>
 
-  <div class="signin-container">
+  <!-- Sign In Container -->
+  <div class="auth-container">
     <h2>Sign In</h2>
     <form>
       <div class="form-group">
@@ -123,9 +51,9 @@
         <input type="password" id="password" name="password" required placeholder="Enter your password" />
       </div>
 
-      <div class="buttons">
-        <input type="submit" value="Sign In" />
-        <a href="signup.html">Sign Up</a>
+      <div class="auth-buttons">
+        <button type="submit" class="auth-btn primary">Sign In</button>
+        <a href="login page.html" class="auth-btn secondary">Log In</a>
       </div>
 
       <div class="more-options">
@@ -137,10 +65,41 @@
         </select>
       </div>
     </form>
-    <div class="footer">
+    <div class="auth-footer">
       &copy; 2025 NeuroSync. All rights reserved.
     </div>
   </div>
 
+  <script>
+    // Dark Mode Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+
+    // Set initial theme
+    if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeIcon.textContent = '🌙';
+    }
+
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  </script>
 </body>
 </html>

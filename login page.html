@@ -3,173 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login Page</title>
-  <style>
-    /* Reset styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      height: 100vh;
-      background: linear-gradient(135deg, #74ebd5, #acb6e5);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .login-container {
-      background-color: white;
-      padding: 40px 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .login-container h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      color: #444;
-      font-weight: 500;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    input[type="submit"] {
-      width: 100%;
-      padding: 12px;
-      background-color: #4a90e2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #357ABD;
-    }
-
-    .more-options {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    select {
-      padding: 8px;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 13px;
-      color: #777;
-    }
-
-    /* Dark Mode Toggle Styles */
-    .theme-toggle-fixed {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-
-    .theme-toggle {
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .theme-toggle:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Dark Mode Styles */
-    body.light-mode {
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-    }
-
-    body.light-mode .login-container {
-      background-color: #2d3748;
-      color: #e2e8f0;
-    }
-
-    body.light-mode .login-container h2 {
-      color: #e2e8f0;
-    }
-
-    body.light-mode label {
-      color: #cbd5e0;
-    }
-
-    body.light-mode input[type="email"],
-    body.light-mode input[type="password"],
-    body.light-mode select {
-      background-color: #4a5568;
-      border-color: #718096;
-      color: #e2e8f0;
-    }
-
-    body.light-mode input[type="email"]::placeholder,
-    body.light-mode input[type="password"]::placeholder {
-      color: #a0aec0;
-    }
-
-    body.light-mode .footer {
-      color: #a0aec0;
-    }
-
-    body.light-mode .theme-toggle {
-      background: rgba(45, 55, 72, 0.9);
-    }
-  </style>
+  <title>Log In - NeuroSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="auth-page">
+  <!-- Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
 
+  <!-- Auth Navbar -->
+  <div class="auth-navbar">
+    <div class="logo-text">NeuroSync</div>
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </div>
+
+  <!-- Theme Toggle -->
   <div class="theme-toggle-fixed" id="themeToggleFixed">
     <button class="theme-toggle" id="themeToggle">
       <span class="theme-icon">🌙</span>
     </button>
   </div>
 
-  <div class="login-container">
-    <h2>Login</h2>
+  <!-- Log In Container -->
+  <div class="auth-container">
+    <h2>Log In</h2>
     <form>
       <div class="form-group">
         <label for="email">Email ID</label>
@@ -181,7 +51,10 @@
         <input type="password" id="password" name="password" required placeholder="Enter your password" />
       </div>
 
-      <input type="submit" value="Login" />
+      <div class="auth-buttons">
+        <button type="submit" class="auth-btn primary">Log In</button>
+        <a href="sign-in page.html" class="auth-btn secondary">Sign In</a>
+      </div>
 
       <div class="more-options">
         <label for="more">More Options</label>
@@ -193,10 +66,41 @@
         </select>
       </div>
     </form>
-    <div class="footer">
-      &copy; 2025 YourCompany. All rights reserved.
+    <div class="auth-footer">
+      &copy; 2025 NeuroSync. All rights reserved.
     </div>
   </div>
 
+  <script>
+    // Dark Mode Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+
+    // Set initial theme
+    if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeIcon.textContent = '🌙';
+    }
+
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  </script>
 </body>
 </html>
