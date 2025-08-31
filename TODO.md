@@ -1,21 +1,17 @@
-# Firebase Integration TODO
+# Background Styles Enhancement Plan
 
-## Steps to Complete:
-- [x] Add Firebase SDK CDN scripts to index.html head section
-- [x] Add Firebase configuration and initialization code
-- [x] Initialize Firebase Analytics
-- [x] Add error handling for Firebase initialization
-- [x] Test Firebase setup in browser
+## Tasks
+- [x] Add more particle divs to index.html (increase from 10 to 25)
+- [x] Update particle styles in style.css with variations (sizes, colors, animations)
+- [ ] Add background pattern overlay
+- [ ] Add animated geometric shapes
+- [ ] Enhance gradient with dynamic animations
+- [ ] Test the enhanced background in browser
 
-## Files to Modify:
-- index.html (main application file)
+# Mood Selection Feature
 
-## Dependencies:
-- Firebase SDK v12.2.1 (via CDN)
-- Firebase Analytics
-
-## Configuration:
-- Using provided Firebase config:
-  - Project: neurosyc-5173b
-  - App ID: 1:855780859936:web:3044309100db9a61fa1c45
-  - Measurement ID: G-75S5GWYEDK
+## Tasks
+- [x] Add mood selection section in index.html with buttons for each mood image from "Feelings images"
+- [x] Add JavaScript in index.html to handle mood button clicks and show tips
+- [x] Add styles in style.css for mood buttons
+- [ ] Test mood selection buttons and tip display in browser
