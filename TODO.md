@@ -1,17 +1,11 @@
-# Background Styles Enhancement Plan
+# TODO: Add Logo Everywhere and Before Header in Index
 
 ## Tasks
-- [x] Add more particle divs to index.html (increase from 10 to 25)
-- [x] Update particle styles in style.css with variations (sizes, colors, animations)
-- [ ] Add background pattern overlay
-- [ ] Add animated geometric shapes
-- [ ] Enhance gradient with dynamic animations
-- [ ] Test the enhanced background in browser
-
-# Mood Selection Feature
-
-## Tasks
-- [x] Add mood selection section in index.html with buttons for each mood image from "Feelings images"
-- [x] Add JavaScript in index.html to handle mood button clicks and show tips
-- [x] Add styles in style.css for mood buttons
-- [ ] Test mood selection buttons and tip display in browser
+- [x] Update public/style.css to style logo images (set width/height, responsive)
+- [x] Update public/index.html: Add logo before h1 in hero, replace navbar logo text with image
+- [x] Update public/login page.html: Replace navbar logo text with image
+- [x] Update public/sign-in page.html: Replace navbar logo text with image
+- [x] Update public/mood-selection.html: Replace navbar logo text with image
+- [ ] Test changes by opening index.html in browser
+- [ ] Verify logo appears in all pages' navbars
+- [ ] Ensure responsive design on different screen sizes
