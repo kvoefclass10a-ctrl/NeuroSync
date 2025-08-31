@@ -140,6 +140,8 @@ h1::after {
   box-sizing: border-box;
 }
 
+
+
 /* NeuroSync Logo Image */
 .nav-logo.logo-text {
   font-family: 'Story Script', cursive;
@@ -158,6 +160,12 @@ h1::after {
   transition: var(--transition);
   height: 100%;
   line-height: 2.5rem;
+}
+
+.nav-logo img {
+  height: 2.5rem;
+  width: auto;
+  object-fit: contain;
 }
 
 .nav-logo.logo-text:hover {
