@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics-compat.js"></script>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="hero">
+    <h1>NeuroSync</h1>
+    <div class="arms">
+      <div><a href="mood-selection.html" style="color: inherit; text-decoration: none;">Mood Selection</a></div>
+      <div>Study Material</div>
+      <div>Feedback Us</div>
+      <div>Dashboard</div>
+      <div>Upload</div>
+      <div>Score</div>
+    </div>
+  </div>
+
+  <div class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-text">NeuroSync</span>
+    </div>
+    <div><a href="mood-selection.html" style="color: inherit; text-decoration: none;">Mood</a></div>
+    <div>Study</div>
+    <div>Feedback</div>
+    <div>Dashboard</div>
+    <div>Upload</div>
+    <div>Score</div>
+   <!-- Inside index.html -->
+<div class="nav-auth">
+    <a href="sign-in page.html" class="auth-btn sign-in">Sign In</a>
+    <a href="login page.html" class="auth-btn login">Log In</a>
+</div>
+
+  </div>
+
+  <!-- Dashboard Sections -->
+  <div class="dashboard-container">
+    <!-- Weekly Timetable & Target Planner -->
+    <section class="dashboard-tab" id="timetable" onclick="window.location.href='student-planner.html'" style="cursor: pointer;">
+      <div class="tab-content">
+        <h2>📅 Weekly Timetable & Target Planner</h2>
+        <div class="timetable-grid">
+          <div class="day-column">
+            <h3>Monday</h3>
+            <div class="time-slot" draggable="true">Math - 9:00 AM</div>
+            <div class="time-slot" draggable="true">Physics - 11:00 AM</div>
+          </div>
+          <div class="day-column">
+            <h3>Tuesday</h3>
+            <div class="time-slot" draggable="true">Chemistry - 10:00 AM</div>
+            <div class="time-slot" draggable="true">Biology - 2:00 PM</div>
+          </div>
+          <div class="day-column">
+            <h3>Wednesday</h3>
+            <div class="time-slot" draggable="true">Revision - 9:00 AM</div>
+          </div>
+          <div class="day-column">
+            <h3>Thursday</h3>
+            <div class="time-slot" draggable="true">Practice Tests - 11:00 AM</div>
+          </div>
+          <div class="day-column">
+            <h3>Friday</h3>
+            <div class="time-slot" draggable="true">Weekly Review - 3:00 PM</div>
+          </div>
+        </div>
+        <button class="add-schedule-btn">+ Add Schedule</button>
+      </div>
+    </section>
+
+    <!-- Notifications & Study Reminders -->
+    <section class="dashboard-tab" id="notifications">
+      <div class="tab-content">
+        <h2>🔔 Notifications & Study Reminders</h2>
+        <div class="notifications-list">
+          <div class="notification">
+            <span class="notification-icon">⏰</span>
+            <div class="notification-content">
+              <p>Math class starts in 15 minutes</p>
+              <small>Today, 8:45 AM</small>
+            </div>
+          </div>
+          <div class="notification">
+            <span class="notification-icon">📚</span>
+            <div class="notification-content">
+              <p>Physics assignment due tomorrow</p>
+              <small>Yesterday, 4:30 PM</small>
+            </div>
+          </div>
+          <div class="notification">
+            <span class="notification-icon">🎯</span>
+            <div class="notification-content">
+              <p>Daily study target: 80% completed</p>
+              <small>2 hours ago</small>
+            </div>
+          </div>
+        </div>
+        <button class="set-reminder-btn">Set New Reminder</button>
+      </div>
+    </section>
+
+    <!-- Customizable Emojis -->
+    <section class="dashboard-tab" id="emojis">
+      <div class="tab-content">
+        <h2>😊 Customizable Emojis</h2>
+        <div class="emoji-picker">
+          <div class="emoji-category">
+            <h4>Study Mood</h4>
+            <div class="emoji-grid">
+              <span class="emoji" data-emoji="😊">😊</span>
+              <span class="emoji" data-emoji="😎">😎</span>
+              <span class="emoji" data-emoji="🤓">🤓</span>
+              <span class="emoji" data-emoji="🧠">🧠</span>
+            </div>
+          </div>
+          <div class="emoji-category">
+            <h4>Progress</h4>
+            <div class="emoji-grid">
+              <span class="emoji" data-emoji="⭐">⭐</span>
+              <span class="emoji" data-emoji="🚀">🚀</span>
+              <span class="emoji" data-emoji="🎯">🎯</span>
+              <span class="emoji" data-emoji="🏆">🏆</span>
+            </div>
+          </div>
+        </div>
+        <div class="selected-emoji">
+          <p>Current Mood: <span id="current-moji">😊</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Streaks & Rewards System -->
+    <section class="dashboard-tab" id="rewards">
+      <div class="tab-content">
+        <h2>🔥 Streaks & Rewards System</h2>
+        <div class="streak-container">
+          <div class="streak-display">
+            <div class="streak-count">7</div>
+            <p>Day Streak</p>
+          </div>
+          <div class="rewards-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 70%;"></div>
+            </div>
+            <p>70% to next reward</p>
+          </div>
+        </div>
+        <div class="achievements">
+          <h4>Recent Achievements</h4>
+          <div class="achievement-badge">🎓 Study Master</div>
+          <div class="achievement-badge">⏰ Early Bird</div>
+          <div class="achievement-badge">📚 Bookworm</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="theme-toggle-fixed" id="themeToggleFixed">
+    <button class="theme-toggle" id="themeToggle">
+      <span class="theme-icon">🌙</span>
+    </button>
+  </div>
+
+  <script>
+    // Firebase Configuration and Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+      authDomain: "neurosync-5173b.firebaseapp.com",
+      projectId: "neurosync-5173b",
+      storageBucket: "neurosync-5173b.firebasestorage.app",
+      messagingSenderId: "855780859936",
+      appId: "1:855780859936:web:3044309100db9a61fa1c45",
+      measurementId: "G-75S5GWYEDK"
+    };
+
+    // Initialize Firebase
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      const analytics = firebase.analytics();
+      console.log('Firebase initialized successfully');
+      
+      // Log app initialization event
+      analytics.logEvent('app_initialized');
+      
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
+    // Dark Mode Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+    
+    // Set initial theme
+    if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeIcon.textContent = '🌙';
+    }
+    
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+      
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar.classList.add('active');
+      } else {
+        navbar.classList.remove('active');
+      }
+    });
+    
+    // Emoji selection functionality
+    const emojis = document.querySelectorAll('.emoji');
+    const currentMoji = document.getElementById('current-moji');
+    
+    emojis.forEach(emoji => {
+      emoji.addEventListener('click', () => {
+        const selectedEmoji = emoji.getAttribute('data-emoji');
+        currentMoji.textContent = selectedEmoji;
+        
+        // Add visual feedback
+        emojis.forEach(e => e.style.transform = 'scale(1)');
+        emoji.style.transform = 'scale(1.3)';
+        emoji.style.background = 'rgba(255, 255, 255, 0.3)';
+      });
+    });
+    
+    // Time slot drag functionality
+    const timeSlots = document.querySelectorAll('.time-slot');
+    timeSlots.forEach(slot => {
+      slot.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', slot.textContent);
+        setTimeout(() => slot.style.opacity = '0.4', 0);
+      });
+      
+      slot.addEventListener('dragend', () => {
+        slot.style.opacity = '1';
+      });
+      
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        slot.textContent = data;
+      });
+    });
+  </script>
+</body>
+</html>
