@@ -479,14 +479,15 @@ html {
 
 /* Planner Section */
 .planner-section {
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255, 255, 255, 0.05) 100%);
   backdrop-filter: blur(15px);
-  border: 1px solid var(--glass-border);
+  border: 2px solid var(--glass-border);
   border-radius: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: var(--transition);
   padding: 1.5rem;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .planner-section:hover {
@@ -496,10 +497,21 @@ html {
 
 /* Section Content */
 .section-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin-bottom: 1rem;
-  color: var(--text-primary);
+  color: var(--accent-color);
   text-align: center;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  border-bottom: 3px solid var(--accent-color);
+  padding-bottom: 0.3rem;
+  letter-spacing: 1px;
+  transition: var(--transition);
+}
+
+.section-content h2:hover {
+  color: #ff8787;
+  border-color: #ff8787;
 }
 
 
@@ -571,7 +583,15 @@ html {
   text-align: center;
   margin-bottom: 0.8rem;
   color: var(--accent-color);
-  font-size: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  letter-spacing: 0.5px;
 }
 
 .time-slot {
@@ -583,11 +603,16 @@ html {
   cursor: grab;
   transition: var(--transition);
   font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: center;
 }
 
 .time-slot:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Notifications */
@@ -741,6 +766,28 @@ html {
 
 .add-schedule-btn:hover,
 .set-reminder-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+}
+
+/* Add Task and Deadline Buttons */
+.add-task-btn,
+.add-deadline-btn {
+  background: var(--accent-color);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: block;
+  margin: 0 auto;
+  font-size: 0.9rem;
+}
+
+.add-task-btn:hover,
+.add-deadline-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
 }
