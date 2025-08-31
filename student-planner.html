@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Planner - NeuroSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics-compat.js"></script>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="hero">
+    <h1>Student Planner</h1>
+    <div class="arms">
+      <div><a href="index.html" style="color: inherit; text-decoration: none;">Home</a></div>
+      <div>Task Scheduler</div>
+      <div>Deadline Tracker</div>
+      <div>Progress Monitor</div>
+      <div>Recommendations</div>
+      <div>Settings</div>
+    </div>
+  </div>
+
+  <div class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-text">NeuroSync</span>
+    </div>
+    <div><a href="index.html" style="color: inherit; text-decoration: none;">Home</a></div>
+    <div>Tasks</div>
+    <div>Deadlines</div>
+    <div>Progress</div>
+    <div>Recs</div>
+    <div>Settings</div>
+   <!-- Inside student-planner.html -->
+<div class="nav-auth">
+    <a href="sign-in page.html" class="auth-btn sign-in">Sign In</a>
+    <a href="login page.html" class="auth-btn login">Log In</a>
+</div>
+
+  </div>
+
+  <!-- Planner Container -->
+  <div class="planner-container">
+    <!-- Task Scheduling -->
+    <section class="planner-section" id="scheduler">
+      <div class="section-content">
+        <h2>📅 Task Scheduler</h2>
+        <div class="scheduler-grid">
+          <div class="day-column">
+            <h3>Monday</h3>
+            <div class="task-slot" draggable="true" data-priority="medium">Math Homework - 2:00 PM</div>
+            <div class="task-slot" draggable="true" data-priority="high">Physics Lab - 4:00 PM</div>
+          </div>
+          <div class="day-column">
+            <h3>Tuesday</h3>
+            <div class="task-slot" draggable="true" data-priority="low">Reading - 1:00 PM</div>
+            <div class="task-slot" draggable="true" data-priority="medium">Chemistry Quiz Prep - 3:00 PM</div>
+          </div>
+          <div class="day-column">
+            <h3>Wednesday</h3>
+            <div class="task-slot" draggable="true" data-priority="high">Project Meeting - 10:00 AM</div>
+          </div>
+          <div class="day-column">
+            <h3>Thursday</h3>
+            <div class="task-slot" draggable="true" data-priority="medium">Study Group - 2:00 PM</div>
+          </div>
+          <div class="day-column">
+            <h3>Friday</h3>
+            <div class="task-slot" draggable="true" data-priority="low">Review Notes - 11:00 AM</div>
+          </div>
+          <div class="day-column">
+            <h3>Weekend</h3>
+            <div class="task-slot" draggable="true" data-priority="medium">Weekend Review - 10:00 AM</div>
+          </div>
+        </div>
+        <button class="add-task-btn" onclick="openAddTaskModal()">+ Add New Task</button>
+      </div>
+    </section>
+
+    <!-- Deadline Tracking -->
+    <section class="planner-section" id="deadlines">
+      <div class="section-content">
+        <h2>⏰ Deadline Tracker</h2>
+        <div class="deadline-table">
+          <div class="deadline-header">
+            <span>Task</span>
+            <span>Deadline</span>
+            <span>Priority</span>
+            <span>Status</span>
+          </div>
+          <div class="deadline-row">
+            <span>Math Assignment</span>
+            <span>2024-01-15</span>
+            <span class="priority-high">High</span>
+            <span class="status-pending">Pending</span>
+          </div>
+          <div class="deadline-row">
+            <span>Physics Project</span>
+            <span>2024-01-20</span>
+            <span class="priority-medium">Medium</span>
+            <span class="status-in-progress">In Progress</span>
+          </div>
+          <div class="deadline-row">
+            <span>Chemistry Lab Report</span>
+            <span>2024-01-18</span>
+            <span class="priority-low">Low</span>
+            <span class="status-completed">Completed</span>
+          </div>
+        </div>
+        <button class="add-deadline-btn" onclick="openAddDeadlineModal()">+ Add Deadline</button>
+      </div>
+    </section>
+
+    <!-- Priority Levels -->
+    <section class="planner-section" id="priorities">
+      <div class="section-content">
+        <h2>🚨 Priority Levels</h2>
+        <div class="priority-list">
+          <div class="priority-group">
+            <h4>🔴 High Priority</h4>
+            <ul>
+              <li>Math Assignment - Due tomorrow</li>
+              <li>Physics Lab Report - Due in 2 days</li>
+            </ul>
+          </div>
+          <div class="priority-group">
+            <h4>🟡 Medium Priority</h4>
+            <ul>
+              <li>Chemistry Quiz Prep - Due in 3 days</li>
+              <li>Study Group Meeting - This week</li>
+            </ul>
+          </div>
+          <div class="priority-group">
+            <h4>🟢 Low Priority</h4>
+            <ul>
+              <li>Reading Assignment - Due next week</li>
+              <li>Extra Practice - Ongoing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress Tracking -->
+    <section class="planner-section" id="progress">
+      <div class="section-content">
+        <h2>📊 Progress Tracking</h2>
+        <div class="progress-items">
+          <div class="progress-item">
+            <h4>Math Course</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+            <p>75% Complete</p>
+          </div>
+          <div class="progress-item">
+            <h4>Physics Course</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 60%;"></div>
+            </div>
+            <p>60% Complete</p>
+          </div>
+          <div class="progress-item">
+            <h4>Chemistry Course</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 85%;"></div>
+            </div>
+            <p>85% Complete</p>
+          </div>
+          <div class="progress-item">
+            <h4>Overall Study Goal</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 70%;"></div>
+            </div>
+            <p>70% Complete</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personalized Recommendations -->
+    <section class="planner-section" id="recommendations">
+      <div class="section-content">
+        <h2>💡 Personalized Recommendations</h2>
+        <div class="recommendations-list">
+          <div class="recommendation">
+            <span class="rec-icon">📚</span>
+            <div class="rec-content">
+              <p>Based on your progress, focus more on Physics this week.</p>
+              <small>AI Recommendation</small>
+            </div>
+          </div>
+          <div class="recommendation">
+            <span class="rec-icon">⏰</span>
+            <div class="rec-content">
+              <p>Schedule breaks every 45 minutes to maintain focus.</p>
+              <small>Productivity Tip</small>
+            </div>
+          </div>
+          <div class="recommendation">
+            <span class="rec-icon">🎯</span>
+            <div class="rec-content">
+              <p>You're doing great! Keep up the momentum with daily goals.</p>
+              <small>Motivational Message</small>
+            </div>
+          </div>
+          <div class="recommendation">
+            <span class="rec-icon">📖</span>
+            <div class="rec-content">
+              <p>Try active recall techniques for better retention.</p>
+              <small>Study Method</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Additional Feature: Study Timer -->
+    <section class="planner-section" id="timer">
+      <div class="section-content">
+        <h2>⏱️ Study Timer</h2>
+        <div class="timer-container">
+          <div class="timer-display">
+            <span id="timer-minutes">25</span>:<span id="timer-seconds">00</span>
+          </div>
+          <div class="timer-controls">
+            <button id="start-timer" class="timer-btn">Start</button>
+            <button id="pause-timer" class="timer-btn">Pause</button>
+            <button id="reset-timer" class="timer-btn">Reset</button>
+          </div>
+          <div class="timer-modes">
+            <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
+            <button class="mode-btn" data-mode="short-break">Short Break</button>
+            <button class="mode-btn" data-mode="long-break">Long Break</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Additional Feature: Notes Section -->
+    <section class="planner-section" id="notes">
+      <div class="section-content">
+        <h2>📝 Quick Notes</h2>
+        <div class="notes-container">
+          <textarea id="notes-textarea" placeholder="Jot down your thoughts, ideas, or reminders..."></textarea>
+          <button class="save-notes-btn">Save Notes</button>
+        </div>
+        <div class="saved-notes">
+          <h4>Saved Notes</h4>
+          <div class="note-item">
+            <p>Remember to review chapter 5 formulas</p>
+            <small>Today, 10:30 AM</small>
+          </div>
+          <div class="note-item">
+            <p>Group study session tomorrow at 3 PM</p>
+            <small>Yesterday, 4:15 PM</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modals for Adding Tasks and Deadlines -->
+  <div id="add-task-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddTaskModal()">&times;</span>
+      <h3>Add New Task</h3>
+      <form id="add-task-form">
+        <div class="form-group">
+          <label for="task-name">Task Name:</label>
+          <input type="text" id="task-name" required>
+        </div>
+        <div class="form-group">
+          <label for="task-day">Day:</label>
+          <select id="task-day" required>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="weekend">Weekend</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="task-time">Time:</label>
+          <input type="time" id="task-time" required>
+        </div>
+        <div class="form-group">
+          <label for="task-priority">Priority:</label>
+          <select id="task-priority" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">Add Task</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="add-deadline-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddDeadlineModal()">&times;</span>
+      <h3>Add New Deadline</h3>
+      <form id="add-deadline-form">
+        <div class="form-group">
+          <label for="deadline-name">Task Name:</label>
+          <input type="text" id="deadline-name" required>
+        </div>
+        <div class="form-group">
+          <label for="deadline-date">Deadline Date:</label>
+          <input type="date" id="deadline-date" required>
+        </div>
+        <div class="form-group">
+          <label for="deadline-priority">Priority:</label>
+          <select id="deadline-priority" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">Add Deadline</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="theme-toggle-fixed" id="themeToggleFixed">
+    <button class="theme-toggle" id="themeToggle">
+      <span class="theme-icon">🌙</span>
+    </button>
+  </div>
+
+  <script>
+    // Firebase Configuration and Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+      authDomain: "neurosync-5173b.firebaseapp.com",
+      projectId: "neurosync-5173b",
+      storageBucket: "neurosync-5173b.firebasestorage.app",
+      messagingSenderId: "855780859936",
+      appId: "1:855780859936:web:3044309100db9a61fa1c45",
+      measurementId: "G-75S5GWYEDK"
+    };
+
+    // Initialize Firebase
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      const analytics = firebase.analytics();
+      console.log('Firebase initialized successfully');
+      
+      // Log app initialization event
+      analytics.logEvent('app_initialized');
+      
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
+    // Dark Mode Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+    
+    // Set initial theme
+    if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeIcon.textContent = '🌙';
+    }
+    
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+      
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar.classList.add('active');
+      } else {
+        navbar.classList.remove('active');
+      }
+    });
+
+    // Task slot drag functionality
+    const taskSlots = document.querySelectorAll('.task-slot');
+    taskSlots.forEach(slot => {
+      slot.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', slot.textContent);
+        setTimeout(() => slot.style.opacity = '0.4', 0);
+      });
+      
+      slot.addEventListener('dragend', () => {
+        slot.style.opacity = '1';
+      });
+      
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        slot.textContent = data;
+      });
+    });
+
+    // Modal functions
+    function openAddTaskModal() {
+      document.getElementById('add-task-modal').style.display = 'block';
+    }
+
+    function closeAddTaskModal() {
+      document.getElementById('add-task-modal').style.display = 'none';
+    }
+
+    function openAddDeadlineModal() {
+      document.getElementById('add-deadline-modal').style.display = 'block';
+    }
+
+    function closeAddDeadlineModal() {
+      document.getElementById('add-deadline-modal').style.display = 'none';
+    }
+
+    // Add task form submission
+    document.getElementById('add-task-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const taskName = document.getElementById('task-name').value;
+      const taskDay = document.getElementById('task-day').value;
+      const taskTime = document.getElementById('task-time').value;
+      const taskPriority = document.getElementById('task-priority').value;
+      
+      // Create new task slot
+      const newTask = document.createElement('div');
+      newTask.className = 'task-slot';
+      newTask.draggable = true;
+      newTask.setAttribute('data-priority', taskPriority);
+      newTask.textContent = `${taskName} - ${taskTime}`;
+      
+      // Add drag functionality
+      newTask.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', newTask.textContent);
+        setTimeout(() => newTask.style.opacity = '0.4', 0);
+      });
+      
+      newTask.addEventListener('dragend', () => {
+        newTask.style.opacity = '1';
+      });
+      
+      // Add to appropriate day column
+      const dayColumn = document.querySelector(`.day-column h3:contains('${taskDay.charAt(0).toUpperCase() + taskDay.slice(1)}')`).parentElement;
+      dayColumn.appendChild(newTask);
+      
+      // Reset form and close modal
+      e.target.reset();
+      closeAddTaskModal();
+    });
+
+    // Add deadline form submission
+    document.getElementById('add-deadline-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const deadlineName = document.getElementById('deadline-name').value;
+      const deadlineDate = document.getElementById('deadline-date').value;
+      const deadlinePriority = document.getElementById('deadline-priority').value;
+      
+      // Create new deadline row
+      const newRow = document.createElement('div');
+      newRow.className = 'deadline-row';
+      newRow.innerHTML = `
+        <span>${deadlineName}</span>
+        <span>${deadlineDate}</span>
+        <span class="priority-${deadlinePriority}">${deadlinePriority.charAt(0).toUpperCase() + deadlinePriority.slice(1)}</span>
+        <span class="status-pending">Pending</span>
+      `;
+      
+      document.querySelector('.deadline-table').appendChild(newRow);
+      
+      // Reset form and close modal
+      e.target.reset();
+      closeAddDeadlineModal();
+    });
+
+    // Study Timer functionality
+    let timerInterval;
+    let timerMinutes = 25;
+    let timerSeconds = 0;
+    let isRunning = false;
+
+    const timerMinutesEl = document.getElementById('timer-minutes');
+    const timerSecondsEl = document.getElementById('timer-seconds');
+    const startBtn = document.getElementById('start-timer');
+    const pauseBtn = document.getElementById('pause-timer');
+    const resetBtn = document.getElementById('reset-timer');
+    const modeBtns = document.querySelectorAll('.mode-btn');
+
+    function updateTimerDisplay() {
+      timerMinutesEl.textContent = timerMinutes.toString().padStart(2, '0');
+      timerSecondsEl.textContent = timerSeconds.toString().padStart(2, '0');
+    }
+
+    function startTimer() {
+      if (!isRunning) {
+        isRunning = true;
+        timerInterval = setInterval(() => {
+          if (timerSeconds === 0) {
+            if (timerMinutes === 0) {
+              clearInterval(timerInterval);
+              isRunning = false;
+              alert('Timer finished!');
+              return;
+            }
+            timerMinutes--;
+            timerSeconds = 59;
+          } else {
+            timerSeconds--;
+          }
+          updateTimerDisplay();
+        }, 1000);
+      }
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      timerMinutes = 25;
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function changeMode(mode) {
+      modeBtns.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      switch(mode) {
+        case 'pomodoro':
+          timerMinutes = 25;
+          break;
+        case 'short-break':
+          timerMinutes = 5;
+          break;
+        case 'long-break':
+          timerMinutes = 15;
+          break;
+      }
+      timerSeconds = 0;
+      updateTimerDisplay();
+      resetTimer();
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => changeMode(btn.getAttribute('data-mode')));
+    });
+
+    // Notes functionality
+    const notesTextarea = document.getElementById('notes-textarea');
+    const saveNotesBtn = document.getElementById('save-notes-btn');
+
+    saveNotesBtn.addEventListener('click', () => {
+      const noteText = notesTextarea.value.trim();
+      if (noteText) {
+        const noteItem = document.createElement('div');
+        noteItem.className = 'note-item';
+        noteItem.innerHTML = `
+          <p>${noteText}</p>
+          <small>${new Date().toLocaleString()}</small>
+        `;
+        document.querySelector('.saved-notes').appendChild(noteItem);
+        notesTextarea.value = '';
+      }
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

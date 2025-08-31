@@ -466,6 +466,42 @@ html {
   margin-top: 0; /* Ensure no extra space on top */
 }
 
+/* Planner Container */
+.planner-container {
+  padding: 2rem;
+  margin-top: 0;
+  min-height: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 0;
+}
+
+/* Planner Section */
+.planner-section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.planner-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Section Content */
+.section-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
 
 .dashboard-tab {
   background: var(--glass-bg);
@@ -715,7 +751,8 @@ body.light-mode .day-column,
 body.light-mode .time-slot,
 body.light-mode .notification,
 body.light-mode .emoji,
-body.light-mode .achievement-badge {
+body.light-mode .achievement-badge,
+body.light-mode .planner-section {
   background: rgba(255, 255, 255, 0.8);
   border-color: rgba(0, 0, 0, 0.1);
 }
