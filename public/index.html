@@ -276,20 +276,26 @@
         e.dataTransfer.setData('text/plain', slot.textContent);
         setTimeout(() => slot.style.opacity = '0.4', 0);
       });
-      
+
       slot.addEventListener('dragend', () => {
         slot.style.opacity = '1';
       });
-      
+
       slot.addEventListener('dragover', (e) => {
         e.preventDefault();
       });
-      
+
       slot.addEventListener('drop', (e) => {
         e.preventDefault();
         const data = e.dataTransfer.getData('text/plain');
         slot.textContent = data;
       });
+    });
+
+    // Navigate to student planner when timetable section is clicked
+    const timetableSection = document.getElementById('timetable');
+    timetableSection.addEventListener('click', () => {
+      window.location.href = 'student-planner.html';
     });
   </script>
 </body>
