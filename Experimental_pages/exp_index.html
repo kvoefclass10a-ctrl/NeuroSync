@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<title>NeuroSync Homepage</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+            --dark-bg: #0C0A15;
+            --dark-bg-secondary: #1A142D;
+            --dark-accent: #9333ea;
+            --dark-accent-secondary: #7e22ce;
+            --dark-border: #2A2140;
+            --dark-text-primary: #FFFFFF;
+            --dark-text-secondary: #E0D1FF;
+            --dark-text-muted: #A492C9;
+            --light-bg: #FFFFFF;
+            --light-bg-secondary: #F0F9FF;
+            --light-accent: #06B6D4;
+            --light-accent-secondary: #0891B2;
+            --light-border: #E0F2FE;
+            --light-text-primary: #0F172A;
+            --light-text-secondary: #334155;
+            --light-text-muted: #64748B;
+        }
+        .dark .bg-primary {
+            background-color: var(--dark-bg);
+        }
+        .dark .bg-secondary {
+            background-color: var(--dark-bg-secondary);
+        }
+        .dark .text-primary {
+            color: var(--dark-text-primary);
+        }
+        .dark .text-secondary {
+            color: var(--dark-text-secondary);
+        }
+        .dark .text-muted {
+            color: var(--dark-text-muted);
+        }
+        .dark .border-primary {
+            border-color: var(--dark-border);
+        }
+        .dark .accent-primary {
+            color: var(--dark-accent);
+        }
+        .dark .accent-gradient {
+            background-image: linear-gradient(to right, var(--dark-accent), var(--dark-accent-secondary));
+        }
+        .dark .bg-accent {
+            background-color: var(--dark-accent);
+        }
+        .dark .bg-accent-secondary {
+            background-color: var(--dark-accent-secondary);
+        }
+        .dark .hover\:text-accent:hover {
+            color: var(--dark-accent);
+        }
+        .dark .hover\:bg-accent-hover:hover {
+            background-color: #3E315E;
+        }
+        .dark .border-accent {
+            border-color: var(--dark-accent);
+        }
+        .dark .shadow-accent {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        }
+        .dark .shadow-accent-lg {
+            box-shadow: 0 10px 15px -3px var(--dark-accent-secondary), 0 4px 6px -4px var(--dark-accent-secondary);
+        }
+        .dark .bg-input {
+            background-color: var(--dark-bg-secondary);
+        }
+        .dark .border-input {
+            border-color: #443267;
+        }
+        .dark .placeholder-color::placeholder {
+            color: #5d458c;
+        }
+        .dark .focus\:ring-accent:focus {
+            --tw-ring-color: var(--dark-accent);
+        }
+        .dark .focus\:border-accent:focus {
+            border-color: var(--dark-accent);
+        }
+        .light .bg-primary {
+            background-color: var(--light-bg);
+        }
+        .light .bg-secondary {
+            background-color: var(--light-bg-secondary);
+        }
+        .light .text-primary {
+            color: var(--light-text-primary);
+        }
+        .light .text-secondary {
+            color: var(--light-text-secondary);
+        }
+        .light .text-muted {
+            color: var(--light-text-muted);
+        }
+        .light .border-primary {
+            border-color: var(--light-border);
+        }
+        .light .accent-primary {
+            color: var(--light-accent);
+        }
+        .light .accent-gradient {
+            background-image: linear-gradient(to right, var(--light-accent), var(--light-accent-secondary));
+        }
+        .light .bg-accent {
+            background-color: var(--light-accent);
+        }
+        .light .bg-accent-secondary {
+            background-color: var(--light-accent-secondary);
+        }
+        .light .hover\:text-accent:hover {
+            color: var(--light-accent);
+        }
+        .light .hover\:bg-accent-hover:hover {
+            background-color: #E0F2FE;
+        }
+        .light .border-accent {
+            border-color: var(--light-accent);
+        }
+        .light .shadow-accent {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        }
+        .light .shadow-accent-lg {
+            box-shadow: 0 10px 15px -3px var(--light-accent-secondary), 0 4px 6px -4px var(--light-accent-secondary);
+        }
+        .light .bg-input {
+            background-color: #F8FAFC;
+        }
+        .light .border-input {
+            border-color: #CBD5E1;
+        }
+        .light .placeholder-color::placeholder {
+            color: #94A3B8;
+        }
+        .light .focus\:ring-accent:focus {
+            --tw-ring-color: var(--light-accent);
+        }
+        .light .focus\:border-accent:focus {
+            border-color: var(--light-accent);
+        }
+        .dark {
+             background: radial-gradient(ellipse at top, #1e113b, #0c0a15 70%);
+        }
+        .translucent-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .translucent-button:hover {
+            background-color: rgba(147, 51, 234, 0.8);
+            border: 1px solid rgba(147, 51, 234, 1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+            color: #FFFFFF;
+        }
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-animation 20s infinite;
+        }
+        @keyframes particle-animation {
+            0% {
+                transform: translate(var(--x-start), var(--y-start)) scale(0);
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x-end), var(--y-end)) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-primary dark">
+<div class="relative flex size-full min-h-screen flex-col dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<div class="absolute inset-0 -z-10 overflow-hidden">
+<div class="particle" style="--x-start: 10vw; --y-start: 20vh; --x-end: 90vw; --y-end: 80vh; width: 2px; height: 2px; animation-delay: 0s;"></div>
+<div class="particle" style="--x-start: 80vw; --y-start: 10vh; --x-end: 20vw; --y-end: 90vh; width: 1px; height: 1px; animation-delay: -1s;"></div>
+<div class="particle" style="--x-start: 5vw; --y-start: 90vh; --x-end: 95vw; --y-end: 5vh; width: 3px; height: 3px; animation-delay: -2s;"></div>
+<div class="particle" style="--x-start: 95vw; --y-start: 85vh; --x-end: 5vw; --y-end: 15vh; width: 2px; height: 2px; animation-delay: -3s;"></div>
+<div class="particle" style="--x-start: 50vw; --y-start: 5vh; --x-end: 50vw; --y-end: 95vh; width: 1px; height: 1px; animation-delay: -4s;"></div>
+<div class="particle" style="--x-start: 25vw; --y-start: 95vh; --x-end: 75vw; --y-end: 5vh; width: 2px; height: 2px; animation-delay: -5s;"></div>
+<div class="particle" style="--x-start: 75vw; --y-start: 5vh; --x-end: 25vw; --y-end: 95vh; width: 1px; height: 1px; animation-delay: -6s;"></div>
+<div class="particle" style="--x-start: 15vw; --y-start: 50vh; --x-end: 85vw; --y-end: 50vh; width: 3px; height: 3px; animation-delay: -7s;"></div>
+<div class="particle" style="--x-start: 85vw; --y-start: 50vh; --x-end: 15vw; --y-end: 50vh; width: 2px; height: 2px; animation-delay: -8s;"></div>
+<div class="particle" style="--x-start: 5vw; --y-start: 5vh; --x-end: 95vw; --y-end: 95vh; width: 1px; height: 1px; animation-delay: -9s;"></div>
+<div class="particle" style="--x-start: 95vw; --y-start: 5vh; --x-end: 5vw; --y-end: 95vh; width: 2px; height: 2px; animation-delay: -10s;"></div>
+<div class="particle" style="--x-start: 30vw; --y-start: 30vh; --x-end: 70vw; --y-end: 70vh; width: 3px; height: 3px; animation-delay: -11s;"></div>
+<div class="particle" style="--x-start: 70vw; --y-start: 30vh; --x-end: 30vw; --y-end: 70vh; width: 1px; height: 1px; animation-delay: -12s;"></div>
+<div class="particle" style="--x-start: 40vw; --y-start: 60vh; --x-end: 60vw; --y-end: 40vh; width: 2px; height: 2px; animation-delay: -13s;"></div>
+<div class="particle" style="--x-start: 60vw; --y-start: 60vh; --x-end: 40vw; --y-end: 40vh; width: 1px; height: 1px; animation-delay: -14s;"></div>
+<div class="particle" style="--x-start: 20vw; --y-start: 70vh; --x-end: 80vw; --y-end: 30vh; width: 3px; height: 3px; animation-delay: -15s;"></div>
+<div class="particle" style="--x-start: 80vw; --y-start: 70vh; --x-end: 20vw; --y-end: 30vh; width: 2px; height: 2px; animation-delay: -16s;"></div>
+<div class="particle" style="--x-start: 10vw; --y-start: 80vh; --x-end: 90vw; --y-end: 20vh; width: 1px; height: 1px; animation-delay: -17s;"></div>
+<div class="particle" style="--x-start: 90vw; --y-start: 80vh; --x-end: 10vw; --y-end: 20vh; width: 2px; height: 2px; animation-delay: -18s;"></div>
+<div class="particle" style="--x-start: 50vw; --y-start: 50vh; --x-end: 50vw; --y-end: 50vh; width: 3px; height: 3px; animation-delay: -19s;"></div>
+</div>
+<div class="layout-container flex h-full grow flex-col bg-transparent">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+<div class="flex items-center gap-3 text-primary">
+<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+</div>
+<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="#">Home</a>
+<a href="Exp_dashboard_home.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">
+<span>Dashboard</span>
+</a>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Resources</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Study Material</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
+</div>
+</div>
+</div>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Company</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Feedback Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</nav>
+<script>
+function openDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.remove('hidden');
+    dropdown.classList.add('block');
+  }
+}
+
+function closeDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+    dropdown.classList.remove('block');
+  }
+}
+
+// Also add click functionality for better UX
+document.addEventListener('DOMContentLoaded', function() {
+  const dropdownButtons = document.querySelectorAll('.relative.group button');
+  dropdownButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.parentElement.querySelector('.absolute');
+      if (dropdown) {
+        if (dropdown.classList.contains('hidden')) {
+          // Close other dropdowns first
+          document.querySelectorAll('.absolute').forEach(d => {
+            d.classList.add('hidden');
+            d.classList.remove('block');
+          });
+          // Open this dropdown
+          dropdown.classList.remove('hidden');
+          dropdown.classList.add('block');
+        } else {
+          // Close this dropdown
+          dropdown.classList.add('hidden');
+          dropdown.classList.remove('block');
+        }
+      }
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative.group')) {
+      document.querySelectorAll('.absolute').forEach(dropdown => {
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('block');
+      });
+    }
+  });
+});
+</script>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<span class="truncate">Get Started</span>
+</button>
+<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-1">
+<section class="relative text-center py-24 px-4 bg-transparent">
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.2), transparent 70%);"></div>
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+<div class="relative z-10 max-w-4xl mx-auto">
+<h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter text-primary animate-fade-in-down" style='font-family: "Story Script", sans-serif; text-shadow: rgba(147, 51, 234, 0.5) 0px 0px 15px, rgba(147, 51, 234, 0.3) 0px 0px 25px;'>NeuroSync</h1>
+<p class="mt-4 text-lg md:text-xl text-secondary max-w-2xl mx-auto">AI-Powered Focus &amp; Mental Wellbeing Companion for Students</p>
+<div class="mt-10 flex flex-wrap gap-4 justify-center">
+<a class="translucent-button flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 text-lg font-bold" href="Exp_Login.html">
+<span class="truncate">Create Free Account</span>
+</a>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-transparent">
+<div class="max-w-6xl mx-auto">
+<div class="text-center mb-12">
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">Track Your Mood &amp; Focus</h2>
+<p class="mt-2 text-lg text-muted">Log your feelings to get personalized suggestions.</p>
+</div>
+<div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-4 sm:p-8 dark:shadow-2xl dark:shadow-[#7E22CE]/10 light:shadow-lg light:shadow-cyan-500/10">
+<div class="flex border-b border-primary mb-8">
+<button class="flex-1 py-3 text-base md:text-lg font-bold border-b-2 border-accent text-primary transition-colors">Mood</button>
+<button class="flex-1 py-3 text-base md:text-lg font-bold border-b-2 border-transparent text-muted hover:text-primary transition-colors">Focus</button>
+</div>
+<div class="flex justify-center flex-wrap gap-4 sm:gap-6 text-2xl mb-8">
+<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
+<span class="text-4xl sm:text-5xl">😄</span>
+<span class="font-medium text-xs sm:text-sm">Happy</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
+<span class="text-4xl sm:text-5xl">😐</span>
+<span class="font-medium text-xs sm:text-sm">Neutral</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
+<span class="text-4xl sm:text-5xl">😔</span>
+<span class="font-medium text-xs sm:text-sm">Sad</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
+<span class="text-4xl sm:text-5xl">😟</span>
+<span class="font-medium text-xs sm:text-sm">Anxious</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
+<span class="text-4xl sm:text-5xl">🤩</span>
+<span class="font-medium text-xs sm:text-sm">Excited</span>
+</button>
+</div>
+<h3 class="text-xl md:text-2xl font-bold text-primary tracking-tight text-center mb-6">Personalized Suggestions</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtT0KI4s3kg14ZrFoZLlKMWvodKpolrsdNbKA5uoGRp7wiYb0F8aDhD7hg5sbX6UYxE9wt3YhSoIy4QEUGjauYxTZJtfXLT9CWfN2U3VEHqtzZTocO-b6vM3to2mManmhCxgh3MqZy3GkEdXSEK5eAEZak4S2DXRHa3SoNyNwODNAZq20YRUp9cJJUfpGerZhdq32t8FzhGPiCKEb06loJHPH2_itJgHm547wjiuYushoilS5QCNnTteBrLNLIooqO0xxGQRNrOBU");'></div>
+<div>
+<p class="text-lg font-bold text-primary">Mindfulness Exercises</p>
+<p class="text-muted">Quick exercises to center your mind.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6x_r8yhpW9Tdo6EJI6P29n1gAspVbi831BdAwXGsSOnTPzhusVUwG6GkrUeuZIAbiYZrJBNnRn_y-EcK3HMYMCHF7Tfr8TbmVeN5QW1aWGd1H-AcyKxNSVvr4aTESkAIt0awzo7JJQofDUEbVND52ks5gYfGMaF6DZrW9TLDE0ksrSqklTd3uS5ti7TPqfQabd85JCNtj7Kfua2N_Hq_4eVmodLptwVkq2NNKwsvlXstRrm95xSAn4hftZuGydmwE_gwNbJbgTQ0");'></div>
+<div>
+<p class="text-lg font-bold text-primary">Study Techniques</p>
+<p class="text-muted">Effective study methods for better focus.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBMbSjC4B4pP1XbLnsslxg2z1-c2kRiwVIboSHZbqAdhTdA8cQd4vSnHEi7Gk8O7QmcyGa7PCVnur1xYU4kPZ1bv5zxMI-gm1hBxM6J1S4pp0UxOR8SDLAgy3eF2PWWBRDUIlXehz2ZcmSCyB5QgU9BqiZ-BF1QAgHUV5ufTGbbasocx-SlEoXFCysNf6NSA0ItY2mSf2ucZ1rliLJwfi2bxZFnlCI1-aagdY85VAPNL5gky9dXhTieRVKIL6y7gAuVIfWTZ_VH75Q");'></div>
+<div>
+<p class="text-lg font-bold text-primary">Stress Management</p>
+<p class="text-muted">Strategies to reduce stress and anxiety.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-secondary/30 backdrop-blur-sm">
+<div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+<div>
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">Gamified Focus Timer</h2>
+<p class="mt-4 text-lg text-muted">Boost your productivity with our interactive Pomodoro timer. Stay focused, take breaks, and watch your avatar grow!</p>
+<div class="mt-8 bg-primary/70 backdrop-blur-sm border border-primary rounded-xl p-6 dark:shadow-2xl dark:shadow-[#7E22CE]/10 light:shadow-lg light:shadow-cyan-500/10">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16 shrink-0 border-2 border-accent" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDfd-joboe9xIoKtUc4hl2jVktQM-V1N3YX8OgXrfPUxZiBgt74XR5WtJfBxsdBl7av2tJbosZROY157DNMjwOJ3UPSiLPVk4Z2IzmHDcxGM8NjxnoIqz_FpuTSDFkMtVHc8_x9izwetsNYUiEg-t7mwPBTg_v2lp5HDySnPsB71LzS-kg8aihsn0g3tnZ26Smwv6ctsVLs05kme6ecPIAEPguvRiEvNQSeKSF9Utp5vZvfnvGbs_4bQGZUUn12N-bOvBRtIXFxEDk");'></div>
+<div class="flex-1">
+<p class="text-xl font-bold text-primary">Pomodoro Timer</p>
+<p class="text-3xl font-mono text-secondary tracking-widest">25:00</p>
+</div>
+<button class="translucent-button flex shrink-0 items-center justify-center rounded-full size-16">
+<span class="material-symbols-outlined text-4xl">play_arrow</span>
+</button>
+</div>
+<div class="mt-6">
+<div class="flex justify-between mb-1">
+<span class="text-base font-medium text-primary">Focus Level</span>
+<span class="text-sm font-medium text-primary">60%</span>
+</div>
+<div class="w-full bg-primary/80 rounded-full h-3">
+<div class="accent-gradient h-3 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="text-center">
+<div class="relative inline-block">
+<div class="w-52 h-52 sm:w-64 sm:h-64 bg-center bg-no-repeat aspect-square bg-cover rounded-full" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuATs3u2GubjP4j-HceJbac0tRsxhSIKisnvcgWI3uT4_YfMv6Ic8qVVWFo7jP5h2zIK50S0DpKSeTEELa4tRGGvbgZfBF8LnClbAFPXZEdqo4HeIBI55VjKA-J1uJ8Tp2qi3D5jz4LlmgNKx9gJgF_wEITJXY9P3B03GDkXojGDoK_kgrekjp0HcY5MIVIdw4nVgtZsadk1EHmVPJkuHpbubzTqINfNId2banP_kQEvIeGtx-rrSGDpJK176IprCoj1Yvy4YqCk2Vk");'></div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-primary/70 backdrop-blur-sm px-4 py-2 rounded-lg border border-primary">
+<p class="text-primary font-bold">Focus Sprite</p>
+<p class="text-sm text-muted">Level 5</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-transparent">
+<div class="max-w-6xl mx-auto">
+<div class="text-center mb-12">
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">Study Library</h2>
+<p class="mt-2 text-lg text-muted">Access a curated library of study materials.</p>
+</div>
+<div class="flex justify-center border-b border-primary mb-8 overflow-x-auto">
+<button class="px-4 sm:px-6 py-3 text-base md:text-lg font-bold border-b-2 border-accent text-primary transition-colors whitespace-nowrap">All</button>
+<button class="px-4 sm:px-6 py-3 text-base md:text-lg font-bold border-b-2 border-transparent text-muted hover:text-primary transition-colors whitespace-nowrap">Math</button>
+<button class="px-4 sm:px-6 py-3 text-base md:text-lg font-bold border-b-2 border-transparent text-muted hover:text-primary transition-colors whitespace-nowrap">Science</button>
+<button class="px-4 sm:px-6 py-3 text-base md:text-lg font-bold border-b-2 border-transparent text-muted hover:text-primary transition-colors whitespace-nowrap">History</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Calculus 101</p>
+<p class="text-muted mt-1">Learn the fundamentals of calculus.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA-GDpfzfj7xIOWo7bOGDz7xg1VbjkJ0Vo6JpI71NPRCZMOg0-CYzAojTILVo8UW06aIC1HONULsuuz6vjr4SI7RHPRMjCVK33mM-rWvNqGsXS_iVIw4_t_7XqqYWLL_BPFz5bk0mbOHwvZ1FlMPNecHuYnZvh0BlEYU5gRDU08Zxc_SGQTzVPtse_18JbJgN4M7VN1MTzyFDK5-Kecw6e8DXN3z_dYaZeHTPRv7Own9jQdDVXnmuE194He-luZ03by97eQ3oFk4Gk");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Physics for Beginners</p>
+<p class="text-muted mt-1">Introduction to basic physics concepts.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBv7eeMGVZ9yzeRcQ2h5Oul7ohyGqDKSMK3UilrZS9G7aPijmAkZo8lt1wywfo-NMD9M-boZp_gQC4tOQoQQ8xTk8E45k63XtE6bJmR_Kkpbwrfr-tj0LSxI8KJS2J9O8UYZqvXhSF96YdIhn4bI-rU7cVX_KwgXYRfnNE5NkRp1ELHt_O_X9fid2LoSsZRDQnFZDpy-IE5RCvM5yZU9m7DL4bbZs1kPmVNU9KqdOwlHiE9xPmCzmM-rdPLGG538qXDjRNcut5yCF4");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Chemistry Basics</p>
+<p class="text-muted mt-1">Essential chemistry principles.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-secondary/30 backdrop-blur-sm">
+<div class="max-w-3xl mx-auto">
+<div class="text-center mb-12">
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">What Our Users Say</h2>
+<p class="mt-2 text-lg text-muted">Feedback from students like you.</p>
+</div>
+<div class="space-y-8">
+<div class="bg-primary/70 backdrop-blur-sm border border-primary p-6 rounded-xl flex items-start gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-12 h-12 shrink-0 border-2 border-accent" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDTXwVQxmt5NGZ3BAJLorucdartLK9jTVcrOitK8blK_tNtDxHv5S9Pvp_dCp9wkoxgUTqhj55JgTv6m2dqEO2sFT8N6qqIpZ5ijo2VPrhVI25889KLiLmCWqtJ8bL5wCU94eCgycfDysXBQ7pLCczZVbcd9pV7tiIdtAqD_1BbWUxcShB4JjHA54jDMHGaADD9oFderx1q1V28K-zothVZTKCJh0B3brlNyQz1db7H6pf-c9QDkjs5tvJRp4ktjAqFC-a5LsHTg4E");'></div>
+<div>
+<div class="flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-1">
+<p class="text-lg font-bold text-primary">Sophia</p>
+<p class="text-muted text-sm">2 weeks ago</p>
+</div>
+<p class="text-primary mt-1">"This app has really helped me stay focused during my study sessions! The gamification is a great motivator."</p>
+</div>
+</div>
+<div class="bg-primary/70 backdrop-blur-sm border border-primary p-6 rounded-xl flex items-start gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-12 h-12 shrink-0 border-2 border-accent" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAa-RK8PETdrX9Tp0mgah2gQNZa0tsE_ZSJnbNfZgoyrl0eo_YWaLDg48i-8UPg9IjLeYaT0Aqpg3LzpBUtCH2KQn51R8hYup306Dbn6xXX94V73LlbJ45FpzcbxSR6d2FzbimvlvsCrpEKKRcZst7XlxgNUqXjsCTNUrvnxsjQPq-YwVisCk6DuGCNrLemGfEtEQjMxGSEs-lBAWZ1tYWlzvBa8ssWFAfFGHYYEiQCUxEmKgL4CMW6dEkUX7h6t8U2jFh2h4fjwy4");'></div>
+<div>
+<div class="flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-1">
+<p class="text-lg font-bold text-primary">Ethan</p>
+<p class="text-muted text-sm">1 month ago</p>
+</div>
+<p class="text-primary mt-1">"The mood tracking feature is insightful and helps me understand my study patterns. Highly recommend it!"</p>
+</div>
+</div>
+<div class="bg-primary/70 backdrop-blur-sm border border-primary p-6 rounded-xl">
+<h3 class="text-xl font-bold text-primary mb-4">Share Your Feedback</h3>
+<div class="flex gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-12 h-12 shrink-0 border-2 border-accent" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDvDYKLaUpb6FNLPnA3nXsawJxZplLw6BDLsAHf0Az5HsY6gJaxYHxF26bhvMLpAlvCySWq-LRns04n-eBULTeIrG3x1VpRjoJdmeTNFtKYPVnBVzMaSRl7U6W0Zc3iRCEAOrifjPV32g-6c5f-F5PDuJc_PkDY_5b9m9913tfWf0dwU2ziTmugdn07VlgzQts8g8jqfaZjdXyAds_xvAHbgM97-38_k3nb-Z4kKdQGVZgSSDZW8t0CifG2OXu4Lym0Pu1fdoq_rvA");'></div>
+<div class="w-full">
+<textarea class="w-full bg-input border border-input rounded-lg p-3 text-primary placeholder-color focus:ring-2 focus:ring-accent focus:border-accent transition h-24 resize-none" placeholder="Share your thoughts..."></textarea>
+<div class="flex justify-end mt-2">
+<button class="translucent-button flex items-center justify-center rounded-full h-11 px-6 font-bold">
+                                                Post
+                                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-secondary/30 backdrop-blur-sm border-t border-primary">
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-10 text-center text-muted">
+<div class="flex justify-center flex-wrap gap-x-8 gap-y-4 mb-8">
+<a class="hover:text-primary transition-colors" href="#">About</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex justify-center gap-6 mb-8">
+<a class="text-muted hover:text-accent transition-colors" href="#"><svg class="feather feather-twitter" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a>
+<a class="text-muted hover:text-accent transition-colors" href="#"><svg class="feather feather-instagram" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><rect height="20" rx="5" ry="5" width="20" x="2" y="2"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>
+<a class="text-muted hover:text-accent transition-colors" href="#"><svg class="feather feather-facebook" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+</div>
+<p>© 2025 NeuroSync. All rights reserved. Built with love for students.</p>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<title>NeuroSync: AI-Powered Focus &amp; Mental Wellbeing Companion</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+        --dark-bg: #0C0A15;
+        --dark-bg-secondary: #1A142D;
+        --dark-accent: #9333ea;
+        --dark-accent-secondary: #7e22ce;
+        --dark-border: #2A2140;
+        --dark-text-primary: #FFFFFF;
+        --dark-text-secondary: #E0D1FF;
+        --dark-text-muted: #A492C9;
+        --light-bg: #FFFFFF;
+        --light-bg-secondary: #F0F9FF;
+        --light-accent: #06B6D4;
+        --light-accent-secondary: #0891B2;
+        --light-border: #E0F2FE;
+        --light-text-primary: #0F172A;
+        --light-text-secondary: #334155;
+        --light-text-muted: #64748B;
+      }
+      .dark .bg-primary {
+        background-color: var(--dark-bg);
+      }
+      .dark .bg-secondary {
+        background-color: var(--dark-bg-secondary);
+      }
+      .dark .text-primary {
+        color: var(--dark-text-primary);
+      }
+      .dark .text-secondary {
+        color: var(--dark-text-secondary);
+      }
+      .dark .text-muted {
+        color: var(--dark-text-muted);
+      }
+      .dark .border-primary {
+        border-color: var(--dark-border);
+      }
+      .dark .accent-primary {
+        color: var(--dark-accent);
+      }
+      .dark .accent-gradient {
+        background-image: linear-gradient(to right, var(--dark-accent), var(--dark-accent-secondary));
+      }
+      .dark .bg-accent {
+        background-color: var(--dark-accent);
+      }
+      .dark .bg-accent-secondary {
+        background-color: var(--dark-accent-secondary);
+      }
+      .dark .hover\:text-accent:hover {
+        color: var(--dark-accent);
+      }
+      .dark .hover\:bg-accent-hover:hover {
+        background-color: #3E315E;
+      }
+      .dark .border-accent {
+        border-color: var(--dark-accent);
+      }
+      .dark .shadow-accent {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+      }
+      .dark .shadow-accent-lg {
+        box-shadow: 0 10px 15px -3px var(--dark-accent-secondary), 0 4px 6px -4px var(--dark-accent-secondary);
+      }
+      .dark .bg-input {
+        background-color: var(--dark-bg-secondary);
+      }
+      .dark .border-input {
+        border-color: #443267;
+      }
+      .dark .placeholder-color::placeholder {
+        color: #5d458c;
+      }
+      .dark .focus\:ring-accent:focus {
+        --tw-ring-color: var(--dark-accent);
+      }
+      .dark .focus\:border-accent:focus {
+        border-color: var(--dark-accent);
+      }
+      .light .bg-primary {
+        background-color: var(--light-bg);
+      }
+      .light .bg-secondary {
+        background-color: var(--light-bg-secondary);
+      }
+      .light .text-primary {
+        color: var(--light-text-primary);
+      }
+      .light .text-secondary {
+        color: var(--light-text-secondary);
+      }
+      .light .text-muted {
+        color: var(--light-text-muted);
+      }
+      .light .border-primary {
+        border-color: var(--light-border);
+      }
+      .light .accent-primary {
+        color: var(--light-accent);
+      }
+      .light .accent-gradient {
+        background-image: linear-gradient(to right, var(--light-accent), var(--light-accent-secondary));
+      }
+      .light .bg-accent {
+        background-color: var(--light-accent);
+      }
+      .light .bg-accent-secondary {
+        background-color: var(--light-accent-secondary);
+      }
+      .light .hover\:text-accent:hover {
+        color: var(--light-accent);
+      }
+      .light .hover\:bg-accent-hover:hover {
+        background-color: #E0F2FE;
+      }
+      .light .border-accent {
+        border-color: var(--light-accent);
+      }
+      .light .shadow-accent {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+      }
+      .light .shadow-accent-lg {
+        box-shadow: 0 10px 15px -3px var(--light-accent-secondary), 0 4px 6px -4px var(--light-accent-secondary);
+      }
+      .light .bg-input {
+        background-color: #F8FAFC;
+      }
+      .light .border-input {
+        border-color: #CBD5E1;
+      }
+      .light .placeholder-color::placeholder {
+        color: #94A3B8;
+      }
+      .light .focus\:ring-accent:focus {
+        --tw-ring-color: var(--light-accent);
+      }
+      .light .focus\:border-accent:focus {
+        border-color: var(--light-accent);
+      }
+      .dark {
+         background: radial-gradient(ellipse at top, #1e113b, #0c0a15 70%);
+      }
+      .translucent-button {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: #FFFFFF;
+        transition: all 0.3s ease;
+      }
+      .translucent-button:hover {
+        background-color: rgba(147, 51, 234, 0.8);
+        border: 1px solid rgba(147, 51, 234, 1);
+        box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+        color: #FFFFFF;
+      }
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#100A1C] dark" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<div class="relative flex size-full min-h-screen flex-col overflow-x-hidden">
+<div class="absolute inset-0 z-0 opacity-20">
+<div class="absolute left-[-20%] top-[10%] h-[400px] w-[400px] rounded-full bg-[#7F13EC] blur-[150px]"></div>
+<div class="absolute right-[-20%] bottom-[10%] h-[400px] w-[400px] rounded-full bg-[#362348] blur-[150px]"></div>
+</div>
+<div class="relative z-10 flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+<div class="flex items-center gap-3 text-primary">
+<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+</div>
+<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="exp_index.html">Home</a>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Focus</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-40 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="Exp_dashboard_home.html">Dashboard</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="Exp_Dashboard_Focus.html">Score</a>
+</div>
+</div>
+</div>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Resources</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Study Material</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
+</div>
+</div>
+</div>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Company</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="Exp_ Getstarted.html">Feedback Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<span class="truncate">Get Started</span>
+</button>
+<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+<script>
+function openDropdown(element) {
+  const dropdown = element.querySelector('div.absolute');
+  if (dropdown) {
+    dropdown.classList.remove('hidden');
+  }
+}
+function closeDropdown(element) {
+  const dropdown = element.querySelector('div.absolute');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+  }
+}
+</script>
+<main class="flex flex-1 items-center justify-center py-5">
+<div class="flex flex-col items-center text-center max-w-2xl px-4">
+<div class="animate-float mb-8">
+<img alt="NeuroSync Brain Logo" class="w-32 h-32" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAt5iGh1xLg_Ubmr9xkfnUxmDJAHOiHF32aXAZ7zBjRaEHzF1xXYYhA3lF30pw_OnAs_ZhSOI2j1dLg-o7rks0LVvUxZiWwzYQCUQ8FugQQtGucxtLNMgoWVolhsSiLmvWDBCUNhNBd1MowNMT7iLE5bWJsDKliPipd1XHurXrTTLphl7G_M4u_iYaIyA-1z76Fo_Ig35U58Jicb90tOW-Xg_N2iSX3tMk8fJ9g4-sh1pev6r0CPNWTYqNf8bwDxlQpPPfeBvXxU2c"/>
+</div>
+<h1 class="text-white text-5xl md:text-6xl font-bold leading-tight tracking-tighter mb-4">
+                        Unlock Your Mind's Potential
+                    </h1>
+<p class="text-gray-300 text-lg md:text-xl font-normal leading-relaxed mb-8 max-w-lg">
+                        NeuroSync is your AI-powered companion for enhanced focus, productivity, and mental well-being. Start your journey to a sharper, more balanced you.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#7F13EC] text-white text-base font-bold leading-normal tracking-wide hover:bg-[#6911c4] transition-transform duration-300 hover:scale-105">
+<span class="truncate">Create Free Account</span>
+</button>
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-white/10 text-white text-base font-bold leading-normal tracking-wide backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-transform duration-300 hover:scale-105">
+<span class="truncate">Learn More</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<title>NeuroSync Dashboard</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+            --primary-color: #8013ec;
+        }
+        .translucent-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .translucent-button:hover {
+            background-color: rgba(147, 51, 234, 0.8);
+            border: 1px solid rgba(147, 51, 234, 1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+            color: #FFFFFF;
+        }
+        .text-primary { color: #FFFFFF; }
+        .text-secondary { color: #ad92c9; }
+        .accent-primary { color: var(--primary-color); }
+        .border-primary { border-color: #2A1F36; }
+    </style>
+</head>
+<body class="bg-[#120B1A] text-white">
+<div class="relative flex size-full min-h-screen flex-col bg-[#120B1A] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+<div class="flex items-center gap-3 text-primary">
+<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+</div>
+<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="index.html">Home</a>
+<a href="#" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">
+<span>Dashboard</span>
+</a>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Resources</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Study Material</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
+</div>
+</div>
+</div>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Company</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Feedback Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
+<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</nav>
+<script>
+function openDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.remove('hidden');
+    dropdown.classList.add('block');
+  }
+}
+
+function closeDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+    dropdown.classList.remove('block');
+  }
+}
+
+// Also add click functionality for better UX
+document.addEventListener('DOMContentLoaded', function() {
+  const dropdownButtons = document.querySelectorAll('.relative.group button');
+  dropdownButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.parentElement.querySelector('.absolute');
+      if (dropdown) {
+        if (dropdown.classList.contains('hidden')) {
+          // Close other dropdowns first
+          document.querySelectorAll('.absolute').forEach(d => {
+            d.classList.add('hidden');
+            d.classList.remove('block');
+          });
+          // Open this dropdown
+          dropdown.classList.remove('hidden');
+          dropdown.classList.add('block');
+        } else {
+          // Close this dropdown
+          dropdown.classList.add('hidden');
+          dropdown.classList.remove('block');
+        }
+      }
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative.group')) {
+      document.querySelectorAll('.absolute').forEach(dropdown => {
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('block');
+      });
+    }
+  });
+});
+</script>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<span class="truncate">Get Started</span>
+</button>
+<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+<div class="flex h-full w-full">
+<aside class="w-80 flex-shrink-0 bg-[#1A1122] p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-[0_0_15px_rgba(128,19,236,0.5)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD7mFGWlvr2tFgaJL5RUb6wksgOv21HaT29jhS9vKVbp7Vyb6pFvxzFua0RVFgMOye8fydSHqqAGJhqUiL7rY9D-FZW5jHrns_-6dQ6szp6d2do8-tI3bgmGHDIq9nQKkmr4cqW-q_J1AwSBav13GtKDEMqSGNitnrmnznwelUtgYY4T-EJWuML3iplSvmcHks8GnVYDp5l1wWYMcwvO-XnZjsfZo1CNbJdlLxSTGqHUIzMNstSNXZGEN0hdjwU-ZpKwBViu08PwZU");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-lg font-bold">Sarah</h1>
+<p class="text-[#ad92c9] text-sm">Student</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="index.html">
+<span class="material-symbols-outlined">home</span>
+<p class="text-sm font-medium">Home</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="Exp_Dashboard_Focus.html">
+<span class="material-symbols-outlined">target</span>
+<p class="text-sm font-medium">Focus</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<p class="text-sm font-medium">Wellbeing</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<p class="text-sm font-medium">Community</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+</nav>
+</aside>
+<main class="flex-1 p-8 overflow-y-auto">
+<header class="mb-8">
+<h1 class="text-4xl font-bold tracking-tight">Dashboard</h1>
+<p class="text-[#ad92c9] mt-1">Welcome back, Sarah! Let's make today productive.</p>
+</header>
+<section class="mb-8">
+<h2 class="text-2xl font-bold tracking-tight mb-4">Daily Summary</h2>
+<div class="bg-[#1A1122] rounded-2xl p-6 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50 flex flex-col xl:flex-row items-start gap-6">
+<div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+<div class="flex flex-col items-center gap-2">
+<div class="relative size-24 flex items-center justify-center">
+<svg class="w-full h-full" viewBox="0 0 100 100">
+<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-[var(--primary-color)]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="57.805" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute material-symbols-outlined text-3xl text-[var(--primary-color)]">timer</span>
+</div>
+<p class="text-2xl font-bold">4.2 <span class="text-lg text-[#ad92c9]">hrs</span></p>
+<p class="text-[#ad92c9]">Focus Time</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="relative size-24 flex items-center justify-center">
+<svg class="w-full h-full" viewBox="0 0 100 100">
+<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-[#0BDA73]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="86.708" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute material-symbols-outlined text-3xl text-[#0BDA73]">sentiment_satisfied</span>
+</div>
+<p class="text-2xl font-bold">8.2<span class="text-lg text-[#ad92c9]">/10</span></p>
+<p class="text-[#ad92c9]">Avg. Mood</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="relative size-24 flex items-center justify-center">
+<svg class="w-full h-full" viewBox="0 0 100 100">
+<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-[#3B82F6]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="28.902" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute material-symbols-outlined text-3xl text-[#3B82F6]">checklist</span>
+</div>
+<p class="text-2xl font-bold">90<span class="text-lg text-[#ad92c9]">%</span></p>
+<p class="text-[#ad92c9]">Tasks Done</p>
+</div>
+</div>
+<div class="w-full xl:w-px h-px xl:h-auto bg-[#2A1F36] self-stretch"></div>
+<div class="flex-shrink-0 w-full xl:w-80">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">auto_awesome</span>
+<h3 class="font-bold text-lg text-white">Personalized Insights</h3>
+</div>
+<div class="space-y-3">
+<div class="bg-[#2A1F36]/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
+<p class="text-sm font-medium text-white">Your mood seems to dip during long study sessions. Try a 5-minute mindfulness break every hour.</p>
+</div>
+<div class="bg-[#2A1F36]/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
+<p class="text-sm font-medium text-white">You're most focused in the morning. Schedule your toughest tasks before noon.</p>
+</div>
+<div class="bg-[#2A1F36]/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
+<p class="text-sm font-medium text-white">Consider reviewing your Biology flashcards. You haven't looked at them in 3 days.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h2 class="text-2xl font-bold tracking-tight mb-4">Current Focus Session</h2>
+<div class="bg-[#1A1122] rounded-2xl p-6 flex items-center justify-between gap-6 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<div class="flex flex-col gap-4">
+<p class="text-lg font-bold">Deep Work Session: Biology</p>
+<p class="text-[#ad92c9]">25 minutes remaining</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-[var(--primary-color)] text-white text-sm font-medium hover:bg-opacity-80 transition-all duration-200 shadow-[0_0_15px_rgba(128,19,236,0.4)]">
+<span class="material-symbols-outlined">pause</span>
+<span>Pause</span>
+</button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-[#362348] text-white text-sm font-medium hover:bg-opacity-80 transition-all duration-200">
+<span class="material-symbols-outlined">stop</span>
+<span>Stop</span>
+</button>
+</div>
+</div>
+<div class="relative w-40 h-40">
+<svg class="w-full h-full" viewBox="0 0 100 100">
+<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-[var(--primary-color)]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="72.256" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">75%</div>
+</div>
+</div>
+</section>
+<section class="mt-8">
+<h2 class="text-2xl font-bold tracking-tight mb-4">Mood &amp; Focus Trends</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="bg-[#1A1122] rounded-2xl p-6 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<p class="text-base font-medium mb-1">Mood Over Time</p>
+<div class="flex items-baseline gap-2">
+<p class="text-4xl font-bold">7.5<span class="text-lg">/10</span></p>
+<p class="text-[#0bda73] text-sm font-medium flex items-center"><span class="material-symbols-outlined text-base">arrow_upward</span>+5%</p>
+</div>
+<p class="text-[#ad92c9] text-sm mb-4">Last 7 Days</p>
+<div class="h-48">
+<svg fill="none" height="100%" preserveAspectRatio="none" viewBox="0 0 472 150" width="100%" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V150H0V109Z" fill="url(#paint0_linear_1_2)"></path>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="var(--primary-color)" stroke-linecap="round" stroke-width="3"></path>
+<defs>
+<linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_1_2" x1="236" x2="236" y1="1" y2="150">
+<stop stop-color="var(--primary-color)" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="var(--primary-color)" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+</svg>
+</div>
+</div>
+<div class="bg-[#1A1122] rounded-2xl p-6 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<p class="text-base font-medium mb-1">Focus Duration</p>
+<div class="flex items-baseline gap-2">
+<p class="text-4xl font-bold">45<span class="text-lg">hrs</span></p>
+<p class="text-[#0bda73] text-sm font-medium flex items-center"><span class="material-symbols-outlined text-base">arrow_upward</span>+10%</p>
+</div>
+<p class="text-[#ad92c9] text-sm mb-4">This Month</p>
+<div class="grid grid-cols-4 gap-4 items-end h-48 px-3">
+<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 80%;"><span class="sr-only">Week 1: 80%</span></div>
+<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 50%;"><span class="sr-only">Week 2: 50%</span></div>
+<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 70%;"><span class="sr-only">Week 3: 70%</span></div>
+<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 90%;"><span class="sr-only">Week 4: 90%</span></div>
+<p class="text-[#ad92c9] text-xs font-bold text-center">W1</p>
+<p class="text-[#ad92c9] text-xs font-bold text-center">W2</p>
+<p class="text-[#ad92c9] text-xs font-bold text-center">W3</p>
+<p class="text-[#ad92c9] text-xs font-bold text-center">W4</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<h2 class="text-2xl font-bold tracking-tight mb-4">Quick Access</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-3 group">
+<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtT0KI4s3kg14ZrFoZLlKMWvodKpolrsdNbKA5uoGRp7wiYb0F8aDhD7hg5sbX6UYxE9wt3YhSoIy4QEUGjauYxTZJtfXLT9CWfN2U3VEHqtzZTocO-b6vM3to2mManmhCxgh3MqZy3GkEdXSEK5eAEZak4S2DXRHa3SoNyNwODNAZq20YRUp9cJJUfpGerZhdq32t8FzhGPiCKEb06loJHPH2_itJgHm547wjiuYushoilS5QCNnTteBrLNLIooqO0xxGQRNrOBU");'></div>
+<div>
+<p class="font-medium">Biology Textbook</p>
+<p class="text-sm text-[#ad92c9]">Chapter 3</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 group">
+<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDlWmJuy9kK5xh0PwYGhnw7m_6GBmxahdEeusvu4-zcjaQBQkPCTr8owNcJ37klGWNojOzmvos4EJUp_16p4Wyt_VINrmnmgdwWu4JQAZm8QCsw3gtFQWsgMNX5emTXtqqebzh1dTQUyPHZSsZL7ggG8LwnXr9rJ2DoWDgpq_m1YQ7E3griQ60wHtqUAhWsjSOwgKUzCE6Coli2IVJrOM3noqWy1fK1OckCwzJSIIG26MR_Uj5JHaIQ9mehyju0Rw97NaHhqfTTt4U");'></div>
+<div>
+<p class="font-medium">Study Notes</p>
+<p class="text-sm text-[#ad92c9]">Lecture 5</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 group">
+<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAXtoewfqG6jYsk61TuaLW_FExOBaumiQAmGBhn2-3kaQU-oDnJLJU2p5jzdIIpbqw6dVNo_bLdvlLX9PJXFAEqoQMUIkzwdB5FtTNjrJgQogMBOxCXHUy82Viu3YPbPaDEa2XtzDZu6JzKMzPOknZfkydGTx2eR_hb5_v4X23b37PIIq3gRKo_BVuKgAQDd1cwFfSE_WFVgoTYL-W-dZ1bJmu__kHIVL7iHx0WIPJleide-1E_ngOjjApESW5pIDoXLgai9bA22N4");'></div>
+<div>
+<p class="font-medium">Flashcards</p>
+<p class="text-sm text-[#ad92c9]">Set 1</p>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<h2 class="text-2xl font-bold tracking-tight mb-4">Gamification</h2>
+<div class="bg-[#1A1122] rounded-2xl p-6 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<div class="flex justify-between items-center mb-2">
+<p class="font-medium">Focus Points</p>
+<p class="text-2xl font-bold text-[var(--primary-color)]">1250</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="font-medium">Avatar Progress (Lvl 3)</p>
+<p class="text-lg font-bold">75%</p>
+</div>
+<div class="w-full bg-[#2A1F36] rounded-full h-2.5 mt-3">
+<div class="bg-[var(--primary-color)] h-2.5 rounded-full shadow-[0_0_10px_var(--primary-color)]" style="width: 75%"></div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h2 class="text-2xl font-bold tracking-tight mb-4">Recent Activity</h2>
+<div class="space-y-4">
+<div class="flex items-center gap-4 bg-[#1A1122] p-4 rounded-xl border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#2A1F36] shrink-0 size-12">
+<span class="material-symbols-outlined text-[var(--primary-color)]">psychology</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-medium">Completed Focus Session</p>
+<p class="text-sm text-[#ad92c9]">You earned 50 focus points.</p>
+</div>
+<p class="text-xs text-[#ad92c9] ml-auto">1h ago</p>
+</div>
+<div class="flex items-center gap-4 bg-[#1A1122] p-4 rounded-xl border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#2A1F36] shrink-0 size-12">
+<span class="material-symbols-outlined text-[var(--primary-color)]">menu_book</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-medium">New Study Materials</p>
+<p class="text-sm text-[#ad92c9]">Biology flashcards were added.</p>
+</div>
+<p class="text-xs text-[#ad92c9] ml-auto">3h ago</p>
+</div>
+<div class="flex items-center gap-4 bg-[#1A1122] p-4 rounded-xl border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#2A1F36] shrink-0 size-12">
+<span class="material-symbols-outlined text-[var(--primary-color)]">emoji_events</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-medium">Achievement Unlocked</p>
+<p class="text-sm text-[#ad92c9]">"Focused Mind" - 10 hours of focus.</p>
+</div>
+<p class="text-xs text-[#ad92c9] ml-auto">1d ago</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+
+</body></html>
