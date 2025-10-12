@@ -186,6 +186,153 @@
                 opacity: 0;
             }
         }
+
+        /* Focus Mode Styles */
+        :root {
+            --zen-blue: #2A4D69;
+            --zen-green: #6D927E;
+            --zen-light: #B4D6CB;
+            --zen-text: #E0E0E0;
+            --zen-bg-start: #0A0A0A;
+            --zen-bg-end: #000000;
+            --timer-glow-color-1: #A78BFA;
+            --timer-glow-color-2: #818CF8;
+        }
+        body.focus-mode {
+            background: radial-gradient(ellipse at center, var(--zen-bg-start), var(--zen-bg-end) 90%);
+            overflow: hidden;
+        }
+        body.focus-mode header,
+        body.focus-mode section:not([data-focus-section]) {
+            display: none !important;
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+        body.focus-mode main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+        body.focus-mode [data-focus-section] {
+            max-width: none;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 2rem;
+            gap: 2rem;
+            transition: all 0.5s ease-in-out;
+        }
+        body.focus-mode #timer-display {
+            font-size: 9rem !important;
+            color: var(--zen-text) !important;
+            text-shadow: 0 0 10px var(--timer-glow-color-1),
+                         0 0 20px var(--timer-glow-color-2),
+                         0 0 40px var(--timer-glow-color-1),
+                         0 0 80px var(--timer-glow-color-2);
+            animation: pulse-glow 3s infinite alternate ease-in-out;
+        }
+        body.focus-mode .pomodoro-glow {
+            text-shadow: 0 0 10px var(--timer-glow-color-1),
+                         0 0 20px var(--timer-glow-color-2),
+                         0 0 40px var(--timer-glow-color-1),
+                         0 0 80px var(--timer-glow-color-2);
+            animation: pulse-glow 3s infinite alternate ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0% {
+                text-shadow: 0 0 10px var(--timer-glow-color-1),
+                             0 0 20px var(--timer-glow-color-2);
+            }
+            100% {
+                text-shadow: 0 0 20px var(--timer-glow-color-1),
+                             0 0 40px var(--timer-glow-color-2),
+                             0 0 60px var(--timer-glow-color-1);
+            }
+        }
+        body.focus-mode .translucent-button {
+            background: linear-gradient(135deg, var(--zen-blue), var(--zen-green)) !important;
+            border: 1px solid var(--zen-light) !important;
+            color: var(--zen-text) !important;
+            box-shadow: 0 0 20px rgba(109, 146, 126, 0.5);
+            transition: all 0.3s ease;
+        }
+        body.focus-mode .translucent-button:hover {
+            background: linear-gradient(135deg, var(--zen-green), var(--zen-blue)) !important;
+            box-shadow: 0 0 30px rgba(109, 146, 126, 0.8);
+            transform: scale(1.05);
+        }
+        .organic-shape {
+            position: absolute;
+            background: linear-gradient(135deg, var(--zen-blue), var(--zen-green));
+            border-radius: 50%;
+            opacity: 0.05;
+            filter: blur(70px);
+            animation: organic-movement 35s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+        @keyframes organic-movement {
+            0% {
+                transform: translate(var(--x-start), var(--y-start)) scale(0.7) rotate(0deg);
+                opacity: 0.05;
+            }
+            50% {
+                transform: translate(var(--x-mid), var(--y-mid)) scale(1.1) rotate(180deg);
+                opacity: 0.08;
+            }
+            100% {
+                transform: translate(var(--x-end), var(--y-end)) scale(0.8) rotate(360deg);
+                opacity: 0.05;
+            }
+        }
+        .focus-quote {
+            color: var(--zen-text);
+            font-size: 1.25rem;
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 2rem;
+            animation: text-glow 4s ease-in-out infinite alternate;
+        }
+        @keyframes text-glow {
+            0%, 100% {
+                text-shadow: 0 0 3px rgba(255, 255, 255, 0.6),
+                             0 0 8px var(--zen-light),
+                             0 0 15px var(--zen-green);
+            }
+            50% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 12px var(--zen-light),
+                             0 0 25px var(--zen-green);
+            }
+        }
+        #fullscreen-btn {
+            background: linear-gradient(135deg, var(--dark-accent), var(--dark-accent-secondary));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        #fullscreen-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+        }
+        body.focus-mode #fullscreen-btn span {
+            color: var(--zen-text);
+        }
     </style>
 </head>
 <body class="bg-primary">
@@ -407,6 +554,109 @@ document.addEventListener('DOMContentLoaded', function() {
   updateProgress();
 });
 
+// Focus Mode Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const fullscreenBtn = document.getElementById('fullscreen-btn');
+  const pomodoroSection = document.querySelector('section:has(#timer-display)');
+  const timerDisplay = document.getElementById('timer-display');
+  const startBtn = document.getElementById('start-btn');
+  const pauseBtn = document.getElementById('pause-btn');
+  const timeButtonsContainer = pomodoroSection.querySelector('.flex.gap-2.mb-4'); // Time selection buttons
+  const avatarDiv = pomodoroSection.querySelector('div.bg-center.bg-no-repeat.aspect-square.bg-cover.rounded-full.size-16'); // Small avatar
+  const pomodoroTitle = pomodoroSection.querySelector('p.text-xl.font-bold.text-primary.mb-2'); // "Pomodoro Timer"
+  const progressContainer = pomodoroSection.querySelector('.mt-6'); // Focus level
+  const largeAvatarContainer = pomodoroSection.querySelector('.text-center'); // Large avatar
+  const sectionH2 = pomodoroSection.querySelector('h2'); // Section title
+  const sectionDesc = pomodoroSection.querySelector('p.mt-4.text-lg.text-muted'); // Section description
+
+  let organicShapes = [];
+  let quoteDiv = null;
+
+  fullscreenBtn.addEventListener('click', function() {
+    const body = document.body;
+    const isFocusMode = body.classList.contains('focus-mode');
+
+    if (isFocusMode) {
+      // Exit focus mode
+      body.classList.remove('focus-mode');
+      pomodoroSection.removeAttribute('data-focus-section');
+      timerDisplay.classList.remove('pomodoro-glow');
+      timerDisplay.style.fontSize = '';
+      avatarDiv.style.display = '';
+      pomodoroTitle.style.display = '';
+      timeButtonsContainer.style.display = '';
+      progressContainer.style.display = '';
+      largeAvatarContainer.style.display = '';
+      sectionH2.style.display = '';
+      sectionDesc.style.display = '';
+      if (quoteDiv) {
+        quoteDiv.remove();
+        quoteDiv = null;
+      }
+      // Remove organic shapes
+      organicShapes.forEach(shape => shape.remove());
+      organicShapes = [];
+      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span> Enter Focus Mode';
+      // Restore sections
+      document.querySelectorAll('header, section:not([data-focus-section])').forEach(el => {
+        el.style.display = '';
+        el.style.opacity = '1';
+      });
+    } else {
+      // Enter focus mode
+      body.classList.add('focus-mode');
+      pomodoroSection.setAttribute('data-focus-section', 'true');
+      timerDisplay.classList.add('pomodoro-glow');
+      // Hide non-essential elements
+      avatarDiv.style.display = 'none';
+      pomodoroTitle.style.display = 'none';
+      timeButtonsContainer.style.display = 'none';
+      progressContainer.style.display = 'none';
+      largeAvatarContainer.style.display = 'none';
+      sectionH2.style.display = 'none';
+      sectionDesc.style.display = 'none';
+      // Enlarge timer
+      timerDisplay.style.fontSize = '9rem';
+      // Add quote below the timer container
+      quoteDiv = document.createElement('p');
+      quoteDiv.className = 'focus-quote';
+      quoteDiv.textContent = '"Enter the Deep Focus Chamber. Silence the noise."';
+      const timerContainer = pomodoroSection.querySelector('.mt-8');
+      timerContainer.appendChild(quoteDiv);
+      // Generate organic shapes
+      const shapeConfigs = [
+        { xStart: '10vw', yStart: '20vh', xMid: '20vw', yMid: '80vh', xEnd: '30vw', yEnd: '40vh', width: '250px', height: '250px', delay: '0s' },
+        { xStart: '80vw', yStart: '10vh', xMid: '70vw', yMid: '30vh', xEnd: '60vw', yEnd: '70vh', width: '180px', height: '180px', delay: '-5s' },
+        { xStart: '5vw', yStart: '90vh', xMid: '15vw', yMid: '70vh', xEnd: '25vw', yEnd: '10vh', width: '300px', height: '300px', delay: '-10s' },
+        { xStart: '95vw', yStart: '85vh', xMid: '85vw', yMid: '65vh', xEnd: '75vw', yEnd: '25vh', width: '220px', height: '220px', delay: '-15s' },
+        { xStart: '50vw', yStart: '5vh', xMid: '40vw', yMid: '25vh', xEnd: '60vw', yEnd: '95vh', width: '150px', height: '150px', delay: '-20s' }
+      ];
+      const backgroundContainer = document.querySelector('.relative.flex.size-full');
+      shapeConfigs.forEach(config => {
+        const shape = document.createElement('div');
+        shape.className = 'organic-shape';
+        shape.style.setProperty('--x-start', config.xStart);
+        shape.style.setProperty('--y-start', config.yStart);
+        shape.style.setProperty('--x-mid', config.xMid);
+        shape.style.setProperty('--y-mid', config.yMid);
+        shape.style.setProperty('--x-end', config.xEnd);
+        shape.style.setProperty('--y-end', config.yEnd);
+        shape.style.width = config.width;
+        shape.style.height = config.height;
+        shape.style.animationDelay = config.delay;
+        backgroundContainer.appendChild(shape);
+        organicShapes.push(shape);
+      });
+      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen_exit</span> Exit Focus Mode';
+      // Hide other sections with animation
+      document.querySelectorAll('header, section:not([data-focus-section])').forEach(el => {
+        el.style.opacity = '0';
+        setTimeout(() => { el.style.display = 'none'; }, 500);
+      });
+    }
+  });
+});
+
 // Theme Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
   const themeToggle = document.getElementById('theme-toggle');
@@ -563,6 +813,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="progress-bar" class="accent-gradient h-3 rounded-full transition-all duration-500 ease-in-out shadow-lg shadow-accent/50"></div>
 </div>
 <p class="text-xs text-muted mt-2 text-center">Your focus grows as you stay on task!</p>
+<button id="fullscreen-btn">
+    <span class="material-symbols-outlined">fullscreen</span>
+    Enter Focus Mode
+</button>
 </div>
 </div>
 </div>
