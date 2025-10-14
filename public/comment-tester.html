@@ -134,8 +134,10 @@ now<!DOCTYPE html>
 
     <div class="comment-form">
       <h2>Add a Comment</h2>
-      <input type="text" id="author" placeholder="Your name" required>
+      <input type="text" id="name" placeholder="Your name" required>
+      <input type="text" id="postId" placeholder="Post ID" required>
       <textarea id="comment-text" placeholder="Write your comment here..." rows="4" required></textarea>
+      <input type="text" id="userId" placeholder="User ID" required>
       <button onclick="addComment()">Add Comment</button>
     </div>
 
@@ -180,24 +182,30 @@ now<!DOCTYPE html>
     }
 
     async function addComment() {
-      const author = document.getElementById('author').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const postId = document.getElementById('postId').value.trim();
       const text = document.getElementById('comment-text').value.trim();
+      const userId = document.getElementById('userId').value.trim();
 
-      if (!author || !text) {
-        updateStatus('Please fill in both author and comment fields', 'error');
+      if (!name || !postId || !text || !userId) {
+        updateStatus('Please fill in all fields', 'error');
         return;
       }
 
       try {
         await db.collection('comments').add({
-          author: author,
+          name: name,
+          postId: postId,
           text: text,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          userId: userId
         });
 
         updateStatus('Comment added successfully!', 'success');
-        document.getElementById('author').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('postId').value = '';
         document.getElementById('comment-text').value = '';
+        document.getElementById('userId').value = '';
         loadComments(); // Refresh the list
       } catch (error) {
         console.error('Error adding comment:', error);
@@ -224,9 +232,11 @@ now<!DOCTYPE html>
           const commentDiv = document.createElement('div');
           commentDiv.className = 'comment-item';
           commentDiv.innerHTML = `
-            <div class="comment-author">${comment.author}</div>
+            <div class="comment-author">Name: ${comment.name}</div>
+            <div class="comment-postId">Post ID: ${comment.postId}</div>
             <div class="comment-text">${comment.text}</div>
             <div class="comment-timestamp">${comment.timestamp ? comment.timestamp.toDate().toLocaleString() : 'Just now'}</div>
+            <div class="comment-userId">User ID: ${comment.userId}</div>
             <div class="comment-actions">
               <button onclick="deleteComment('${doc.id}')">Delete</button>
             </div>
