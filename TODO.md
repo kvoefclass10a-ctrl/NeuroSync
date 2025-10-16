@@ -61,3 +61,22 @@
 - Prevent default form behavior.
 - Clear input after submission.
 - Display comments with styling consistent with the site.
+
+## Migrate Comments to Firebase Firestore
+
+## Steps to Complete:
+
+1. [x] Add Firebase Firestore imports to the script tag in public/index.html.
+2. [x] Update JavaScript to use Firestore instead of localStorage for comments.
+3. [x] Add Timestamp import and window.Timestamp for use in code.
+4. [x] Update firestore.rules to allow read/create on /comments collection with proper validation.
+5. [x] Deploy firestore.rules to Firebase using Firebase CLI.
+6. [x] Test the comments functionality to ensure it works with Firestore.
+7. [x] Update TODO.md to mark steps complete.
+
+## Notes:
+- Use addDoc, getDocs, collection, query, orderBy from Firestore.
+- Store text and timestamp fields.
+- Display comments ordered by timestamp descending.
+- Ensure rules enforce server timestamp and text length.
+- Rules deployed successfully to Firebase project 'neurosync-5173b'.

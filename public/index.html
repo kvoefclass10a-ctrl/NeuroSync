@@ -9,6 +9,32 @@
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link rel="stylesheet" href="style.css">
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+    authDomain: "neurosync-5173b.firebaseapp.com",
+    projectId: "neurosync-5173b",
+    storageBucket: "neurosync-5173b.firebasestorage.app",
+    messagingSenderId: "855780859936",
+    appId: "1:855780859936:web:3044309100db9a61fa1c45",
+    measurementId: "G-75S5GWYEDK"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.collection = collection;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.Timestamp = Timestamp;
+</script>
 <style type="text/tailwindcss">
         :root {
             --dark-bg: #0C0A15;
@@ -706,43 +732,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Comments Functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   const commentForm = document.getElementById('comment-form');
+  const nameInput = document.getElementById('name-input');
   const commentInput = document.getElementById('comment-input');
   const commentsDisplay = document.getElementById('comments-display');
 
-  // Load existing comments from localStorage
-  let comments = JSON.parse(localStorage.getItem('comments')) || [];
+  async function loadComments() {
+    const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
 
-  function displayComments() {
-    commentsDisplay.innerHTML = '';
-    comments.forEach((comment, index) => {
-      const commentDiv = document.createElement('div');
-      commentDiv.className = 'bg-primary/50 backdrop-blur-sm border border-primary rounded-lg p-4';
-      commentDiv.innerHTML = `
-        <p class="text-primary">${comment.text}</p>
-        <p class="text-xs text-muted mt-2">${new Date(comment.timestamp).toLocaleString()}</p>
-      `;
-      commentsDisplay.appendChild(commentDiv);
-    });
+  async function displayComments() {
+    try {
+      const comments = await loadComments();
+      commentsDisplay.innerHTML = '';
+      comments.forEach((comment) => {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'bg-primary/50 backdrop-blur-sm border border-primary rounded-lg p-4';
+        const timestampStr = comment.timestamp && comment.timestamp.toDate ? comment.timestamp.toDate().toLocaleString() : 'Invalid timestamp';
+        commentDiv.innerHTML = `
+          <p class="text-primary font-bold">${comment.name || 'Anonymous'}</p>
+          <p class="text-primary mt-1">${comment.text || 'No text'}</p>
+          <p class="text-xs text-muted mt-2 flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full border border-primary/20">
+            <span class="material-symbols-outlined text-sm">schedule</span>
+            ${timestampStr}
+          </p>
+        `;
+        commentsDisplay.appendChild(commentDiv);
+      });
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      commentsDisplay.innerHTML = '<p class="text-muted">Error loading comments. Check console for details.</p>';
+    }
   }
 
   // Display comments on load
   displayComments();
 
   // Handle form submission
-  commentForm.addEventListener('submit', function(e) {
+  commentForm.addEventListener('submit', async function(e) {
     e.preventDefault();
+    const name = nameInput.value.trim() || 'Anonymous';
     const commentText = commentInput.value.trim();
     if (commentText) {
-      const newComment = {
-        text: commentText,
-        timestamp: new Date().toISOString()
-      };
-      comments.push(newComment);
-      localStorage.setItem('comments', JSON.stringify(comments));
-      commentInput.value = '';
-      displayComments();
+      try {
+        await addDoc(collection(db, 'comments'), {
+          name: name,
+          text: commentText,
+          timestamp: Timestamp.now()
+        });
+        nameInput.value = '';
+        commentInput.value = '';
+        displayComments();
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        alert('Error submitting comment. Check console for details.');
+      }
     }
   });
 });
@@ -942,6 +989,10 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-4 sm:p-8 dark:shadow-2xl dark:shadow-[#7E22CE]/10 light:shadow-lg light:shadow-cyan-500/10">
 <form id="comment-form" class="mb-8">
+<div class="mb-4">
+<label for="name-input" class="block text-primary font-medium mb-2">Your Name</label>
+<input type="text" id="name-input" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent" placeholder="Enter your name...">
+</div>
 <div class="mb-4">
 <label for="comment-input" class="block text-primary font-medium mb-2">Your Message</label>
 <textarea id="comment-input" rows="4" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent resize-none" placeholder="Write your comment here..."></textarea>
