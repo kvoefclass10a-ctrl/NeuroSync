@@ -8,6 +8,7 @@
 <title>NeuroSync Homepage</title>
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="stylesheet" href="style.css">
 <style type="text/tailwindcss">
         :root {
             --dark-bg: #0C0A15;
@@ -153,6 +154,12 @@
         .light {
              background: linear-gradient(to bottom, #FFFFFF, #F0F9FF);
         }
+        .dark .particle {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .light .particle {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
         .translucent-button {
             background-color: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -165,6 +172,16 @@
             border: 1px solid rgba(147, 51, 234, 1);
             box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
             color: #FFFFFF;
+        }
+        .light .translucent-button {
+            background-color: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #000000;
+        }
+        .light .translucent-button:hover {
+            background-color: rgba(6, 182, 212, 0.8);
+            border: 1px solid rgba(6, 182, 212, 1);
+            color: #000000;
         }
         .particle {
             position: absolute;
@@ -335,8 +352,8 @@
         }
     </style>
 </head>
-<body class="bg-primary">
-<div class="relative flex size-full min-h-screen flex-col dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<body>
+<div class="relative flex size-full min-h-screen flex-col dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;' id="theme-container">
 <div class="absolute inset-0 -z-10 overflow-hidden">
 <div class="particle" style="--x-start: 10vw; --y-start: 20vh; --x-end: 90vw; --y-end: 80vh; width: 2px; height: 2px; animation-delay: 0s;"></div>
 <div class="particle" style="--x-start: 80vw; --y-start: 10vh; --x-end: 20vw; --y-end: 90vh; width: 1px; height: 1px; animation-delay: -1s;"></div>
@@ -661,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   const themeToggle = document.getElementById('theme-toggle');
   const icon = themeToggle.querySelector('span');
-  const themeElement = document.querySelector('.group');
+  const themeElement = document.getElementById('theme-container');
 
   // Load saved theme or default to dark
   const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -685,6 +702,48 @@ document.addEventListener('DOMContentLoaded', function() {
     themeElement.classList.add(newTheme);
     updateIcon(newTheme);
     localStorage.setItem('theme', newTheme);
+  });
+});
+
+// Comments Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const commentForm = document.getElementById('comment-form');
+  const commentInput = document.getElementById('comment-input');
+  const commentsDisplay = document.getElementById('comments-display');
+
+  // Load existing comments from localStorage
+  let comments = JSON.parse(localStorage.getItem('comments')) || [];
+
+  function displayComments() {
+    commentsDisplay.innerHTML = '';
+    comments.forEach((comment, index) => {
+      const commentDiv = document.createElement('div');
+      commentDiv.className = 'bg-primary/50 backdrop-blur-sm border border-primary rounded-lg p-4';
+      commentDiv.innerHTML = `
+        <p class="text-primary">${comment.text}</p>
+        <p class="text-xs text-muted mt-2">${new Date(comment.timestamp).toLocaleString()}</p>
+      `;
+      commentsDisplay.appendChild(commentDiv);
+    });
+  }
+
+  // Display comments on load
+  displayComments();
+
+  // Handle form submission
+  commentForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+      const newComment = {
+        text: commentText,
+        timestamp: new Date().toISOString()
+      };
+      comments.push(newComment);
+      localStorage.setItem('comments', JSON.stringify(comments));
+      commentInput.value = '';
+      displayComments();
+    }
   });
 });
 </script>
@@ -852,4 +911,50 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 </div>
 <div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
-<div class
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Physics 101</p>
+<p class="text-muted mt-1">Explore the laws of motion and energy.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Chemistry 101</p>
+<p class="text-muted mt-1">Understand atoms, molecules, and reactions.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">History 101</p>
+<p class="text-muted mt-1">Explore key events and figures in history.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-transparent">
+<div class="max-w-6xl mx-auto">
+<div class="text-center mb-12">
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">Comments</h2>
+<p class="mt-2 text-lg text-muted">Share your thoughts and feedback!</p>
+</div>
+<div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-4 sm:p-8 dark:shadow-2xl dark:shadow-[#7E22CE]/10 light:shadow-lg light:shadow-cyan-500/10">
+<form id="comment-form" class="mb-8">
+<div class="mb-4">
+<label for="comment-input" class="block text-primary font-medium mb-2">Your Message</label>
+<textarea id="comment-input" rows="4" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent resize-none" placeholder="Write your comment here..."></textarea>
+</div>
+<button type="submit" class="translucent-button px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">Send Comment</button>
+</form>
+<div id="comments-display" class="space-y-4">
+<!-- Comments will be displayed here -->
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>
