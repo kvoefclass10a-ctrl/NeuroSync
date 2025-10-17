@@ -1,0 +1,160 @@
+{
+  "name": "Library Contribution Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "sheetId": "<YOUR_GOOGLE_SHEET_ID>",
+        "range": "Sheet1!A:F",
+        "options": {},
+        "triggerOn": "added"
+      },
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"PDF_Link\"]}}",
+        "responseFormat": "file",
+        "download": true
+      },
+      "name": "Fetch PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "mode": "passThrough",
+        "functionCode": "return items;"
+      },
+      "name": "AI Relevance Check (Sample Placeholder)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 280]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"relevance\"]}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "If Relevant",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 280]
+    },
+    {
+      "parameters": {
+        "url": "<YOUR_LIBRARY_API_UPLOAD_ENDPOINT>",
+        "method": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "contributor",
+              "value": "={{$json[\"Contributor_Name\"]}}"
+            },
+            {
+              "name": "class",
+              "value": "={{$json[\"Class\"]}}"
+            },
+            {
+              "name": "subject",
+              "value": "={{$json[\"Subject\"]}}"
+            },
+            {
+              "name": "file",
+              "value": "={{$node[\"Fetch PDF\"].binary[\"data\"]}}",
+              "type": "binary"
+            }
+          ]
+        }
+      },
+      "name": "Upload to Library",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 280]
+    },
+    {
+      "parameters": {
+        "sheetId": "<YOUR_GOOGLE_SHEET_ID>",
+        "range": "Sheet1!G{{ $json[\"_rowIndex\"] + 1 }}",
+        "valueInputMode": "USER_ENTERED",
+        "options": {},
+        "values": [["Accepted"]]
+      },
+      "name": "Update Sheet Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1250, 280]
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch PDF": {
+      "main": [
+        [
+          {
+            "node": "AI Relevance Check (Sample Placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Relevance Check (Sample Placeholder)": {
+      "main": [
+        [
+          {
+            "node": "If Relevant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Relevant": {
+      "main": [
+        [
+          {
+            "node": "Upload to Library",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Sheet Status",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Upload to Library": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

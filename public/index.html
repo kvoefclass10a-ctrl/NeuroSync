@@ -8,6 +8,11 @@
 <title>NeuroSync Homepage</title>
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="stylesheet" href="style.css">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
 <style type="text/tailwindcss">
         :root {
             --dark-bg: #0C0A15;
@@ -687,6 +692,73 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('theme', newTheme);
   });
 });
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+  authDomain: "neurosync-5173b.firebaseapp.com",
+  projectId: "neurosync-5173b",
+  storageBucket: "neurosync-5173b.firebasestorage.app",
+  messagingSenderId: "855780859936",
+  appId: "1:855780859936:web:3044309100db9a61fa1c45",
+  measurementId: "G-75S5GWYEDK"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Comments Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const commentForm = document.getElementById('comment-form');
+  const nameInput = document.getElementById('name-input');
+  const userIdInput = document.getElementById('userId-input');
+  const postIdInput = document.getElementById('postId-input');
+  const commentInput = document.getElementById('comment-input');
+  const commentsDisplay = document.getElementById('comments-display');
+
+  function displayComments() {
+    commentsDisplay.innerHTML = '';
+    db.collection('comments').orderBy('timestamp', 'desc').get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const comment = doc.data();
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'bg-primary/50 backdrop-blur-sm border border-primary rounded-lg p-4';
+        commentDiv.innerHTML = `
+          <p class="text-primary font-bold">${comment.name}</p>
+          <p class="text-primary">${comment.text}</p>
+          <span class="inline-block px-2 py-1 text-xs text-muted mt-2 accent-gradient shadow-lg shadow-accent/50 hover:shadow-accent-lg hover:scale-105 transition-all duration-300 rounded-full">${new Date(comment.timestamp.toDate()).toLocaleString()}</span>
+        `;
+        commentsDisplay.appendChild(commentDiv);
+      });
+    }).catch((error) => {
+      console.error("Error getting comments: ", error);
+    });
+  }
+
+  // Display comments on load
+  displayComments();
+
+  // Handle form submission
+  commentForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = nameInput.value.trim() || 'Anonymous';
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+      db.collection('comments').add({
+        name: name,
+        text: commentText,
+        timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+      }).then(() => {
+        nameInput.value = '';
+        commentInput.value = '';
+        displayComments();
+      }).catch((error) => {
+        console.error("Error adding comment: ", error);
+      });
+    }
+  });
+});
 </script>
 <div class="flex items-center gap-4">
 <button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11 hover:scale-110 transition-transform">
@@ -852,4 +924,59 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 </div>
 <div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
-<div class
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Physics 101</p>
+<p class="text-muted mt-1">Explore the laws of motion and energy.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">Chemistry 101</p>
+<p class="text-muted mt-1">Understand atoms, molecules, and reactions.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-secondary/50 backdrop-blur-sm border border-primary overflow-hidden dark:shadow-2xl dark:shadow-[#7E22CE]/5 light:shadow-lg light:shadow-cyan-500/5 transform hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_B6m0e8ga_eaolkZK4wkepTqjLQ_LjuEikUHi7vBQyve9zHbh1plw5sfErgfwW4W3Lzs4Kenj74MjmJTaJDhccZIDnCY_Ne4VNvYdaYLIPYdrB9DkoTM3aG6Z9EhcJtTbOvg4J6VFFzQYpSv6kJUf92TFYg42gwzAskOot2W2kY_GYcfUvlLInynpmwYGejHaD0wnG4jVH80_zlhEPw231twfMeQ2pQDo23PTNr7FD6ITeeT5p-mWx04K5tWfnnLFkdY0CWTKKVc");'></div>
+<div class="p-5">
+<p class="text-xl font-bold text-primary">History 101</p>
+<p class="text-muted mt-1">Explore key events and figures in history.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-20 px-4 sm:px-10 bg-transparent">
+<div class="max-w-6xl mx-auto">
+<div class="text-center mb-12">
+<h2 class="text-3xl md:text-4xl font-bold text-primary tracking-tight">Comments</h2>
+<p class="mt-2 text-lg text-muted">Share your thoughts and feedback!</p>
+</div>
+<div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-4 sm:p-8 dark:shadow-2xl dark:shadow-[#7E22CE]/10 light:shadow-lg light:shadow-cyan-500/10">
+<form id="comment-form" class="mb-8">
+<input type="hidden" id="postId-input" value="homepage">
+<div class="mb-4">
+<label for="name-input" class="block text-primary font-medium mb-2">Your Name</label>
+<input type="text" id="name-input" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent" placeholder="Enter your name...">
+</div>
+<div class="mb-4">
+<label for="userId-input" class="block text-primary font-medium mb-2">User ID (optional)</label>
+<input type="text" id="userId-input" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent" placeholder="Enter your user ID...">
+</div>
+<div class="mb-4">
+<label for="comment-input" class="block text-primary font-medium mb-2">Your Message</label>
+<textarea id="comment-input" rows="4" class="w-full px-4 py-3 bg-input border border-input rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent resize-none" placeholder="Write your comment here..."></textarea>
+</div>
+<button type="submit" class="translucent-button px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">Send Comment</button>
+</form>
+<div id="comments-display" class="space-y-4">
+<!-- Comments will be displayed here -->
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>
