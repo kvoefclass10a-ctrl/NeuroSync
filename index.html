@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8"/>
+  <!DOCTYPE html>
+<head>
 <meta charset="utf-8"/>
 <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
 <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
@@ -12,6 +11,7 @@
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
 <style type="text/css">
         :root {
@@ -340,8 +340,8 @@
         }
     </style>
 </head>
-<body class="bg-primary">
-<div class="relative flex size-full min-h-screen flex-col dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<body class="bg-primary dark">
+<div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
 <div class="absolute inset-0 -z-10 overflow-hidden">
 <div class="particle" style="--x-start: 10vw; --y-start: 20vh; --x-end: 90vw; --y-end: 80vh; width: 2px; height: 2px; animation-delay: 0s;"></div>
 <div class="particle" style="--x-start: 80vw; --y-start: 10vh; --x-end: 20vw; --y-end: 90vh; width: 1px; height: 1px; animation-delay: -1s;"></div>
@@ -706,7 +706,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.firestore();
+
+// Get current user and update UI
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // Hide the Get Started button and Create Free Account button for authenticated users
+    document.getElementById('get-started-btn').style.display = 'none';
+    document.querySelector('a[href="auth.html"]').style.display = 'none';
+  } else {
+    // Show buttons for non-authenticated users
+    document.getElementById('get-started-btn').style.display = '';
+    document.querySelector('a[href="auth.html"]').style.display = '';
+  }
+});
 
 // Comments Functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -764,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11 hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-2xl">dark_mode</span>
 </button>
-<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<button id="get-started-btn" class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
 <span class="truncate">Get Started</span>
 </button>
 <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
@@ -780,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter text-primary animate-fade-in-down" style='font-family: "Story Script", sans-serif; text-shadow: rgba(147, 51, 234, 0.5) 0px 0px 15px, rgba(147, 51, 234, 0.3) 0px 0px 25px;'>NeuroSync</h1>
 <p class="mt-4 text-lg md:text-xl text-secondary max-w-2xl mx-auto">AI-Powered Focus &amp; Mental Wellbeing Companion for Students</p>
 <div class="mt-10 flex flex-wrap gap-4 justify-center">
-<a class="translucent-button flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 text-lg font-bold" href="login page.html">
+<a class="translucent-button flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 text-lg font-bold" href="auth.html">
 <span class="truncate">Create Free Account</span>
 </a>
 </div>

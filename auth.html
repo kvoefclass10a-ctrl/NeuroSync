@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html><head>
-<meta charset="utf-8"/>
+<html>
+<head>
 <meta charset="utf-8"/>
 <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
 <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
-<title>Stitch Design</title>
+<title>NeuroSync Authentication</title>
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -172,28 +172,6 @@
       }
     </style>
 </head>
-<script type="module" id="firebase-init">
-  // Firebase SDK
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
-    authDomain: "neurosync-5173b.firebaseapp.com",
-    projectId: "neurosync-5173b",
-    storageBucket: "neurosync-5173b.appspot.com",
-    messagingSenderId: "855780859936",
-    appId: "1:855780859936:web:3044309100db9a61fa1c45"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Make auth available globally
-  window.firebaseAuth = { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword };
-</script>
 <body class="bg-[#110d19] text-white">
 <div class="relative flex size-full min-h-screen flex-col bg-[#110d19] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
 <div class="layout-container flex h-full grow flex-col">
@@ -296,7 +274,7 @@ function closeDropdown(element) {
 <input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="password" placeholder="••••••••" type="password"/>
 </div>
 <button id="submit-button" class="w-full rounded-lg bg-[var(--primary-600)] py-3 text-sm font-bold text-white shadow-lg shadow-[var(--primary-600)]/20 transition-all hover:bg-[var(--primary-700)] hover:shadow-xl hover:shadow-[var(--primary-700)]/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-600)] focus:ring-offset-[#1a1122]" type="submit">
-                Create Account 
+                Create Account
               </button>
 <div id="error-message" style="color: red; margin-top: 10px; text-align: center;"></div>
 </form>
@@ -329,83 +307,13 @@ function closeDropdown(element) {
 </button>
 </div>
 <p id="auth-toggle" class="mt-6 text-center text-xs text-gray-400">
-              Already have an account? 
+              Already have an account?
               <a class="text-gray-300 underline hover:text-white cursor-pointer">Sign In</a>
             </p>
 </div>
 </main>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let isLogin = false;
-
-      const authForm = document.getElementById('auth-form');
-      const formTitle = document.getElementById('form-title');
-      const formSubtitle = document.getElementById('form-subtitle');
-      const submitButton = document.getElementById('submit-button');
-      const authToggle = document.getElementById('auth-toggle');
-      const errorMessage = document.getElementById('error-message');
-
-      function toggleMode() {
-        isLogin = !isLogin;
-        errorMessage.textContent = '';
-        if (isLogin) {
-          formTitle.textContent = 'Welcome Back!';
-          formSubtitle.textContent = 'Sign in to continue your journey with NeuroSync.';
-          submitButton.textContent = 'Sign In';
-          authToggle.innerHTML = `Don't have an account? <a class="text-gray-300 underline hover:text-white cursor-pointer">Create Account</a>`;
-        } else {
-          formTitle.textContent = 'Create Your Free Account';
-          formSubtitle.textContent = 'Unlock your potential with NeuroSync. It\'s free forever.';
-          submitButton.textContent = 'Create Account';
-          authToggle.innerHTML = `Already have an account? <a class="text-gray-300 underline hover:text-white cursor-pointer">Sign In</a>`;
-        }
-      }
-
-      authToggle.addEventListener('click', (e) => {
-        if (e.target.tagName === 'A') {
-          toggleMode();
-        }
-      });
-
-      authForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      errorMessage.textContent = '';
-
-      const { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = window.firebaseAuth;
-
-      if (isLogin) {
-        // Handle Login
-        signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed in 
-            console.log('User signed in:', userCredential.user);
-            // Redirect to the dashboard or home page after successful login
-            window.location.href = 'student-planner.html';
-          })
-          .catch((error) => {
-            console.error('Login error:', error);
-            errorMessage.textContent = error.message;
-          });
-      } else {
-        // Handle Sign Up
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed up 
-            console.log('User signed up:', userCredential.user);
-            // Redirect to the dashboard or home page after successful signup
-            window.location.href = 'student-planner.html';
-          })
-          .catch((error) => {
-            console.error('Signup error:', error);
-            errorMessage.textContent = error.message;
-          });
-      }
-    });
-    });
-</script>
+<script type="module" src="auth.js"></script>
 </div>
 
 </body></html>

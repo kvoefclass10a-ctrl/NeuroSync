@@ -7,6 +7,79 @@
 <title>NeuroSync Dashboard</title>
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-storage-compat.js"></script>
+<script>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+  authDomain: "neurosync-5173b.firebaseapp.com",
+  projectId: "neurosync-5173b",
+  storageBucket: "neurosync-5173b.firebasestorage.app",
+  messagingSenderId: "855780859936",
+  appId: "1:855780859936:web:3044309100db9a61fa1c45",
+  measurementId: "G-75S5GWYEDK"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Get current user and update UI
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // Load profile data
+    try {
+      const doc = await db.collection('profiles').doc(user.uid).get();
+      let profileData = {};
+      if (doc.exists) {
+        profileData = doc.data();
+      }
+
+      // Update profile photo
+      const profilePhotoDiv = document.querySelector('.bg-center.bg-no-repeat.aspect-square.bg-cover.rounded-full.size-12');
+      if (profileData.photoURL) {
+        profilePhotoDiv.style.backgroundImage = `url("${profileData.photoURL}")`;
+      } else {
+        // Default avatar
+        profilePhotoDiv.style.backgroundImage = 'none';
+        profilePhotoDiv.innerHTML = '<span class="material-symbols-outlined text-2xl text-[var(--primary-color)]">person</span>';
+      }
+
+      // Update name
+      const displayName = profileData.firstName && profileData.lastName
+        ? `${profileData.firstName} ${profileData.lastName}`
+        : user.displayName || user.email.split('@')[0] || 'User';
+      document.getElementById('user-name').textContent = displayName;
+
+      // Update role
+      const roleElement = document.querySelector('.text-\\[\\#ad92c9\\].text-sm');
+      roleElement.textContent = profileData.role || 'Student';
+
+      // Update welcome message
+      const firstName = profileData.firstName || displayName.split(' ')[0];
+      document.getElementById('welcome-message').textContent = `Welcome back, ${firstName}! Let's make today productive.`;
+
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      // Fallback to basic user info
+      const username = user.displayName || user.email.split('@')[0] || 'User';
+      document.getElementById('user-name').textContent = username;
+      document.getElementById('welcome-message').textContent = `Welcome back, ${username}! Let's make today productive.`;
+    }
+
+    // Hide the Get Started button for authenticated users
+    document.getElementById('get-started-btn').style.display = 'none';
+  } else {
+    // Redirect to login if not authenticated
+    window.location.href = 'auth.html';
+  }
+});
+</script>
 <style type="text/tailwindcss">
         :root {
             --primary-color: #8013ec;
@@ -125,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <div class="flex items-center gap-4">
-<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<button id="get-started-btn" class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
 <span class="truncate">Get Started</span>
 </button>
 <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
@@ -138,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center gap-3 mb-8">
 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-[0_0_15px_rgba(128,19,236,0.5)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD7mFGWlvr2tFgaJL5RUb6wksgOv21HaT29jhS9vKVbp7Vyb6pFvxzFua0RVFgMOye8fydSHqqAGJhqUiL7rY9D-FZW5jHrns_-6dQ6szp6d2do8-tI3bgmGHDIq9nQKkmr4cqW-q_J1AwSBav13GtKDEMqSGNitnrmnznwelUtgYY4T-EJWuML3iplSvmcHks8GnVYDp5l1wWYMcwvO-XnZjsfZo1CNbJdlLxSTGqHUIzMNstSNXZGEN0hdjwU-ZpKwBViu08PwZU");'></div>
 <div class="flex flex-col">
-<h1 class="text-white text-lg font-bold">Sarah</h1>
+<h1 class="text-white text-lg font-bold" id="user-name">Sarah</h1>
 <p class="text-[#ad92c9] text-sm">Student</p>
 </div>
 </div>
@@ -159,16 +232,34 @@ document.addEventListener('DOMContentLoaded', function() {
 <span class="material-symbols-outlined">groups</span>
 <p class="text-sm font-medium">Community</p>
 </a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="profile.html">
+<span class="material-symbols-outlined">person</span>
+<p class="text-sm font-medium">Profile</p>
+</a>
 <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors" href="#">
 <span class="material-symbols-outlined">settings</span>
 <p class="text-sm font-medium">Settings</p>
 </a>
+<button id="sign-out-btn" class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-[#362348] rounded-lg transition-colors w-full text-left">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium">Sign Out</p>
+</button>
 </nav>
+<script>
+// Sign out functionality
+document.getElementById('sign-out-btn').addEventListener('click', () => {
+  firebase.auth().signOut().then(() => {
+    window.location.href = 'index.html';
+  }).catch((error) => {
+    console.error('Sign out error:', error);
+  });
+});
+</script>
 </aside>
 <main class="flex-1 p-8 overflow-y-auto">
 <header class="mb-8">
 <h1 class="text-4xl font-bold tracking-tight">Dashboard</h1>
-<p class="text-[#ad92c9] mt-1">Welcome back, Sarah! Let's make today productive.</p>
+<p class="text-[#ad92c9] mt-1" id="welcome-message">Welcome back, Sarah! Let's make today productive.</p>
 </header>
 <section class="mb-8">
 <h2 class="text-2xl font-bold tracking-tight mb-4">Daily Summary</h2>
