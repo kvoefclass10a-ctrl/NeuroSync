@@ -338,6 +338,117 @@
         body.focus-mode #fullscreen-btn span {
             color: var(--zen-text);
         }
+
+        /* Enhanced Mood Selection Styles */
+        .mood-button {
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mood-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .mood-button:hover::before {
+            left: 100%;
+        }
+
+        .mood-button:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(147, 51, 234, 0.3);
+            border-color: rgba(147, 51, 234, 0.4);
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(255, 255, 255, 0.08));
+        }
+
+        .mood-button.selected {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(126, 34, 206, 0.1));
+            border-color: rgba(147, 51, 234, 0.6);
+            box-shadow: 0 0 30px rgba(147, 51, 234, 0.5), inset 0 2px 10px rgba(147, 51, 234, 0.2);
+            animation: pulse-selected 2s infinite;
+        }
+
+        @keyframes pulse-selected {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(147, 51, 234, 0.5), inset 0 2px 10px rgba(147, 51, 234, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(147, 51, 234, 0.7), inset 0 2px 15px rgba(147, 51, 234, 0.3);
+            }
+        }
+
+        .mood-button span:first-child {
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .mood-button:hover span:first-child {
+            transform: scale(1.3) rotate(5deg);
+            filter: drop-shadow(0 0 10px rgba(147, 51, 234, 0.6));
+        }
+
+        .mood-button.selected span:first-child {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 15px rgba(147, 51, 234, 0.8));
+        }
+
+        .mood-button span:last-child {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .mood-button:hover span:last-child {
+            color: var(--dark-accent);
+            transform: translateY(-2px);
+        }
+
+        .mood-button.selected span:last-child {
+            color: var(--dark-accent);
+            font-weight: 700;
+        }
+
+        /* Mood Grid Animation */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .mood-grid .mood-button:nth-child(1) { animation-delay: 0.1s; }
+        .mood-grid .mood-button:nth-child(2) { animation-delay: 0.2s; }
+        .mood-grid .mood-button:nth-child(3) { animation-delay: 0.3s; }
+        .mood-grid .mood-button:nth-child(4) { animation-delay: 0.4s; }
+        .mood-grid .mood-button:nth-child(5) { animation-delay: 0.5s; }
+
+        .mood-grid .mood-button {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body class="bg-primary dark">
@@ -374,7 +485,7 @@
 </div>
 <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
 <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="#">Home</a>
-<a href="student-planner.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">
+<a href="student-planner.html" id="dashboard-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">
 <span>Dashboard</span>
 </a>
 <div class="relative group">
@@ -666,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   const themeToggle = document.getElementById('theme-toggle');
   const icon = themeToggle.querySelector('span');
-  const themeElement = document.querySelector('.group');
+  const themeElement = document.body;
 
   // Load saved theme or default to dark
   const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -710,16 +821,87 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Get current user and update UI
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
   if (user) {
     // Hide the Get Started button and Create Free Account button for authenticated users
     document.getElementById('get-started-btn').style.display = 'none';
     document.querySelector('a[href="auth.html"]').style.display = 'none';
+
+    // Show navbar profile and dashboard link for authenticated users
+    document.getElementById('navbar-profile').style.display = 'flex';
+    document.getElementById('dashboard-nav-link').style.display = 'flex';
+
+    // Load profile data
+    try {
+      const doc = await db.collection('Profiles').doc(user.uid).get();
+      let profileData = {};
+      if (doc.exists) {
+        profileData = doc.data();
+      }
+
+      // Update navbar profile photo
+      const navbarPhotoDiv = document.getElementById('navbar-profile-photo');
+      if (profileData.photoUrl) {
+        navbarPhotoDiv.style.backgroundImage = `url("${profileData.photoUrl}")`;
+        navbarPhotoDiv.innerHTML = '';
+      } else {
+        navbarPhotoDiv.style.backgroundImage = 'none';
+        navbarPhotoDiv.innerHTML = '<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>';
+      }
+
+      // Update navbar name
+      const displayName = profileData.firstname && profileData.lastname
+        ? `${profileData.firstname} ${profileData.lastname}`
+        : user.displayName || user.email.split('@')[0] || 'User';
+      document.getElementById('navbar-name').textContent = displayName;
+
+      // Update navbar class and role
+      const classRole = profileData.class && profileData.role
+        ? `${profileData.class} • ${profileData.role}`
+        : profileData.role || 'Student';
+      document.getElementById('navbar-class-role').textContent = classRole;
+
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      // Fallback to basic user info
+      const username = user.displayName || user.email.split('@')[0] || 'User';
+      document.getElementById('navbar-name').textContent = username;
+      document.getElementById('navbar-class-role').textContent = 'Student';
+    }
+
   } else {
     // Show buttons for non-authenticated users
     document.getElementById('get-started-btn').style.display = '';
     document.querySelector('a[href="auth.html"]').style.display = '';
+    // Hide navbar profile and dashboard link for non-authenticated users
+    document.getElementById('navbar-profile').style.display = 'none';
+    document.getElementById('dashboard-nav-link').style.display = 'none';
   }
+});
+
+// Enhanced Mood Functionality
+import('./mood.js').then(module => {
+  module.initMoodLogging();
+  module.loadRecentMoods();
+
+  // Add enhanced mood selection interactions
+  const moodButtons = document.querySelectorAll('.mood-button');
+  let selectedMood = null;
+
+  moodButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove selected class from all buttons
+      moodButtons.forEach(btn => btn.classList.remove('selected'));
+
+      // Add selected class to clicked button
+      this.classList.add('selected');
+      selectedMood = this.dataset.mood;
+
+      // Trigger mood logging
+      const moodLevel = parseInt(this.dataset.level);
+      module.logMood(selectedMood, moodLevel);
+    });
+  });
 });
 
 // Comments Functionality
@@ -773,8 +955,72 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+// Navbar dropdown functionality
+let dropdownTimeout;
+const navbarProfile = document.getElementById('navbar-profile');
+const navbarDropdown = document.getElementById('navbar-dropdown');
+
+navbarProfile.addEventListener('mouseenter', () => {
+  clearTimeout(dropdownTimeout);
+  navbarDropdown.classList.remove('hidden');
+  navbarDropdown.classList.add('block');
+});
+
+navbarProfile.addEventListener('mouseleave', () => {
+  dropdownTimeout = setTimeout(() => {
+    navbarDropdown.classList.add('hidden');
+    navbarDropdown.classList.remove('block');
+  }, 3000); // 3 seconds delay
+});
+
+navbarDropdown.addEventListener('mouseenter', () => {
+  clearTimeout(dropdownTimeout);
+});
+
+navbarDropdown.addEventListener('mouseleave', () => {
+  dropdownTimeout = setTimeout(() => {
+    navbarDropdown.classList.add('hidden');
+    navbarDropdown.classList.remove('block');
+  }, 3000); // 3 seconds delay
+});
+
+// Navbar sign out functionality
+document.getElementById('navbar-sign-out-btn').addEventListener('click', () => {
+  firebase.auth().signOut().then(() => {
+    window.location.href = 'index.html';
+  }).catch((error) => {
+    console.error('Sign out error:', error);
+  });
+});
 </script>
 <div class="flex items-center gap-4">
+<div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
+<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
+</div>
+<div class="flex flex-col">
+<div class="text-white text-sm font-medium" id="navbar-name">User</div>
+<div class="text-[#ad92c9] text-xs" id="navbar-class-role">Student</div>
+</div>
+<!-- Dropdown Menu -->
+<div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
+<div class="py-1">
+<a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+<span class="material-symbols-outlined text-base">person</span>
+<span>See Profile</span>
+</a>
+<a href="profile.html?edit=true" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+<span class="material-symbols-outlined text-base">edit</span>
+<span>Edit Profile</span>
+</a>
+<button id="navbar-sign-out-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
+<span class="material-symbols-outlined text-base">logout</span>
+<span>Sign Out</span>
+</button>
+</div>
+</div>
+</div>
 <button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11 hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-2xl">dark_mode</span>
 </button>
@@ -811,49 +1057,69 @@ document.addEventListener('DOMContentLoaded', function() {
 <button class="flex-1 py-3 text-base md:text-lg font-bold border-b-2 border-accent text-primary transition-colors">Mood</button>
 <button class="flex-1 py-3 text-base md:text-lg font-bold border-b-2 border-transparent text-muted hover:text-primary transition-colors">Focus</button>
 </div>
-<div class="flex justify-center flex-wrap gap-4 sm:gap-6 text-2xl mb-8">
-<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
-<span class="text-4xl sm:text-5xl">😄</span>
-<span class="font-medium text-xs sm:text-sm">Happy</span>
+<div class="mood-grid">
+<button class="mood-button flex flex-col items-center gap-3 text-muted hover:text-accent transition-colors group" data-mood="Happy" data-level="5">
+<span class="text-5xl sm:text-6xl">😄</span>
+<span class="font-medium text-sm sm:text-base">Happy</span>
 </button>
-<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
-<span class="text-4xl sm:text-5xl">😐</span>
-<span class="font-medium text-xs sm:text-sm">Neutral</span>
+<button class="mood-button flex flex-col items-center gap-3 text-muted hover:text-accent transition-colors group" data-mood="Neutral" data-level="3">
+<span class="text-5xl sm:text-6xl">😐</span>
+<span class="font-medium text-sm sm:text-base">Neutral</span>
 </button>
-<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
-<span class="text-4xl sm:text-5xl">😔</span>
-<span class="font-medium text-xs sm:text-sm">Sad</span>
+<button class="mood-button flex flex-col items-center gap-3 text-muted hover:text-accent transition-colors group" data-mood="Sad" data-level="2">
+<span class="text-5xl sm:text-6xl">😔</span>
+<span class="font-medium text-sm sm:text-base">Sad</span>
 </button>
-<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
-<span class="text-4xl sm:text-5xl">😟</span>
-<span class="font-medium text-xs sm:text-sm">Anxious</span>
+<button class="mood-button flex flex-col items-center gap-3 text-muted hover:text-accent transition-colors group" data-mood="Anxious" data-level="1">
+<span class="text-5xl sm:text-6xl">😟</span>
+<span class="font-medium text-sm sm:text-base">Anxious</span>
 </button>
-<button class="flex flex-col items-center gap-2 text-muted hover:text-accent transition-colors group">
-<span class="text-4xl sm:text-5xl">🤩</span>
-<span class="font-medium text-xs sm:text-sm">Excited</span>
+<button class="mood-button flex flex-col items-center gap-3 text-muted hover:text-accent transition-colors group" data-mood="Excited" data-level="4">
+<span class="text-5xl sm:text-6xl">🤩</span>
+<span class="font-medium text-sm sm:text-base">Excited</span>
 </button>
 </div>
 <h3 class="text-xl md:text-2xl font-bold text-primary tracking-tight text-center mb-6">Personalized Suggestions</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
-<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtT0KI4s3kg14ZrFoZLlKMWvodKpolrsdNbKA5uoGRp7wiYb0F8aDhD7hg5sbX6UYxE9wt3YhSoIy4QEUGjauYxTZJtfXLT9CWfN2U3VEHqtzZTocO-b6vM3to2mManmhCxgh3MqZy3GkEdXSEK5eAEZak4S2DXRHa3SoNyNwODNAZq20YRUp9cJJUfpGerZhdq32t8FzhGPiCKEb06loJHPH2_itJgHm547wjiuYushoilS5QCNnTteBrLNLIooqO0xxGQRNrOBU");'></div>
-<div>
-<p class="text-lg font-bold text-primary">Mindfulness Exercises</p>
-<p class="text-muted">Quick exercises to center your mind.</p>
+<div id="mood-suggestion" class="text-center text-muted mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 backdrop-blur-sm transition-all duration-500">
+  <div class="text-lg font-medium mb-2">Select your mood to see a suggestion.</div>
+  <div class="text-sm opacity-75">Your emotional state helps us provide better guidance</div>
+</div>
+<button id="log-mood-btn" class="translucent-button px-8 py-4 rounded-full font-bold hover:scale-105 transition-transform mx-auto block mb-8 text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">Log Mood</button>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="flex flex-col gap-6 rounded-2xl bg-gradient-to-br from-primary/80 to-primary/60 backdrop-blur-sm border border-primary/50 p-6 transform hover:-translate-y-3 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20 group">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtT0KI4s3kg14ZrFoZLlKMWvodKpolrsdNbKA5uoGRp7wiYb0F8aDhD7hg5sbX6UYxE9wt3YhSoIy4QEUGjauYxTZJtfXLT9CWfN2U3VEHqtzZTocO-b6vM3to2mManmhCxgh3MqZy3GkEdXSEK5eAEZak4S2DXRHa3SoNyNwODNAZq20YRUp9cJJUfpGerZhdq32t8FzhGPiCKEb06loJHPH2_itJgHm547wjiuYushoilS5QCNnTteBrLNLIooqO0xxGQRNrOBU");'>
+<div class="w-full h-full bg-gradient-to-t from-black/20 to-transparent"></div>
+</div>
+<div class="text-center">
+<p class="text-xl font-bold text-primary mb-2 group-hover:text-accent transition-colors duration-300">Mindfulness Exercises</p>
+<p class="text-muted leading-relaxed">Quick exercises to center your mind and find inner peace.</p>
+<div class="mt-4 flex justify-center">
+<span class="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">5 min sessions</span>
 </div>
 </div>
-<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
-<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6x_r8yhpW9Tdo6EJI6P29n1gAspVbi831BdAwXGsSOnTPzhusVUwG6GkrUeuZIAbiYZrJBNnRn_y-EcK3HMYMCHF7Tfr8TbmVeN5QW1aWGd1H-AcyKxNSVvr4aTESkAIt0awzo7JJQofDUEbVND52ks5gYfGMaF6DZrW9TLDE0ksrSqklTd3uS5ti7TPqfQabd85JCNtj7Kfua2N_Hq_4eVmodLptwVkq2NNKwsvlXstRrm95xSAn4hftZuGydmwE_gwNbJbgTQ0");'></div>
-<div>
-<p class="text-lg font-bold text-primary">Study Techniques</p>
-<p class="text-muted">Effective study methods for better focus.</p>
+</div>
+<div class="flex flex-col gap-6 rounded-2xl bg-gradient-to-br from-primary/80 to-primary/60 backdrop-blur-sm border border-primary/50 p-6 transform hover:-translate-y-3 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 group">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6x_r8yhpW9Tdo6EJI6P29n1gAspVbi831BdAwXGsSOnTPzhusVUwG6GkrUeuZIAbiYZrJBNnRn_y-EcK3HMYMCHF7Tfr8TbmVeN5QW1aWGd1H-AcyKxNSVvr4aTESkAIt0awzo7JJQofDUEbVND52ks5gYfGMaF6DZrW9TLDE0ksrSqklTd3uS5ti7TPqfQabd85JCNtj7Kfua2N_Hq_4eVmodLptwVkq2NNKwsvlXstRrm95xSAn4hftZuGydmwE_gwNbJbgTQ0");'>
+<div class="w-full h-full bg-gradient-to-t from-black/20 to-transparent"></div>
+</div>
+<div class="text-center">
+<p class="text-xl font-bold text-primary mb-2 group-hover:text-accent transition-colors duration-300">Study Techniques</p>
+<p class="text-muted leading-relaxed">Effective study methods for better focus and retention.</p>
+<div class="mt-4 flex justify-center">
+<span class="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">Proven methods</span>
 </div>
 </div>
-<div class="flex flex-col gap-4 rounded-xl bg-primary/70 backdrop-blur-sm border border-primary p-4 transform hover:-translate-y-2 transition-transform duration-300">
-<div class="w-full h-40 bg-center bg-no-repeat bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBMbSjC4B4pP1XbLnsslxg2z1-c2kRiwVIboSHZbqAdhTdA8cQd4vSnHEi7Gk8O7QmcyGa7PCVnur1xYU4kPZ1bv5zxMI-gm1hBxM6J1S4pp0UxOR8SDLAgy3eF2PWWBRDUIlXehz2ZcmSCyB5QgU9BqiZ-BF1QAgHUV5ufTGbbasocx-SlEoXFCysNf6NSA0ItY2mSf2ucZ1rliLJwfi2bxZFnlCI1-aagdY85VAPNL5gky9dXhTieRVKIL6y7gAuVIfWTZ_VH75Q");'></div>
-<div>
-<p class="text-lg font-bold text-primary">Stress Management</p>
-<p class="text-muted">Strategies to reduce stress and anxiety.</p>
+</div>
+<div class="flex flex-col gap-6 rounded-2xl bg-gradient-to-br from-primary/80 to-primary/60 backdrop-blur-sm border border-primary/50 p-6 transform hover:-translate-y-3 transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/20 group">
+<div class="w-full h-48 bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBMbSjC4B4pP1XbLnsslxg2z1-c2kRiwVIboSHZbqAdhTdA8cQd4vSnHEi7Gk8O7QmcyGa7PCVnur1xYU4kPZ1bv5zxMI-gm1hBxM6J1S4pp0UxOR8SDLAgy3eF2PWWBRDUIlXehz2ZcmSCyB5QgU9BqiZ-BF1QAgHUV5ufTGbbasocx-SlEoXFCysNf6NSA0ItY2mSf2ucZ1rliLJwfi2bxZFnlCI1-aagdY85VAPNL5gky9dXhTieRVKIL6y7gAuVIfWTZ_VH75Q");'>
+<div class="w-full h-full bg-gradient-to-t from-black/20 to-transparent"></div>
+</div>
+<div class="text-center">
+<p class="text-xl font-bold text-primary mb-2 group-hover:text-accent transition-colors duration-300">Stress Management</p>
+<p class="text-muted leading-relaxed">Strategies to reduce stress and build resilience.</p>
+<div class="mt-4 flex justify-center">
+<span class="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">Science-backed</span>
+</div>
 </div>
 </div>
 </div>

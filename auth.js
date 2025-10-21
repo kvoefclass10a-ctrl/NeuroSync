@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Make auth available globally if needed
 window.firebaseAuth = { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword };
@@ -35,16 +37,19 @@ let isLogin = false; // false for signup, true for login
 function toggleMode() {
   isLogin = !isLogin;
   errorMessage.textContent = '';
+  const profileFields = document.querySelectorAll('[id^="profile-fields"]');
   if (isLogin) {
     formTitle.textContent = 'Welcome Back!';
     formSubtitle.textContent = 'Sign in to continue your journey with NeuroSync.';
     submitButton.textContent = 'Sign In';
     authToggle.innerHTML = `Don't have an account? <a class="text-gray-300 underline hover:text-white cursor-pointer">Create Account</a>`;
+    profileFields.forEach(field => field.style.display = 'none');
   } else {
     formTitle.textContent = 'Create Your Free Account';
     formSubtitle.textContent = 'Unlock your potential with NeuroSync. It\'s free forever.';
     submitButton.textContent = 'Create Account';
     authToggle.innerHTML = `Already have an account? <a class="text-gray-300 underline hover:text-white cursor-pointer">Sign In</a>`;
+    profileFields.forEach(field => field.style.display = 'block');
   }
 }
 
@@ -54,7 +59,29 @@ authToggle.addEventListener('click', (e) => {
   }
 });
 
-authForm.addEventListener('submit', (e) => {
+async function signUp(email, password, firstname, lastname, age, className, preferredSubject, role) {
+  try {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+    // Create profile linked to UID
+    await setDoc(doc(db, "Profiles", user.uid), {
+      firstname,
+      lastname,
+      age,
+      class: className,
+      preferredSubject,
+      role,
+      createdAt: serverTimestamp()
+    });
+
+    console.log("✅ Profile created successfully!");
+  } catch (error) {
+    console.error("❌ Error:", error.message);
+    throw error;
+  }
+}
+
+authForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -75,16 +102,21 @@ authForm.addEventListener('submit', (e) => {
       });
   } else {
     // Handle Sign Up
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-      // Signed up
-      console.log('User signed up:', userCredential.user);
+    const firstname = document.getElementById('firstname').value;
+    const lastname = document.getElementById('lastname').value;
+    const age = document.getElementById('age').value;
+    const className = document.getElementById('className').value;
+    const preferredSubject = document.getElementById('preferredSubject').value;
+    const role = document.getElementById('role').value;
+
+    try {
+      await signUp(email, password, firstname, lastname, age, className, preferredSubject, role);
+      console.log('User signed up and profile created');
       // Redirect to the dashboard or home page after successful signup
       window.location.href = 'student-planner.html';
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error('Signup error:', error);
       errorMessage.textContent = error.message;
-    });
+    }
   }
 });

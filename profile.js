@@ -5,6 +5,34 @@
 
 // Assume Firebase is initialized with your config elsewhere on the page
 
+function loadProfile() {
+  const user = firebase.auth().currentUser;
+
+  if (!user) {
+    alert('User not logged in');
+    return;
+  }
+
+  const uid = user.uid;
+  const db = firebase.firestore();
+
+  db.collection('Profiles').doc(uid).get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById('firstName').value = data.firstname || '';
+        document.getElementById('lastName').value = data.lastname || '';
+        document.getElementById('age').value = data.age || '';
+        document.getElementById('classGrade').value = data.class || '';
+        document.getElementById('role').value = data.role || 'Student';
+        document.getElementById('photoUrl').value = data.photoUrl || '';
+      }
+    })
+    .catch((error) => {
+      console.error('Error loading profile:', error);
+    });
+}
+
 function saveProfile() {
   const user = firebase.auth().currentUser;
 
@@ -29,14 +57,16 @@ function saveProfile() {
   const db = firebase.firestore();
 
   // Save to Firestore
-  db.collection('users').doc(uid).set({
-    firstName: firstName,
-    lastName: lastName,
+  db.collection('Profiles').doc(uid).set({
+    firstname: firstName,
+    lastname: lastName,
     age: age,
-    classGrade: classGrade,
+    class: classGrade,
+    preferredSubject: '', // Assuming not in form, can be added later
     role: role,
     photoUrl: photoUrl,
-    email: email
+    email: email,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   })
   .then(() => {
     alert('Profile saved successfully!');
@@ -45,3 +75,10 @@ function saveProfile() {
     alert('Error saving profile: ' + error.message);
   });
 }
+
+// Load profile on page load
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    loadProfile();
+  }
+});
