@@ -28,7 +28,146 @@ export const moodTips = {
     "Celebrate small wins along the way.",
     "Seek mentorship from those ahead of you.",
     "Stay adaptable in your approach.",
-    "Prioritize tasks that align with your vision.",
+    "Prioritize tasks that align with your vision."
+  ],
+  Happy: [
+    "Share your happiness with others around you.",
+    "Take a moment to appreciate what went well today.",
+    "Use this positive energy to tackle a challenging task.",
+    "Write down three things you're grateful for.",
+    "Smile at strangers and spread the joy.",
+    "Listen to your favorite upbeat music.",
+    "Spend time with people who make you laugh.",
+    "Treat yourself to something you enjoy.",
+    "Reflect on your accomplishments.",
+    "Plan something fun for the weekend."
+  ],
+  Neutral: [
+    "Take a short walk to clear your mind.",
+    "Try a new hobby or activity.",
+    "Connect with a friend for a casual chat.",
+    "Organize your workspace for better focus.",
+    "Read an interesting article or book.",
+    "Practice deep breathing exercises.",
+    "Set a small, achievable goal for today.",
+    "Listen to calming music or a podcast.",
+    "Do some light stretching or yoga.",
+    "Write in a journal about your thoughts."
+  ],
+  Sad: [
+    "Allow yourself to feel your emotions without judgment.",
+    "Reach out to a trusted friend or family member.",
+    "Engage in self-care activities you enjoy.",
+    "Take a warm shower or bath.",
+    "Write down your feelings in a journal.",
+    "Go for a gentle walk in nature.",
+    "Watch a comforting movie or show.",
+    "Practice self-compassion and kindness.",
+    "Do something creative like drawing or painting.",
+    "Consider talking to a counselor or therapist."
+  ],
+  Anxious: [
+    "Practice deep breathing: inhale for 4 counts, hold for 4, exhale for 4.",
+    "Ground yourself by naming 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste.",
+    "Challenge negative thoughts with evidence-based counterarguments.",
+    "Break down overwhelming tasks into smaller, manageable steps.",
+    "Use progressive muscle relaxation techniques.",
+    "Limit caffeine and sugar intake.",
+    "Establish a consistent sleep schedule.",
+    "Practice mindfulness meditation.",
+    "Exercise regularly to reduce stress hormones.",
+    "Create a 'worry time' where you set aside 15 minutes to address concerns."
+  ],
+  Excited: [
+    "Channel your energy into productive activities.",
+    "Share your excitement with others to amplify the positive feelings.",
+    "Use this motivation to start a new project or goal.",
+    "Take action on something you've been putting off.",
+    "Celebrate the anticipation of good things to come.",
+    "Create a vision board for your aspirations.",
+    "Set specific, actionable steps toward your goals.",
+    "Surround yourself with supportive, positive people.",
+    "Document your progress and achievements.",
+    "Reward yourself for taking initiative."
+  ]
+};
+
+// Initialize mood logging functionality
+export function initMoodLogging() {
+  const moodButtons = document.querySelectorAll('.mood-button');
+  const logMoodBtn = document.getElementById('log-mood-btn');
+  const moodSuggestion = document.getElementById('mood-suggestion');
+
+  if (moodButtons.length > 0) {
+    moodButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove selected class from all buttons
+        moodButtons.forEach(btn => btn.classList.remove('selected'));
+
+        // Add selected class to clicked button
+        this.classList.add('selected');
+        const selectedMood = this.dataset.mood;
+        const moodLevel = parseInt(this.dataset.level);
+
+        // Update suggestion
+        if (moodSuggestion) {
+          const tips = moodTips[selectedMood] || [];
+          const randomTip = tips[Math.floor(Math.random() * tips.length)] || "Keep up the great work!";
+          moodSuggestion.innerHTML = `
+            <div class="text-lg font-medium mb-2">Great choice! Here's a tip for you:</div>
+            <div class="text-sm opacity-75">${randomTip}</div>
+          `;
+        }
+      });
+    });
+  }
+
+  if (logMoodBtn) {
+    logMoodBtn.addEventListener('click', async function() {
+      const selectedButton = document.querySelector('.mood-button.selected');
+      if (!selectedButton) {
+        showNotification('Please select a mood first!', 'error');
+        return;
+      }
+
+      const mood = selectedButton.dataset.mood;
+      const level = parseInt(selectedButton.dataset.level);
+
+      await logMood(mood, level);
+    });
+  }
+}
+
+// Log mood to Firebase
+export async function logMood(mood, level) {
+  const user = auth.currentUser;
+  if (!user) {
+    showNotification('Please log in to log your mood.', 'error');
+    return;
+  }
+
+  try {
+    // Add mood entry
+    await addDoc(collection(db, 'Moods'), {
+      userId: user.uid,
+      mood: mood,
+      level: level,
+      timestamp: new Date()
+    });
+
+    // Update rewards
+    await updateRewards(user.uid, 2); // 2 points for logging mood
+
+    // Reload recent moods
+    await loadRecentMoods();
+
+    showNotification(`Mood logged: ${mood}! +2 points earned.`, 'success');
+
+  } catch (error) {
+    console.error('Error logging mood:', error);
+    showNotification('Failed to log mood. Please try again.', 'error');
+  }
+}
 
 // Update rewards points and recalculate level
 async function updateRewards(userId, pointsToAdd) {

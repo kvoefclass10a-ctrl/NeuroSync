@@ -2,7 +2,7 @@
 
 // Firebase SDK imports
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js";
-import { getFirestore, collection, addDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js";
+import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js";
 
 const auth = getAuth();
 const db = getFirestore();
@@ -277,6 +277,28 @@ function showNotification(message, type) {
   }, 3000);
 }
 
+// Save session reflection to Firebase
+export async function saveSessionReflection(focusRating, reflectionNotes) {
+  const user = auth.currentUser;
+  if (!user || !currentSession) return;
+
+  try {
+    const reflectionRef = doc(db, 'SessionReflections', `${currentSession}_reflection`);
+    await setDoc(reflectionRef, {
+      sessionId: currentSession,
+      userId: user.uid,
+      focusRating: parseInt(focusRating),
+      reflectionNotes: reflectionNotes.trim(),
+      timestamp: new Date()
+    }, { merge: true });
+
+    console.log('Session reflection saved successfully');
+  } catch (error) {
+    console.error('Error saving session reflection:', error);
+    throw error;
+  }
+}
+
 // Load focus session statistics
 export async function loadFocusStats() {
   const user = auth.currentUser;
@@ -289,6 +311,20 @@ export async function loadFocusStats() {
 
     let totalSessions = 0;
     let totalMinutes = 0;
+    let averageFocusRating = 0;
+    let totalReflections = 0;
+
+    // Load reflections for focus rating calculation
+    const reflectionsRef = collection(db, 'SessionReflections');
+    const reflectionsQuery = query(reflectionsRef, where('userId', '==', user.uid));
+    const reflectionsSnapshot = await getDocs(reflectionsQuery);
+
+    let totalRating = 0;
+    reflectionsSnapshot.forEach((doc) => {
+      const reflection = doc.data();
+      totalRating += reflection.focusRating || 0;
+      totalReflections++;
+    });
 
     querySnapshot.forEach((doc) => {
       const session = doc.data();
@@ -296,12 +332,18 @@ export async function loadFocusStats() {
       totalMinutes += session.duration || 0;
     });
 
+    if (totalReflections > 0) {
+      averageFocusRating = (totalRating / totalReflections).toFixed(1);
+    }
+
     // Update UI elements if they exist
     const sessionsElement = document.getElementById('total-sessions');
     const minutesElement = document.getElementById('total-minutes');
+    const ratingElement = document.getElementById('average-focus-rating');
 
     if (sessionsElement) sessionsElement.textContent = totalSessions;
     if (minutesElement) minutesElement.textContent = totalMinutes;
+    if (ratingElement) ratingElement.textContent = averageFocusRating > 0 ? `${averageFocusRating}/5` : 'N/A';
 
   } catch (error) {
     console.error('Error loading focus stats:', error);
