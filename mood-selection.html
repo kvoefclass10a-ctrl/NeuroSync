@@ -78,6 +78,38 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
     }
 
+    /* Filter Tab Styles */
+    .filter-tab {
+      transition: all 0.3s ease;
+    }
+
+    .filter-tab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(147, 51, 234, 0.2);
+    }
+
+    .filter-tab.active {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(126, 34, 206, 0.1));
+      border-color: rgba(147, 51, 234, 0.6);
+      color: var(--dark-accent);
+
+
+
+      
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+    }
+
+    /* Mood Search Styles */
+    #mood-search {
+      transition: all 0.3s ease;
+    }
+
+    #mood-search:focus {
+      border-color: var(--dark-accent);
+      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+      transform: scale(1.02);
+    }
+
     .chatbot-mood-btn {
       padding: 1.5rem;
       border-radius: 1.5rem;
@@ -94,6 +126,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .chatbot-mood-btn.hidden {
+      opacity: 0;
+      transform: scale(0.8);
+      pointer-events: none;
     }
 
     .chatbot-mood-btn::before {
@@ -149,6 +189,65 @@
     .chatbot-mood-btn.selected img {
       transform: scale(1.2);
       filter: drop-shadow(0 0 15px rgba(147, 51, 234, 0.8));
+    }
+
+    /* Responsive Mood Grid */
+    @media (max-width: 768px) {
+      .mood-grid {
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+        gap: 0.5rem !important;
+      }
+
+      .chatbot-mood-btn {
+        width: 70px !important;
+        height: 70px !important;
+      }
+
+      .chatbot-mood-btn img {
+        width: 40px !important;
+        height: 40px !important;
+      }
+
+      .mood-filters {
+        gap: 0.25rem !important;
+      }
+
+      .filter-tab {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.9rem !important;
+      }
+
+      #mood-search {
+        width: 250px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .mood-grid {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)) !important;
+        gap: 0.4rem !important;
+      }
+
+      .chatbot-mood-btn {
+        width: 60px !important;
+        height: 60px !important;
+        padding: 1rem !important;
+      }
+
+      .chatbot-mood-btn img {
+        width: 35px !important;
+        height: 35px !important;
+      }
+
+      .filter-tab {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.8rem !important;
+      }
+
+      #mood-search {
+        width: 200px !important;
+        font-size: 14px !important;
+      }
     }
 
     /* Mood Grid Animation */
@@ -269,10 +368,11 @@
 <body>
   <!-- Header/Navbar copied from index.html -->
   <div class="navbar" id="navbar">
-    <div class="nav-logo">
-      <img src="logo.png" alt="Logo" class="logo-text">
-    </div>
-    <div><a href="mood-selection.html" style="color: var(--accent-color); text-decoration: underline;">Mood</a></div>
+  <div class="nav-logo">
+    <img src="logo.png" alt="Logo" class="logo-text">
+  </div>
+  <div><a href="index.html" style="color: inherit; text-decoration: none;">Home</a></div>
+  <div><a href="mood-selection.html" style="color: var(--accent-color); text-decoration: underline;">Mood</a></div>
     <div><a href="index.html#study" style="color: inherit; text-decoration: none;">Study</a></div>
     <div><a href="index.html#feedback" style="color: inherit; text-decoration: none;">Feedback</a></div>
     <div><a href="index.html#dashboard" style="color: inherit; text-decoration: none;">Dashboard</a></div>
@@ -292,32 +392,62 @@
       <input type="text" id="chat-input" placeholder="Type your message or select a mood below..." style="flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; outline: none;" autocomplete="off" />
       <button type="submit" style="margin-left: 10px; padding: 10px 20px; border-radius: 20px; border: none; background-color: #4a90e2; color: white; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;">Send</button>
     </form>
+    <!-- Mood Filter Tabs -->
+    <div class="mood-filters" style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+      <button class="filter-tab active" data-filter="all" style="padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid rgba(42, 33, 64, 0.3); background: rgba(147, 51, 234, 0.1); color: var(--dark-text-secondary); cursor: pointer; transition: all 0.3s ease; font-weight: 600;">All Moods</button>
+      <button class="filter-tab" data-filter="positive" style="padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid rgba(42, 33, 64, 0.3); background: rgba(26, 20, 45, 0.8); color: var(--dark-text-secondary); cursor: pointer; transition: all 0.3s ease; font-weight: 600;">Positive</button>
+      <button class="filter-tab" data-filter="negative" style="padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid rgba(42, 33, 64, 0.3); background: rgba(26, 20, 45, 0.8); color: var(--dark-text-secondary); cursor: pointer; transition: all 0.3s ease; font-weight: 600;">Negative</button>
+      <button class="filter-tab" data-filter="neutral" style="padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid rgba(42, 33, 64, 0.3); background: rgba(26, 20, 45, 0.8); color: var(--dark-text-secondary); cursor: pointer; transition: all 0.3s ease; font-weight: 600;">Neutral</button>
+    </div>
+
+    <!-- Mood Search -->
+    <div class="mood-search" style="display: flex; justify-content: center; margin-bottom: 1rem;">
+      <input type="text" id="mood-search" placeholder="🔍 Search moods..." style="padding: 0.75rem 1rem; border-radius: 25px; border: 2px solid rgba(42, 33, 64, 0.3); background: rgba(26, 20, 45, 0.8); color: var(--dark-text-primary); font-size: 16px; outline: none; width: 300px; max-width: 90%; backdrop-filter: blur(10px);" autocomplete="off" />
+    </div>
+
+    <!-- Mood Streak Tracker -->
+    <div class="mood-streak" style="display: flex; justify-content: center; margin-bottom: 1rem;">
+      <div style="background: rgba(26, 20, 45, 0.8); padding: 0.75rem 1.5rem; border-radius: 25px; border: 1px solid rgba(42, 33, 64, 0.3); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 0.5rem;">
+        <span style="color: var(--dark-text-secondary); font-size: 0.9rem;">🔥 Current Streak:</span>
+        <span id="streak-count" style="color: var(--dark-accent); font-weight: bold; font-size: 1.1rem;">0 days</span>
+      </div>
+    </div>
+
     <div class="mood-grid" style="margin-top: 1rem; justify-content: center; overflow-y: auto; max-height: 120px;">
-      <button class="mood-button chatbot-mood-btn" data-mood="Ambitious"><img src="Feelings images/Ambitious.png" alt="Ambitious" title="Ambitious" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Angry"><img src="Feelings images/Angry.png" alt="Angry" title="Angry" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Annoyed"><img src="Feelings images/Annoyed.png" alt="Annoyed" title="Annoyed" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Anxious"><img src="Feelings images/Anxious.png" alt="Anxious" title="Anxious" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Ashamed"><img src="Feelings images/Ashamed.png" alt="Ashamed" title="Ashamed" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Bored"><img src="Feelings images/Bored.png" alt="Bored" title="Bored" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Calm"><img src="Feelings images/Calm.png" alt="Calm" title="Calm" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Concerned"><img src="Feelings images/Concerned.png" alt="Concerned" title="Concerned" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Confident"><img src="Feelings images/Confident.png" alt="Confident" title="Confident" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Confused"><img src="Feelings images/Confused.png" alt="Confused" title="Confused" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Curious"><img src="Feelings images/Curious.png" alt="Curious" title="Curious" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Determined"><img src="Feelings images/Determined.png" alt="Determined" title="Determined" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Disappointed"><img src="Feelings images/Disappointed.png" alt="Disappointed" title="Disappointed" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Excited"><img src="Feelings images/Excited.png" alt="Excited" title="Excited" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Focused"><img src="Feelings images/Focused.png" alt="Focused" title="Focused" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Greatful"><img src="Feelings images/Greatful.png" alt="Greatful" title="Greatful" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Happy"><img src="Feelings images/Happy.png" alt="Happy" title="Happy" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Hopeless"><img src="Feelings images/Hopeless.png" alt="Hopeless" title="Hopeless" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Hurt"><img src="Feelings images/Hurt.png" alt="Hurt" title="Hurt" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Included"><img src="Feelings images/Included.png" alt="Included" title="Included" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Jealous"><img src="Feelings images/Jealous.png" alt="Jealous" title="Jealous" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Lonely"><img src="Feelings images/Lonely.png" alt="Lonely" title="Lonely" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Proud"><img src="Feelings images/Proud.png" alt="Proud" title="Proud" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Stressed"><img src="Feelings images/Stressed.png" alt="Stressed" title="Stressed" /></button>
-      <button class="mood-button chatbot-mood-btn" data-mood="Tired"><img src="Feelings images/Tired.png" alt="Tired" title="Tired" /></button>
+      <!-- Positive Moods -->
+      <button class="mood-button chatbot-mood-btn" data-mood="Ambitious" data-category="positive"><img src="Feelings images/Ambitious.png" alt="Ambitious" title="Ambitious" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Calm" data-category="positive"><img src="Feelings images/Calm.png" alt="Calm" title="Calm" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Confident" data-category="positive"><img src="Feelings images/Confident.png" alt="Confident" title="Confident" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Curious" data-category="positive"><img src="Feelings images/Curious.png" alt="Curious" title="Curious" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Determined" data-category="positive"><img src="Feelings images/Determined.png" alt="Determined" title="Determined" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Excited" data-category="positive"><img src="Feelings images/Excited.png" alt="Excited" title="Excited" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Focused" data-category="positive"><img src="Feelings images/Focused.png" alt="Focused" title="Focused" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Greatful" data-category="positive"><img src="Feelings images/Greatful.png" alt="Greatful" title="Greatful" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Happy" data-category="positive"><img src="Feelings images/Happy.png" alt="Happy" title="Happy" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Included" data-category="positive"><img src="Feelings images/Included.png" alt="Included" title="Included" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Proud" data-category="positive"><img src="Feelings images/Proud.png" alt="Proud" title="Proud" /></button>
+
+      <!-- Negative Moods -->
+      <button class="mood-button chatbot-mood-btn" data-mood="Angry" data-category="negative"><img src="Feelings images/Angry.png" alt="Angry" title="Angry" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Annoyed" data-category="negative"><img src="Feelings images/Annoyed.png" alt="Annoyed" title="Annoyed" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Anxious" data-category="negative"><img src="Feelings images/Anxious.png" alt="Anxious" title="Anxious" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Ashamed" data-category="negative"><img src="Feelings images/Ashamed.png" alt="Ashamed" title="Ashamed" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Bored" data-category="negative"><img src="Feelings images/Bored.png" alt="Bored" title="Bored" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Concerned" data-category="negative"><img src="Feelings images/Concerned.png" alt="Concerned" title="Concerned" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Confused" data-category="negative"><img src="Feelings images/Confused.png" alt="Confused" title="Confused" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Disappointed" data-category="negative"><img src="Feelings images/Disappointed.png" alt="Disappointed" title="Disappointed" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Hopeless" data-category="negative"><img src="Feelings images/Hopeless.png" alt="Hopeless" title="Hopeless" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Hurt" data-category="negative"><img src="Feelings images/Hurt.png" alt="Hurt" title="Hurt" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Jealous" data-category="negative"><img src="Feelings images/Jealous.png" alt="Jealous" title="Jealous" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Lonely" data-category="negative"><img src="Feelings images/Lonely.png" alt="Lonely" title="Lonely" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Stressed" data-category="negative"><img src="Feelings images/Stressed.png" alt="Stressed" title="Stressed" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Tired" data-category="negative"><img src="Feelings images/Tired.png" alt="Tired" title="Tired" /></button>
+
+      <!-- Neutral Moods -->
+      <button class="mood-button chatbot-mood-btn" data-mood="Neutral" data-category="neutral"><img src="Feelings images/Neutral.png" alt="Neutral" title="Neutral" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Okay" data-category="neutral"><img src="Feelings images/Okay.png" alt="Okay" title="Okay" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Indifferent" data-category="neutral"><img src="Feelings images/Indifferent.png" alt="Indifferent" title="Indifferent" /></button>
+      <button class="mood-button chatbot-mood-btn" data-mood="Content" data-category="neutral"><img src="Feelings images/Content.png" alt="Content" title="Content" /></button>
     </div>
   </section>
 
@@ -1965,6 +2095,54 @@
         "Take short naps if needed.",
         "Manage stress to improve rest.",
         "Consult a doctor if fatigue persists."
+      ],
+      Neutral: [
+        "Embrace the balance in your emotions.",
+        "Take a moment to reflect on your current state.",
+        "Practice mindfulness to stay grounded.",
+        "Accept that not every feeling needs intensity.",
+        "Find peace in neutrality.",
+        "Use this time to recharge emotionally.",
+        "Observe your thoughts without judgment.",
+        "Maintain emotional equilibrium.",
+        "Allow yourself to just be.",
+        "Practice neutral breathing exercises."
+      ],
+      Okay: [
+        "You're doing fine, keep going.",
+        "Acknowledge that 'okay' is a valid feeling.",
+        "Focus on small positive aspects.",
+        "Give yourself credit for stability.",
+        "Practice gratitude for average days.",
+        "Set gentle goals for improvement.",
+        "Accept that not every day is extraordinary.",
+        "Find comfort in routine.",
+        "Be kind to yourself on neutral days.",
+        "Use this as a foundation for growth."
+      ],
+      Indifferent: [
+        "Explore what might spark your interest.",
+        "Try new activities to break routine.",
+        "Reflect on what truly matters to you.",
+        "Practice self-awareness exercises.",
+        "Engage in creative pursuits.",
+        "Connect with others to feel more involved.",
+        "Set small challenges to re-engage.",
+        "Practice mindfulness to reconnect.",
+        "Find meaning in simple things.",
+        "Seek inspiration from your surroundings."
+      ],
+      Content: [
+        "Savor the moment of satisfaction.",
+        "Practice gratitude for what you have.",
+        "Reflect on your achievements.",
+        "Share your contentment with others.",
+        "Use this feeling as motivation.",
+        "Maintain balance in your life.",
+        "Enjoy simple pleasures.",
+        "Express appreciation to loved ones.",
+        "Build on this positive foundation.",
+        "Practice daily gratitude rituals."
       ]
     };
 
@@ -1984,6 +2162,9 @@
       const buttons = document.querySelectorAll('.chatbot-mood-btn');
       const chatForm = document.getElementById('chat-form');
       const chatInput = document.getElementById('chat-input');
+      const moodSearch = document.getElementById('mood-search');
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      const streakCount = document.getElementById('streak-count');
 
       // Add chat message with CSS classes for styling
       function addChatMessage(sender, text) {
@@ -2051,6 +2232,11 @@
       toggleHistoryBtn.addEventListener('mouseenter', () => toggleHistoryBtn.style.transform = 'translateY(-2px)');
       toggleHistoryBtn.addEventListener('mouseleave', () => toggleHistoryBtn.style.transform = 'translateY(0)');
       chatForm.appendChild(toggleHistoryBtn);
+
+      // Initialize mood filtering and search
+      initMoodFilters();
+      initMoodSearch();
+      updateMoodStreak();
 
       // Check authentication state
       auth.onAuthStateChanged((user) => {
@@ -2374,10 +2560,304 @@
         Confident: '😎', Confused: '😕', Curious: '🤔', Determined: '🔥',
         Disappointed: '😞', Excited: '🤩', Focused: '🎯', Greatful: '🙏',
         Happy: '😊', Hopeless: '😔', Hurt: '💔', Included: '🤝',
-        Jealous: '😤', Lonely: '😢', Proud: '🏆', Stressed: '😫', Tired: '😴'
+        Tired: '😴',
+        Neutral: '😐',
+        Okay: '👌',
+        Indifferent: '😑',
+        Content: '😌'
       };
       return emojiMap[mood] || '😐';
     }
+
+    // Initialize mood filtering functionality
+    function initMoodFilters() {
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs
+          filterTabs.forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          tab.classList.add('active');
+
+          const filter = tab.getAttribute('data-filter');
+          filterMoods(filter);
+        });
+      });
+    }
+
+    // Initialize mood search functionality
+    function initMoodSearch() {
+      moodSearch.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        searchMoods(searchTerm);
+      });
+    }
+
+    // Filter moods by category
+    function filterMoods(filter) {
+      const moodButtons = document.querySelectorAll('.chatbot-mood-btn');
+
+      moodButtons.forEach(button => {
+        const category = button.getAttribute('data-category');
+        const mood = button.getAttribute('data-mood').toLowerCase();
+
+        if (filter === 'all' || category === filter) {
+          button.classList.remove('hidden');
+        } else {
+          button.classList.add('hidden');
+        }
+      });
+    }
+
+    // Search moods by name
+    function searchMoods(searchTerm) {
+      const moodButtons = document.querySelectorAll('.chatbot-mood-btn');
+
+      moodButtons.forEach(button => {
+        const mood = button.getAttribute('data-mood').toLowerCase();
+
+        if (mood.includes(searchTerm)) {
+          button.classList.remove('hidden');
+        } else {
+          button.classList.add('hidden');
+        }
+      });
+    }
+
+    // Update mood streak display
+    async function updateMoodStreak() {
+      const user = auth.currentUser;
+      if (!user) {
+        streakCount.textContent = '0 days';
+        return;
+      }
+
+      try {
+        const querySnapshot = await db.collection('Moods')
+          .where('userId', '==', user.uid)
+          .orderBy('timestamp', 'desc')
+          .limit(30)
+          .get();
+
+        if (querySnapshot.empty) {
+          streakCount.textContent = '0 days';
+          return;
+        }
+
+        const moods = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          moods.push({
+            date: new Date(data.timestamp.toDate()).toDateString(),
+            mood: data.mood
+          });
+        });
+
+        // Calculate streak (simplified - consecutive days with mood logging)
+        let streak = 0;
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+        // Check if logged today or yesterday
+        const todayLogged = moods.some(m => m.date === today);
+        const yesterdayLogged = moods.some(m => m.date === yesterday);
+
+        if (todayLogged) {
+          streak = 1;
+          // Count consecutive days backwards
+          let checkDate = new Date(Date.now() - 86400000); // Start from yesterday
+          while (moods.some(m => m.date === checkDate.toDateString())) {
+            streak++;
+            checkDate = new Date(checkDate.getTime() - 86400000);
+          }
+        } else if (yesterdayLogged) {
+          streak = 1;
+        }
+
+        streakCount.textContent = `${streak} day${streak !== 1 ? 's' : ''}`;
+      } catch (error) {
+        console.error('Error calculating streak:', error);
+        streakCount.textContent = '0 days';
+      }
+    }
+
+    // Enhanced mood tips with activity suggestions
+    const moodActivities = {
+      Ambitious: [
+        "Set specific goals for the next hour",
+        "Create a vision board for your dreams",
+        "Read a book about successful people",
+        "Start a new learning project",
+        "Plan your day with purpose"
+      ],
+      Angry: [
+        "Take a brisk walk to release energy",
+        "Write down what's bothering you",
+        "Practice deep breathing exercises",
+        "Listen to calming music",
+        "Talk to a trusted friend"
+      ],
+      Annoyed: [
+        "Take a short break from the situation",
+        "Practice mindfulness meditation",
+        "Do something enjoyable to shift focus",
+        "Express your feelings constructively",
+        "Find humor in the situation"
+      ],
+      Anxious: [
+        "Practice grounding techniques (5-4-3-2-1)",
+        "Write down your worries and solutions",
+        "Do light exercise like yoga",
+        "Listen to nature sounds",
+        "Connect with supportive people"
+      ],
+      Ashamed: [
+        "Practice self-compassion exercises",
+        "Write a kind letter to yourself",
+        "Focus on your positive qualities",
+        "Talk to someone understanding",
+        "Learn from the experience"
+      ],
+      Bored: [
+        "Try a new hobby or activity",
+        "Explore a new place or topic",
+        "Connect with friends or family",
+        "Learn something new online",
+        "Engage in creative expression"
+      ],
+      Calm: [
+        "Practice meditation or mindfulness",
+        "Enjoy a peaceful walk in nature",
+        "Read a good book",
+        "Listen to soothing music",
+        "Spend time with loved ones"
+      ],
+      Concerned: [
+        "Gather information to address concerns",
+        "Talk to someone knowledgeable",
+        "Make a plan to resolve issues",
+        "Practice positive visualization",
+        "Focus on what you can control"
+      ],
+      Confident: [
+        "Celebrate your recent achievements",
+        "Practice positive affirmations",
+        "Take on a new challenge",
+        "Help someone else succeed",
+        "Share your knowledge with others"
+      ],
+      Confused: [
+        "Break down the problem into smaller parts",
+        "Research and gather information",
+        "Ask for clarification or help",
+        "Take time to process information",
+        "Organize your thoughts in writing"
+      ],
+      Curious: [
+        "Explore a new topic or subject",
+        "Ask questions and seek answers",
+        "Visit a museum or library",
+        "Try a new experience",
+        "Engage in learning activities"
+      ],
+      Determined: [
+        "Create a detailed action plan",
+        "Break goals into manageable steps",
+        "Track your progress daily",
+        "Find accountability partners",
+        "Celebrate small victories"
+      ],
+      Disappointed: [
+        "Process your emotions healthily",
+        "Learn from the experience",
+        "Set new goals or adjust plans",
+        "Focus on future opportunities",
+        "Practice gratitude for other things"
+      ],
+      Excited: [
+        "Channel energy into productive tasks",
+        "Share your excitement with others",
+        "Plan how to make the most of it",
+        "Take action towards your goals",
+        "Document the experience"
+      ],
+      Focused: [
+        "Create a distraction-free environment",
+        "Use time-blocking techniques",
+        "Set specific, achievable goals",
+        "Take regular short breaks",
+        "Reward yourself for focus periods"
+      ],
+      Greatful: [
+        "Write a gratitude journal",
+        "Express thanks to others",
+        "Practice daily gratitude exercises",
+        "Focus on positive aspects",
+        "Help others in need"
+      ],
+      Happy: [
+        "Share your joy with loved ones",
+        "Engage in enjoyable activities",
+        "Practice random acts of kindness",
+        "Celebrate life's small moments",
+        "Create positive memories"
+      ],
+      Hopeless: [
+        "Reach out for professional support",
+        "Break overwhelming tasks into small steps",
+        "Connect with supportive people",
+        "Practice self-care activities",
+        "Focus on small, achievable goals"
+      ],
+      Hurt: [
+        "Allow yourself to feel and process emotions",
+        "Seek support from loved ones",
+        "Practice self-care and healing activities",
+        "Consider professional counseling",
+        "Focus on personal growth"
+      ],
+      Included: [
+        "Reach out to friends and family",
+        "Join community groups or clubs",
+        "Participate in social activities",
+        "Volunteer for causes you care about",
+        "Build and nurture relationships"
+      ],
+      Jealous: [
+        "Practice self-compassion and understanding",
+        "Focus on your own achievements",
+        "Celebrate others' successes",
+        "Work on personal growth goals",
+        "Practice gratitude for what you have"
+      ],
+      Lonely: [
+        "Reach out to friends or family",
+        "Join social groups or clubs",
+        "Volunteer in your community",
+        "Consider professional support",
+        "Engage in activities you enjoy"
+      ],
+      Proud: [
+        "Celebrate your achievements",
+        "Share successes with supportive people",
+        "Set new challenging goals",
+        "Help others achieve their goals",
+        "Document your journey"
+      ],
+      Stressed: [
+        "Practice relaxation techniques",
+        "Exercise regularly",
+        "Prioritize and organize tasks",
+        "Take regular breaks",
+        "Seek support from others"
+      ],
+      Tired: [
+        "Get adequate rest and sleep",
+        "Take short power naps",
+        "Practice relaxation before bed",
+        "Establish a consistent sleep routine",
+        "Consider your energy levels"
+      ]
+    };
 
     // Show notification
     function showNotification(message, type) {
