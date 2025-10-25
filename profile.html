@@ -12,7 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-storage-compat.js"></script>
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -29,7 +30,9 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
+
+        // Cloudinary configuration
+        let cloudinaryUrl = null;
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
@@ -67,6 +70,10 @@
                     if (data.photoUrl) {
                         document.getElementById('photoPreview').src = data.photoUrl;
                         document.getElementById('photoPreview').style.display = 'block';
+                        document.getElementById('defaultAvatar').style.display = 'none';
+                    } else {
+                        document.getElementById('photoPreview').style.display = 'none';
+                        document.getElementById('defaultAvatar').style.display = 'flex';
                     }
                 } else {
                     console.log('No profile document found');
@@ -82,16 +89,35 @@
             }
         }
 
-        function previewPhoto(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('photoPreview').src = e.target.result;
-                    document.getElementById('photoPreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+        function openCloudinaryWidget() {
+            const widget = cloudinary.createUploadWidget(
+                {
+                    cloudName: 'dwlxccz91',
+                    uploadPreset: 'uploadpreset', // Replace with your actual upload preset
+                    sources: ['local', 'url', 'camera'],
+                    multiple: false,
+                    cropping: true,
+                    croppingAspectRatio: 1,
+                    showSkipCropButton: false,
+                    folder: 'profile_photos',
+                    resourceType: 'image',
+                    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif'],
+                    maxFileSize: 5000000, // 5MB
+                },
+                (error, result) => {
+                    if (!error && result && result.event === 'success') {
+                        cloudinaryUrl = result.info.secure_url;
+                        document.getElementById('photoPreview').src = cloudinaryUrl;
+                        document.getElementById('photoPreview').style.display = 'block';
+                        document.getElementById('defaultAvatar').style.display = 'none';
+                        showPopup('Photo uploaded successfully!', 'success');
+                    } else if (error) {
+                        console.error('Upload error:', error);
+                        showPopup('Error uploading photo. Please try again.', 'error');
+                    }
+                }
+            );
+            widget.open();
         }
 
         let isEditMode = false;
@@ -135,7 +161,6 @@
             const age = parseInt(document.getElementById('age').value);
             const classValue = document.getElementById('class').value.trim();
             const role = document.getElementById('role').value;
-            const photoFile = document.getElementById('photo').files[0];
 
             // Validation
             if (!firstName || !lastName || !age || !classValue) {
@@ -148,14 +173,6 @@
             }
 
             try {
-                let photoURL = null;
-                if (photoFile) {
-                    const storageRef = storage.ref();
-                    const photoRef = storageRef.child(`profile_photos/${user.uid}`);
-                    await photoRef.put(photoFile);
-                    photoURL = await photoRef.getDownloadURL();
-                }
-
                 const profileData = {
                     firstname: firstName,
                     lastname: lastName,
@@ -163,7 +180,7 @@
                     class: classValue,
                     preferredSubject: document.getElementById('preferredSubject').value.trim(),
                     role,
-                    photoUrl: photoURL,
+                    photoUrl: cloudinaryUrl || null, // Use Cloudinary URL if uploaded
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
@@ -173,6 +190,7 @@
                 // Reload profile to update display
                 loadProfile(user.uid);
                 toggleEditMode(); // Exit edit mode after save
+                cloudinaryUrl = null; // Reset for next upload
             } catch (error) {
                 console.error('Error saving profile:', error);
                 showPopup('Error saving profile. Please try again.', 'error');
@@ -243,11 +261,10 @@
                             <span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">person</span>
                         </div>
                     </div>
-                    <label id="photoLabel" for="photo" class="translucent-button rounded-full px-4 py-2 cursor-pointer text-sm" style="display: none;">
+                    <button id="photoLabel" type="button" onclick="openCloudinaryWidget()" class="translucent-button rounded-full px-4 py-2 cursor-pointer text-sm" style="display: none;">
                         <span class="material-symbols-outlined text-base mr-1">photo_camera</span>
                         Change Photo
-                    </label>
-                    <input type="file" id="photo" accept="image/*" onchange="previewPhoto(event)" class="hidden">
+                    </button>
                 </div>
 
                 <!-- Profile Info Display -->
