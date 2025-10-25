@@ -24,6 +24,17 @@ const db = getFirestore(app);
 // Make auth available globally if needed
 window.firebaseAuth = { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword };
 
+// Password toggle functionality
+const togglePasswordButton = document.getElementById('toggle-password');
+const passwordInput = document.getElementById('password');
+
+togglePasswordButton.addEventListener('click', () => {
+  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+  passwordInput.setAttribute('type', type);
+  const icon = togglePasswordButton.querySelector('span');
+  icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+});
+
 // DOM elements (assuming they exist in your HTML)
 const authForm = document.getElementById('auth-form');
 const formTitle = document.getElementById('form-title');

@@ -271,7 +271,12 @@ function closeDropdown(element) {
 <label class="text-sm font-medium text-gray-300" for="password">Password</label>
 <a class="text-xs text-gray-400 underline-offset-2 transition-colors hover:text-white hover:underline" href="#">Forgot Password?</a>
 </div>
-<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="password" placeholder="••••••••" type="password"/>
+<div class="relative">
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 pr-10 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="password" placeholder="••••••••" type="password"/>
+<button id="toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
 </div>
 <div class="space-y-2" id="profile-fields" style="display: none;">
 <label class="text-sm font-medium text-gray-300" for="firstname">First Name</label>
