@@ -1,0 +1,74 @@
+/* Student Planner Navbar Enhancements */
+.navbar div, .navbar a {
+  cursor: pointer;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease;
+  color: inherit;
+  text-decoration: none;
+  user-select: none;
+}
+
+.navbar div:hover, .navbar a:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #007bff;
+}
+
+/* Active tab style */
+.navbar .active-tab {
+  font-weight: bold;
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
+
+/* Hide all planner sections by default */
+.planner-section {
+  display: none;
+}
+
+/* Show the active planner section */
+.planner-section.active {
+  display: block;
+}
+
+/* Arms navigation styling for student-planner.html */
+.hero .arms div {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.hero .arms div:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #007bff;
+}
+
+/* Active arm tab */
+.hero .arms .active-arm {
+  font-weight: bold;
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
+
+/* Light mode adjustments for planner navbar */
+body.light-mode .navbar div:hover,
+body.light-mode .navbar a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #4299e1;
+}
+
+body.light-mode .navbar .active-tab {
+  border-bottom: 2px solid #4299e1;
+  color: #4299e1;
+}
+
+body.light-mode .hero .arms div:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #4299e1;
+}
+
+body.light-mode .hero .arms .active-arm {
+  border-bottom: 2px solid #4299e1;
+  color: #4299e1;
+}
