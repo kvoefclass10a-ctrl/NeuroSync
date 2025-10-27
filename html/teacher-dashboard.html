@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <title>Teacher Dashboard - NeuroSync</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+            authDomain: "neurosync-5173b.firebaseapp.com",
+            projectId: "neurosync-5173b",
+            storageBucket: "neurosync-5173b.firebasestorage.app",
+            messagingSenderId: "855780859936",
+            appId: "1:855780859936:web:3044309100db9a61fa1c45",
+            measurementId: "G-75S5GWYEDK"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let userProfile = null;
+
+        // Check authentication and role
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await loadUserProfile(user);
+                if (userProfile && userProfile.role === 'Teacher') {
+                    await loadPendingMaterials();
+                    await loadApprovedMaterials();
+                    await loadTeacherStats();
+                } else {
+                    showNotification('Access denied. Teacher role required.', 'error');
+                    setTimeout(() => window.location.href = 'Dashboard.html', 2000);
+                }
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function loadUserProfile(user) {
+            try {
+                const doc = await db.collection('Profiles').doc(user.uid).get();
+                userProfile = doc.exists() ? doc.data() : {};
+                
+                // Update navbar name
+                const displayName = userProfile.firstname && userProfile.lastname
+                    ? `${userProfile.firstname} ${userProfile.lastname}`
+                    : user.displayName || user.email.split('@')[0] || 'User';
+                document.getElementById('navbar-name').textContent = displayName;
+                document.getElementById('welcome-message').textContent = `Welcome, ${userProfile.firstname || displayName.split(' ')[0]}!`;
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function loadPendingMaterials() {
+            try {
+                const snapshot = await db.collection('StudyLibrary')
+                    .where('approved', '==', false)
+                    .orderBy('uploadDate', 'desc')
+                    .get();
+
+                const container = document.getElementById('pending-materials');
+                container.innerHTML = '';
+
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <span class="material-symbols-outlined text-4xl text-secondary mb-4">check_circle</span>
+                            <p class="text-secondary">No pending materials to review.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const material = doc.data();
+                    const materialCard = createPendingMaterialCard(doc.id, material);
+                    container.appendChild(materialCard);
+                });
+
+            } catch (error) {
+                console.error('Error loading pending materials:', error);
+            }
+        }
+
+        async function loadApprovedMaterials() {
+            try {
+                const snapshot = await db.collection('StudyLibrary')
+                    .where('approved', '==', true)
+                    .orderBy('uploadDate', 'desc')
+                    .limit(10)
+                    .get();
+
+                const container = document.getElementById('approved-materials');
+                container.innerHTML = '';
+
+                snapshot.forEach(doc => {
+                    const material = doc.data();
+                    const materialCard = createApprovedMaterialCard(doc.id, material);
+                    container.appendChild(materialCard);
+                });
+
+            } catch (error) {
+                console.error('Error loading approved materials:', error);
+            }
+        }
+
+        async function loadTeacherStats() {
+            try {
+                const pendingSnapshot = await db.collection('StudyLibrary')
+                    .where('approved', '==', false)
+                    .get();
+
+                const approvedSnapshot = await db.collection('StudyLibrary')
+                    .where('approved', '==', true)
+                    .get();
+
+                const totalStudentsSnapshot = await db.collection('Profiles')
+                    .where('role', '==', 'Student')
+                    .get();
+
+                document.getElementById('pending-count').textContent = pendingSnapshot.size;
+                document.getElementById('approved-count').textContent = approvedSnapshot.size;
+                document.getElementById('total-students').textContent = totalStudentsSnapshot.size;
+
+            } catch (error) {
+                console.error('Error loading teacher stats:', error);
+            }
+        }
+
+        function createPendingMaterialCard(materialId, material) {
+            const card = document.createElement('div');
+            card.className = 'bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6';
+            
+            const uploadDate = material.uploadDate ? new Date(material.uploadDate.toDate()).toLocaleDateString() : 'Unknown';
+            const fileIcon = getFileIcon(material.type);
+            
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">${fileIcon}</span>
+                        <div>
+                            <h3 class="text-xl font-bold text-primary">${material.title || 'Untitled'}</h3>
+                            <p class="text-sm text-secondary">${material.subject} • ${material.class} • ${material.type}</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-medium">Pending</span>
+                </div>
+                
+                <p class="text-muted mb-4">${material.description || 'No description available.'}</p>
+                
+                <div class="flex items-center justify-between text-sm text-secondary mb-4">
+                    <span>Uploaded by: ${material.uploadedBy || 'Unknown'}</span>
+                    <span>${uploadDate}</span>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button onclick="previewMaterial('${materialId}')" class="flex-1 translucent-button py-2 rounded-lg text-sm font-medium hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-sm mr-1">visibility</span>
+                        Preview
+                    </button>
+                    <button onclick="approveMaterial('${materialId}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                        <span class="material-symbols-outlined text-sm mr-1">check</span>
+                        Approve
+                    </button>
+                    <button onclick="rejectMaterial('${materialId}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                        <span class="material-symbols-outlined text-sm mr-1">close</span>
+                        Reject
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function createApprovedMaterialCard(materialId, material) {
+            const card = document.createElement('div');
+            card.className = 'bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-4';
+            
+            const uploadDate = material.uploadDate ? new Date(material.uploadDate.toDate()).toLocaleDateString() : 'Unknown';
+            const fileIcon = getFileIcon(material.type);
+            
+            card.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl">${fileIcon}</span>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-primary">${material.title || 'Untitled'}</h4>
+                        <p class="text-sm text-secondary">${material.subject} • ${material.class}</p>
+                    </div>
+                    <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">Approved</span>
+                </div>
+                <div class="flex items-center justify-between text-xs text-secondary">
+                    <span>${uploadDate}</span>
+                    <button onclick="revokeApproval('${materialId}')" class="text-red-400 hover:text-red-300 transition-colors">
+                        Revoke
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function getFileIcon(type) {
+            const icons = {
+                'Notes': '📝',
+                'PYQ': '📋',
+                'Video': '🎥',
+                'QuestionBank': '📚',
+                'PDF': '📄',
+                'Presentation': '📊'
+            };
+            return icons[type] || '📄';
+        }
+
+        async function approveMaterial(materialId) {
+            try {
+                await db.collection('StudyLibrary').doc(materialId).update({
+                    approved: true,
+                    approvedBy: auth.currentUser.uid,
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('Material approved successfully!', 'success');
+                loadPendingMaterials();
+                loadApprovedMaterials();
+                loadTeacherStats();
+
+            } catch (error) {
+                console.error('Error approving material:', error);
+                showNotification('Error approving material. Please try again.', 'error');
+            }
+        }
+
+        async function rejectMaterial(materialId) {
+            const reason = prompt('Please provide a reason for rejection:');
+            if (!reason) return;
+
+            try {
+                await db.collection('StudyLibrary').doc(materialId).update({
+                    approved: false,
+                    rejected: true,
+                    rejectedBy: auth.currentUser.uid,
+                    rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    rejectionReason: reason
+                });
+
+                showNotification('Material rejected.', 'info');
+                loadPendingMaterials();
+                loadTeacherStats();
+
+            } catch (error) {
+                console.error('Error rejecting material:', error);
+                showNotification('Error rejecting material. Please try again.', 'error');
+            }
+        }
+
+        async function revokeApproval(materialId) {
+            if (!confirm('Are you sure you want to revoke approval for this material?')) return;
+
+            try {
+                await db.collection('StudyLibrary').doc(materialId).update({
+                    approved: false,
+                    revokedBy: auth.currentUser.uid,
+                    revokedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('Approval revoked.', 'info');
+                loadApprovedMaterials();
+                loadTeacherStats();
+
+            } catch (error) {
+                console.error('Error revoking approval:', error);
+                showNotification('Error revoking approval. Please try again.', 'error');
+            }
+        }
+
+        function previewMaterial(materialId) {
+            showNotification('Preview feature coming soon!', 'info');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' :
+                type === 'info' ? 'bg-blue-500' : 'bg-gray-500'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function signOut() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+            });
+        }
+    </script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #8013ec;
+        }
+        .translucent-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .translucent-button:hover {
+            background-color: rgba(147, 51, 234, 0.8);
+            border: 1px solid rgba(147, 51, 234, 1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+            color: #FFFFFF;
+        }
+        .text-primary { color: #FFFFFF; }
+        .text-secondary { color: #ad92c9; }
+        .accent-primary { color: var(--primary-color); }
+        .border-primary { border-color: #2A1F36; }
+        .bg-primary { background-color: #120B1A; }
+        .bg-secondary { background-color: #1A1122; }
+        .bg-tertiary { background-color: #2A1F36; }
+    </style>
+</head>
+<body class="bg-primary text-white">
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-primary">
+            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+            </svg>
+            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+        </div>
+        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Student Dashboard</a>
+            <a href="teacher-dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 bg-accent text-primary">Teacher Dashboard</a>
+            <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-white text-sm font-medium" id="navbar-name">Teacher</div>
+                    <div class="text-[#ad92c9] text-xs">Teacher</div>
+                </div>
+            </div>
+            <button onclick="signOut()" class="translucent-button flex items-center justify-center rounded-full size-11">
+                <span class="material-symbols-outlined text-2xl">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="min-h-screen p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-primary mb-2" id="welcome-message">Welcome, Teacher!</h1>
+                <p class="text-secondary">Review and approve study materials submitted by students.</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">pending</span>
+                        <span class="text-2xl font-bold text-accent" id="pending-count">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Pending Materials</h3>
+                    <p class="text-sm text-secondary">Awaiting review</p>
+                </div>
+
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">check_circle</span>
+                        <span class="text-2xl font-bold text-accent" id="approved-count">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Approved Materials</h3>
+                    <p class="text-sm text-secondary">Available to students</p>
+                </div>
+
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">school</span>
+                        <span class="text-2xl font-bold text-accent" id="total-students">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Total Students</h3>
+                    <p class="text-sm text-secondary">Registered users</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Pending Materials -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Pending Review</h2>
+                    <div id="pending-materials" class="space-y-4">
+                        <!-- Pending materials will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Recently Approved -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Recently Approved</h2>
+                    <div id="approved-materials" class="space-y-3">
+                        <!-- Approved materials will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-8 bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-primary mb-6">Quick Actions</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="loadPendingMaterials()" class="translucent-button p-4 rounded-lg text-center hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-3xl text-accent mb-2 block">refresh</span>
+                        <span class="font-medium">Refresh Pending</span>
+                    </button>
+                    <button onclick="window.location.href='study-library.html'" class="translucent-button p-4 rounded-lg text-center hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-3xl text-accent mb-2 block">library_books</span>
+                        <span class="font-medium">View Library</span>
+                    </button>
+                    <button onclick="window.location.href='Dashboard.html'" class="translucent-button p-4 rounded-lg text-center hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-3xl text-accent mb-2 block">dashboard</span>
+                        <span class="font-medium">Student View</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

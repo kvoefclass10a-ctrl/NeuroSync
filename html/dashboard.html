@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8"/>
 <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
 <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
@@ -13,12 +14,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-storage-compat.js"></script>
 <script>
-// Focus Timer Functionality
-import('./focus.js').then(module => {
-  module.initFocusTimer();
-  module.loadFocusStats();
-});
-
 // Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
@@ -35,78 +30,72 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+        let userProfile = null;
+
 // Get current user and update UI
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-    // Load profile data
+                await loadUserProfile(user);
+                await loadDashboardData(user.uid);
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function loadUserProfile(user) {
     try {
       const doc = await db.collection('Profiles').doc(user.uid).get();
-      let profileData = {};
-      if (doc.exists) {
-        profileData = doc.data();
-      }
-
-      // Update profile photo (sidebar)
-      const profilePhotoDiv = document.querySelector('.bg-center.bg-no-repeat.aspect-square.bg-cover.rounded-full.size-12');
-      if (profileData.photoUrl) {
-        profilePhotoDiv.style.backgroundImage = `url("${profileData.photoUrl}")`;
-      } else {
-        // Default avatar
-        profilePhotoDiv.style.backgroundImage = 'none';
-        profilePhotoDiv.innerHTML = '<span class="material-symbols-outlined text-2xl text-[var(--primary-color)]">person</span>';
-      }
+                userProfile = doc.exists() ? doc.data() : {};
 
       // Update navbar profile photo
       const navbarPhotoDiv = document.getElementById('navbar-profile-photo');
-      if (profileData.photoUrl) {
-        navbarPhotoDiv.style.backgroundImage = `url("${profileData.photoUrl}")`;
+                if (userProfile.photoUrl) {
+                    navbarPhotoDiv.style.backgroundImage = `url("${userProfile.photoUrl}")`;
         navbarPhotoDiv.innerHTML = '';
       } else {
         navbarPhotoDiv.style.backgroundImage = 'none';
         navbarPhotoDiv.innerHTML = '<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>';
       }
 
-      // Update name (sidebar)
-      const displayName = profileData.firstname && profileData.lastname
-        ? `${profileData.firstname} ${profileData.lastname}`
+                // Update navbar name
+                const displayName = userProfile.firstname && userProfile.lastname
+                    ? `${userProfile.firstname} ${userProfile.lastname}`
         : user.displayName || user.email.split('@')[0] || 'User';
-      document.getElementById('user-name').textContent = displayName;
-
-      // Update navbar name
       document.getElementById('navbar-name').textContent = displayName;
 
-      // Update role (sidebar)
-      const roleElement = document.querySelector('.text-\\[\\#ad92c9\\].text-sm');
-      roleElement.textContent = profileData.role || 'Student';
+                // Update navbar class and role
+                const classRole = userProfile.class && userProfile.role
+                    ? `${userProfile.class} • ${userProfile.role}`
+                    : userProfile.role || 'Student';
+                document.getElementById('navbar-class-role').textContent = classRole;
 
-      // Update navbar class and role
-      const classRole = profileData.class && profileData.role
-        ? `${profileData.class} • ${profileData.role}`
-        : profileData.role || 'Student';
-      document.getElementById('navbar-class-role').textContent = classRole;
+                // Show teacher dashboard link for teachers
+                if (userProfile.role === 'Teacher') {
+                    document.getElementById('teacher-dashboard-link').style.display = 'flex';
+                }
 
       // Update welcome message
-      const firstName = profileData.firstname || displayName.split(' ')[0];
+                const firstName = userProfile.firstname || displayName.split(' ')[0];
       document.getElementById('welcome-message').textContent = `Welcome back, ${firstName}! Let's make today productive.`;
-
-      // Load rewards data
-      await loadRewardsData(user.uid);
 
     } catch (error) {
       console.error('Error loading profile:', error);
-      // Fallback to basic user info
-      const username = user.displayName || user.email.split('@')[0] || 'User';
-      document.getElementById('user-name').textContent = username;
-      document.getElementById('welcome-message').textContent = `Welcome back, ${username}! Let's make today productive.`;
-    }
+            }
+        }
 
-    // Hide the Get Started button for authenticated users
-    document.getElementById('get-started-btn').style.display = 'none';
-  } else {
-    // Redirect to login if not authenticated
-    window.location.href = 'auth.html';
-  }
-});
+        async function loadDashboardData(userId) {
+            try {
+                await Promise.all([
+                    loadRewardsData(userId),
+                    loadFocusStats(userId),
+                    loadMoodStats(userId),
+                    loadRecentActivity(userId),
+                    loadStudyMaterials(userId)
+                ]);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
 
 // Load rewards data
 async function loadRewardsData(userId) {
@@ -137,6 +126,181 @@ async function loadRewardsData(userId) {
     console.error('Error loading rewards:', error);
   }
 }
+
+        // Load focus session statistics
+        async function loadFocusStats(userId) {
+            try {
+                const sessionsSnapshot = await db.collection('FocusSessions')
+                    .where('userId', '==', userId)
+                    .where('completed', '==', true)
+                    .get();
+
+                let totalSessions = 0;
+                let totalMinutes = 0;
+                let todaySessions = 0;
+                let todayMinutes = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                sessionsSnapshot.forEach(doc => {
+                    const session = doc.data();
+                    totalSessions++;
+                    totalMinutes += session.duration || 0;
+                    
+                    if (session.endTime && session.endTime.toDate() >= today) {
+                        todaySessions++;
+                        todayMinutes += session.duration || 0;
+                    }
+                });
+
+                document.getElementById('total-sessions').textContent = totalSessions;
+                document.getElementById('total-minutes').textContent = totalMinutes;
+                document.getElementById('today-sessions').textContent = todaySessions;
+                document.getElementById('today-minutes').textContent = todayMinutes;
+
+            } catch (error) {
+                console.error('Error loading focus stats:', error);
+            }
+        }
+
+        // Load mood statistics
+        async function loadMoodStats(userId) {
+            try {
+                const moodsSnapshot = await db.collection('Moods')
+                    .where('userId', '==', userId)
+                    .orderBy('timestamp', 'desc')
+                    .limit(7)
+                    .get();
+
+                const moodData = [];
+                moodsSnapshot.forEach(doc => {
+                    moodData.push(doc.data());
+                });
+
+                // Update mood trend
+                if (moodData.length > 0) {
+                    const avgMood = moodData.reduce((sum, mood) => sum + mood.level, 0) / moodData.length;
+                    document.getElementById('avg-mood').textContent = avgMood.toFixed(1);
+                    document.getElementById('mood-trend').textContent = moodData.length >= 2 ? 
+                        (moodData[0].level > moodData[1].level ? '↗️ Improving' : 
+                         moodData[0].level < moodData[1].level ? '↘️ Declining' : '→ Stable') : '→ New';
+                }
+
+                // Display recent moods
+                const recentMoodsContainer = document.getElementById('recent-moods');
+                recentMoodsContainer.innerHTML = '';
+                
+                moodData.slice(0, 5).forEach(mood => {
+                    const moodItem = document.createElement('div');
+                    moodItem.className = 'flex items-center justify-between p-2 bg-tertiary rounded-lg';
+                    moodItem.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">${getMoodEmoji(mood.mood)}</span>
+                            <span class="text-sm">${mood.mood}</span>
+                        </div>
+                        <span class="text-xs text-secondary">${new Date(mood.timestamp.toDate()).toLocaleDateString()}</span>
+                    `;
+                    recentMoodsContainer.appendChild(moodItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading mood stats:', error);
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity(userId) {
+            try {
+                const activityContainer = document.getElementById('recent-activity');
+                activityContainer.innerHTML = '';
+
+                // Get recent focus sessions
+                const recentSessions = await db.collection('FocusSessions')
+                    .where('userId', '==', userId)
+                    .orderBy('startTime', 'desc')
+                    .limit(3)
+                    .get();
+
+                recentSessions.forEach(doc => {
+                    const session = doc.data();
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'flex items-center gap-3 p-3 bg-tertiary rounded-lg';
+                    activityItem.innerHTML = `
+                        <span class="material-symbols-outlined text-accent">timer</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">Focus Session</p>
+                            <p class="text-xs text-secondary">${session.duration || 0} minutes • ${new Date(session.startTime.toDate()).toLocaleDateString()}</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${session.completed ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}">
+                            ${session.completed ? 'Completed' : 'Incomplete'}
+                        </span>
+                    `;
+                    activityContainer.appendChild(activityItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        // Load study materials
+        async function loadStudyMaterials(userId) {
+            try {
+                const materialsSnapshot = await db.collection('StudyLibrary')
+                    .where('uploadedBy', '==', userId)
+                    .orderBy('uploadDate', 'desc')
+                    .limit(3)
+                    .get();
+
+                const materialsContainer = document.getElementById('recent-materials');
+                materialsContainer.innerHTML = '';
+
+                if (materialsSnapshot.empty) {
+                    materialsContainer.innerHTML = '<p class="text-secondary text-sm">No materials uploaded yet.</p>';
+                    return;
+                }
+
+                materialsSnapshot.forEach(doc => {
+                    const material = doc.data();
+                    const materialItem = document.createElement('div');
+                    materialItem.className = 'flex items-center gap-3 p-3 bg-tertiary rounded-lg';
+                    materialItem.innerHTML = `
+                        <span class="material-symbols-outlined text-accent">description</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">${material.title || 'Untitled'}</p>
+                            <p class="text-xs text-secondary">${material.subject} • ${material.type}</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${material.approved ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}">
+                            ${material.approved ? 'Approved' : 'Pending'}
+                        </span>
+                    `;
+                    materialsContainer.appendChild(materialItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading study materials:', error);
+            }
+        }
+
+        function getMoodEmoji(mood) {
+            const emojiMap = {
+                'Happy': '😄',
+                'Neutral': '😐',
+                'Sad': '😔',
+                'Anxious': '😟',
+                'Excited': '🤩'
+            };
+            return emojiMap[mood] || '😐';
+        }
+
+        // Navbar sign out functionality
+        function signOut() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+            });
+        }
 </script>
 <style type="text/tailwindcss">
         :root {
@@ -149,497 +313,408 @@ async function loadRewardsData(userId) {
             --border-primary: #2A1F36;
         }
 
-        .light {
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F3F4F6;
-            --bg-tertiary: #E5E7EB;
-            --text-primary: #111827;
-            --text-secondary: #6B7280;
-            --border-primary: #D1D5DB;
-            --primary-color: #7C3AED;
-        }
-
         .translucent-button {
             background-color: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            color: #FFFFFF;
             transition: all 0.3s ease;
         }
-
-        .light .translucent-button {
-            background-color: rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            color: var(--text-primary);
-        }
-
         .translucent-button:hover {
             background-color: rgba(147, 51, 234, 0.8);
             border: 1px solid rgba(147, 51, 234, 1);
             box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
-            color: var(--text-primary);
+            color: #FFFFFF;
         }
-
-        .light .translucent-button:hover {
-            background-color: rgba(124, 58, 237, 0.8);
-            border: 1px solid rgba(124, 58, 237, 1);
-            box-shadow: 0 0 15px rgba(124, 58, 237, 0.7);
-            color: var(--text-primary);
-        }
-
-        .text-primary { color: var(--text-primary); }
-        .text-secondary { color: var(--text-secondary); }
+        .text-primary { color: #FFFFFF; }
+        .text-secondary { color: #ad92c9; }
         .accent-primary { color: var(--primary-color); }
-        .border-primary { border-color: var(--border-primary); }
-        .bg-primary { background-color: var(--bg-primary); }
-        .bg-secondary { background-color: var(--bg-secondary); }
-        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .border-primary { border-color: #2A1F36; }
+        .bg-primary { background-color: #120B1A; }
+        .bg-secondary { background-color: #1A1122; }
+        .bg-tertiary { background-color: #2A1F36; }
     </style>
 </head>
-<body class="bg-primary text-primary">
-<div class="relative flex size-full min-h-screen flex-col bg-primary dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
-<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
-<div class="flex items-center gap-3 text-primary">
-<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
-</svg>
-<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
-</div>
-<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
-<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="index.html">Home</a>
-<a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">
-<span>Dashboard</span>
-</a>
-<div class="relative group">
-<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-<span>Resources</span>
-<span class="material-symbols-outlined text-base">expand_more</span>
-</button>
-<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-<div class="py-1">
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Study Material</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
-</div>
-</div>
-</div>
-<div class="relative group">
-<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-<span>Company</span>
-<span class="material-symbols-outlined text-base">expand_more</span>
-</button>
-<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-<div class="py-1">
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Feedback Us</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
-</div>
-</div>
-</div>
-</nav>
-<script>
-function openDropdown(element) {
-  const dropdown = element.querySelector('.absolute');
-  if (dropdown) {
-    dropdown.classList.remove('hidden');
-    dropdown.classList.add('block');
-  }
-}
+<body class="bg-primary text-white">
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-primary">
+            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+            </svg>
+            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+        </div>
+        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 bg-accent text-primary">Dashboard</a>
+            <a href="teacher-dashboard.html" id="teacher-dashboard-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">Teacher Dashboard</a>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Resources</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
+                    </div>
+                </div>
+            </div>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Company</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
+                    </div>
+                </div>
+            </div>
+            <a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
+            <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative">
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
+                    <span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
+                </div>
+                <div class="flex flex-col">
+                    <div class="text-white text-sm font-medium" id="navbar-name">User</div>
+                    <div class="text-[#ad92c9] text-xs" id="navbar-class-role">Student</div>
+                </div>
+                <!-- Dropdown Menu -->
+                <div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
+                    <div class="py-1">
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">person</span>
+                            <span>See Profile</span>
+                        </a>
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">edit</span>
+                            <span>Edit Profile</span>
+                        </a>
+                        <button onclick="signOut()" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
+    </header>
 
-function closeDropdown(element) {
-  const dropdown = element.querySelector('.absolute');
-  if (dropdown) {
-    dropdown.classList.add('hidden');
-    dropdown.classList.remove('block');
-  }
-}
+    <div class="min-h-screen p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-primary mb-2" id="welcome-message">Welcome back!</h1>
+                <p class="text-secondary">Track your progress and stay focused on your goals.</p>
+            </div>
 
-// Also add click functionality for better UX
-document.addEventListener('DOMContentLoaded', function() {
-  const dropdownButtons = document.querySelectorAll('.relative.group button');
-  dropdownButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const dropdown = this.parentElement.querySelector('.absolute');
-      if (dropdown) {
-        if (dropdown.classList.contains('hidden')) {
-          // Close other dropdowns first
-          document.querySelectorAll('.absolute').forEach(d => {
-            d.classList.add('hidden');
-            d.classList.remove('block');
-          });
-          // Open this dropdown
-          dropdown.classList.remove('hidden');
-          dropdown.classList.add('block');
-        } else {
-          // Close this dropdown
-          dropdown.classList.add('hidden');
-          dropdown.classList.remove('block');
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Focus Points -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">stars</span>
+                        <span class="text-2xl font-bold text-accent" id="focus-points">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Focus Points</h3>
+                    <p class="text-sm text-secondary">Level <span id="avatar-level">1</span></p>
+                    <div class="mt-3 w-full bg-tertiary rounded-full h-2">
+                        <div class="bg-accent h-2 rounded-full transition-all duration-500" id="level-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Total Sessions -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">timer</span>
+                        <span class="text-2xl font-bold text-accent" id="total-sessions">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Focus Sessions</h3>
+                    <p class="text-sm text-secondary"><span id="total-minutes">0</span> minutes total</p>
+                </div>
+
+                <!-- Today's Progress -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">today</span>
+                        <span class="text-2xl font-bold text-accent" id="today-sessions">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Today's Sessions</h3>
+                    <p class="text-sm text-secondary"><span id="today-minutes">0</span> minutes today</p>
+                </div>
+
+                <!-- Mood Average -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl text-accent">mood</span>
+                        <span class="text-2xl font-bold text-accent" id="avg-mood">0</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-primary mb-1">Mood Average</h3>
+                    <p class="text-sm text-secondary" id="mood-trend">→ Stable</p>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Focus Timer -->
+                <div class="lg:col-span-2 bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Focus Timer</h2>
+                    <div class="text-center">
+                        <div class="mb-6">
+                            <div class="w-32 h-32 mx-auto bg-center bg-no-repeat aspect-square bg-cover rounded-full border-2 border-accent" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDfd-joboe9xIoKtUc4hl2jVktQM-V1N3YX8OgXrfPUxZiBgt74XR5WtJfBxsdBl7av2tJbosZROY157DNMjwOJ3UPSiLPVk4Z2IzmHDcxGM8NjxnoIqz_FpuTSDFkMtVHc8_x9izwetsNYUiEg-t7mwPBTg_v2lp5HDySnPsB71LzS-kg8aihsn0g3tnZ26Smwv6ctsVLs05kme6ecPIAEPguvRiEvNQSeKSF9Utp5vZvfnvGbs_4bQGZUUn12N-bOvBRtIXFxEDk");'></div>
+                        </div>
+                        <p id="timer-display" class="text-4xl font-mono text-secondary tracking-widest mb-6">25:00</p>
+                        <div class="flex gap-2 mb-4 justify-center">
+                            <button id="time-15" class="translucent-button px-3 py-1 text-sm rounded-full">15 min</button>
+                            <button id="time-25" class="translucent-button px-3 py-1 text-sm rounded-full bg-accent text-primary">25 min</button>
+                            <button id="time-30" class="translucent-button px-3 py-1 text-sm rounded-full">30 min</button>
+                            <button id="time-45" class="translucent-button px-3 py-1 text-sm rounded-full">45 min</button>
+                        </div>
+                        <div class="flex gap-2 justify-center">
+                            <button id="start-btn" class="translucent-button flex shrink-0 items-center justify-center rounded-full size-16 hover:scale-110 transition-transform duration-200 shadow-lg shadow-accent/30">
+                                <span class="material-symbols-outlined text-4xl">play_arrow</span>
+                            </button>
+                            <button id="pause-btn" class="translucent-button flex shrink-0 items-center justify-center rounded-full size-16 hover:scale-110 transition-transform duration-200 shadow-lg shadow-accent/30" style="display: none;">
+                                <span class="material-symbols-outlined text-4xl">pause</span>
+                            </button>
+                            <button id="reset-btn" class="translucent-button flex shrink-0 items-center justify-center rounded-full size-16 hover:scale-110 transition-transform duration-200 shadow-lg shadow-accent/30">
+                                <span class="material-symbols-outlined text-4xl">replay</span>
+                            </button>
+                        </div>
+                        <div class="mt-6">
+                            <div class="flex justify-between mb-1 items-center">
+                                <span class="text-base font-medium text-primary">Focus Level</span>
+                                <span id="progress-text" class="text-sm font-bold text-accent px-2 py-1 rounded-full bg-accent/20">0%</span>
+                            </div>
+                            <div class="w-full bg-tertiary rounded-full h-3 overflow-hidden">
+                                <div id="progress-bar" class="bg-accent h-3 rounded-full transition-all duration-500 ease-in-out shadow-lg shadow-accent/50" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="space-y-6">
+                    <!-- Mood Tracker -->
+                    <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-primary mb-4">Quick Mood Check</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button onclick="window.location.href='mood-selection.html'" class="translucent-button p-3 rounded-lg text-center hover:scale-105 transition-transform">
+                                <span class="text-2xl block mb-1">😄</span>
+                                <span class="text-xs">Happy</span>
+                            </button>
+                            <button onclick="window.location.href='mood-selection.html'" class="translucent-button p-3 rounded-lg text-center hover:scale-105 transition-transform">
+                                <span class="text-2xl block mb-1">😐</span>
+                                <span class="text-xs">Neutral</span>
+                            </button>
+                            <button onclick="window.location.href='mood-selection.html'" class="translucent-button p-3 rounded-lg text-center hover:scale-105 transition-transform">
+                                <span class="text-2xl block mb-1">😔</span>
+                                <span class="text-xs">Sad</span>
+                            </button>
+                            <button onclick="window.location.href='mood-selection.html'" class="translucent-button p-3 rounded-lg text-center hover:scale-105 transition-transform">
+                                <span class="text-2xl block mb-1">😟</span>
+                                <span class="text-xs">Anxious</span>
+                            </button>
+                        </div>
+                        <button onclick="window.location.href='mood-selection.html'" class="w-full translucent-button py-2 rounded-lg text-sm font-medium">
+                            View All Moods
+                        </button>
+                    </div>
+
+                    <!-- Study Library -->
+                    <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-primary mb-4">Study Resources</h3>
+                        <div class="space-y-3">
+                            <button onclick="window.location.href='study-library.html'" class="w-full translucent-button py-3 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-accent">library_books</span>
+                                <span>Browse Study Materials</span>
+                            </button>
+                            <button onclick="window.location.href='study-library.html'" class="w-full translucent-button py-3 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-accent">upload</span>
+                                <span>Upload Material</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Rewards -->
+                    <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-primary mb-4">Your Progress</h3>
+                        <div class="space-y-3">
+                            <button onclick="window.location.href='rewards.html'" class="w-full translucent-button py-3 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-accent">emoji_events</span>
+                                <span>View Rewards</span>
+                            </button>
+                            <button onclick="window.location.href='profile.html'" class="w-full translucent-button py-3 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-accent">person</span>
+                                <span>Edit Profile</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Recent Moods -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-primary mb-4">Recent Moods</h3>
+                    <div id="recent-moods" class="space-y-2">
+                        <!-- Recent moods will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-primary mb-4">Recent Activity</h3>
+                    <div id="recent-activity" class="space-y-2">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Materials -->
+            <div class="mt-8 bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                <h3 class="text-lg font-bold text-primary mb-4">Your Study Materials</h3>
+                <div id="recent-materials" class="space-y-2">
+                    <!-- Recent materials will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Focus Timer Script -->
+    <script>
+        // Focus Timer Functionality
+        let selectedTime = 25 * 60; // Default 25 minutes in seconds
+        let timeLeft = selectedTime;
+        let isRunning = false;
+        let timerInterval;
+        const timerDisplay = document.getElementById('timer-display');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const timeButtons = document.querySelectorAll('#time-15, #time-25, #time-30, #time-45');
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
-      }
-    });
-  });
 
-  // Close dropdowns when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative.group')) {
-      document.querySelectorAll('.absolute').forEach(dropdown => {
-        dropdown.classList.add('hidden');
-        dropdown.classList.remove('block');
-      });
-    }
-  });
-});
-</script>
-<div class="flex items-center gap-4">
-<div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
-<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
-</div>
-<div class="flex flex-col">
-<div class="text-primary text-sm font-medium" id="navbar-name">User</div>
-<div class="text-secondary text-xs" id="navbar-class-role">Student</div>
-</div>
-<!-- Dropdown Menu -->
-<div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-secondary backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
-<div class="py-1">
-<a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-tertiary transition-colors">
-<span class="material-symbols-outlined text-base">person</span>
-<span>See Profile</span>
-</a>
-<a href="profile.html?edit=true" class="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-tertiary transition-colors">
-<span class="material-symbols-outlined text-base">edit</span>
-<span>Edit Profile</span>
-</a>
-<button id="navbar-sign-out-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-tertiary transition-colors w-full text-left">
-<span class="material-symbols-outlined text-base">logout</span>
-<span>Sign Out</span>
-</button>
-</div>
-</div>
-</div>
-<button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11">
-<span class="material-symbols-outlined text-2xl" id="theme-icon">dark_mode</span>
-</button>
-<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
-<span class="material-symbols-outlined text-2xl">menu</span>
-</button>
-</div>
-</header>
-<div class="flex h-full w-full">
-<aside class="w-80 flex-shrink-0 bg-secondary p-6">
-<div class="flex items-center gap-3 mb-8">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-[0_0_15px_rgba(128,19,236,0.5)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD7mFGWlvr2tFgaJL5RUb6wksgOv21HaT29jhS9vKVbp7Vyb6pFvxzFua0RVFgMOye8fydSHqqAGJhqUiL7rY9D-FZW5jHrns_-6dQ6szp6d2do8-tI3bgmGHDIq9nQKkmr4cqW-q_J1AwSBav13GtKDEMqSGNitnrmnznwelUtgYY4T-EJWuML3iplSvmcHks8GnVYDp5l1wWYMcwvO-XnZjsfZo1CNbJdlLxSTGqHUIzMNstSNXZGEN0hdjwU-ZpKwBViu08PwZU");'></div>
-<div class="flex flex-col">
-<h1 class="text-primary text-lg font-bold" id="user-name">Sarah</h1>
-<p class="text-secondary text-sm">Student</p>
-</div>
-</div>
-<nav class="flex flex-col gap-2">
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="index.html">
-<span class="material-symbols-outlined">home</span>
-<p class="text-sm font-medium">Home</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="Exp_Dashboard_Focus.html">
-<span class="material-symbols-outlined">target</span>
-<p class="text-sm font-medium">Focus</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="#">
-<span class="material-symbols-outlined">favorite</span>
-<p class="text-sm font-medium">Wellbeing</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="#">
-<span class="material-symbols-outlined">groups</span>
-<p class="text-sm font-medium">Community</p>
-</a>
+        function updateProgress() {
+            const totalTime = selectedTime;
+            const elapsed = totalTime - timeLeft;
+            const progress = Math.min((elapsed / totalTime) * 100, 100);
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
 
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="rewards.html">
-<span class="material-symbols-outlined">emoji_events</span>
-<p class="text-sm font-medium">Rewards</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="study-library.html">
-<span class="material-symbols-outlined">library_books</span>
-<p class="text-sm font-medium">Study Library</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="feedback.html">
-<span class="material-symbols-outlined">feedback</span>
-<p class="text-sm font-medium">Feedback</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors" href="#">
-<span class="material-symbols-outlined">settings</span>
-<p class="text-sm font-medium">Settings</p>
-</a>
-<button id="sign-out-btn" class="flex items-center gap-3 px-3 py-2 text-primary/70 hover:text-primary hover:bg-tertiary rounded-lg transition-colors w-full text-left">
-<span class="material-symbols-outlined">logout</span>
-<p class="text-sm font-medium">Sign Out</p>
-</button>
-</nav>
-<script>
-// Sign out functionality
-document.getElementById('sign-out-btn').addEventListener('click', () => {
-  firebase.auth().signOut().then(() => {
-    window.location.href = 'index.html';
-  }).catch((error) => {
-    console.error('Sign out error:', error);
-  });
-});
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'flex';
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    updateProgress();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        startBtn.style.display = 'flex';
+                        pauseBtn.style.display = 'none';
+                        alert('Session complete! Great job maintaining focus.');
+                    }
+                }, 1000);
+            }
+        }
 
-// Navbar dropdown functionality
-let dropdownTimeout;
-const navbarProfile = document.getElementById('navbar-profile');
-const navbarDropdown = document.getElementById('navbar-dropdown');
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+            }
+        }
 
-navbarProfile.addEventListener('mouseenter', () => {
-  clearTimeout(dropdownTimeout);
-  navbarDropdown.classList.remove('hidden');
-  navbarDropdown.classList.add('block');
-});
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = selectedTime;
+            updateDisplay();
+            updateProgress();
+            startBtn.style.display = 'flex';
+            pauseBtn.style.display = 'none';
+        }
 
-navbarProfile.addEventListener('mouseleave', () => {
-  dropdownTimeout = setTimeout(() => {
-    navbarDropdown.classList.add('hidden');
-    navbarDropdown.classList.remove('block');
-  }, 3000); // 3 seconds delay
-});
+        function selectTime(minutes) {
+            selectedTime = minutes * 60;
+            resetTimer();
+            timeButtons.forEach(btn => {
+                btn.classList.remove('bg-accent', 'text-primary');
+            });
+            const activeBtn = document.getElementById(`time-${minutes}`);
+            activeBtn.classList.add('bg-accent', 'text-primary');
+        }
 
-navbarDropdown.addEventListener('mouseenter', () => {
-  clearTimeout(dropdownTimeout);
-});
+        // Event Listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
 
-navbarDropdown.addEventListener('mouseleave', () => {
-  dropdownTimeout = setTimeout(() => {
-    navbarDropdown.classList.add('hidden');
-    navbarDropdown.classList.remove('block');
-  }, 3000); // 3 seconds delay
-});
+        timeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const minutes = parseInt(this.id.split('-')[1]);
+                selectTime(minutes);
+            });
+        });
 
-// Navbar sign out functionality
-document.getElementById('navbar-sign-out-btn').addEventListener('click', () => {
-  firebase.auth().signOut().then(() => {
-    window.location.href = 'index.html';
-  }).catch((error) => {
-    console.error('Sign out error:', error);
-  });
-});
-</script>
-</aside>
-<main class="flex-1 p-8 overflow-y-auto">
-<header class="mb-8">
-<h1 class="text-4xl font-bold tracking-tight">Dashboard</h1>
-<p class="text-secondary mt-1" id="welcome-message">Welcome back, Sarah! Let's make today productive.</p>
-</header>
-<section class="mb-8">
-<h2 class="text-2xl font-bold tracking-tight mb-4">Daily Summary</h2>
-<div class="bg-secondary rounded-2xl p-6 border border-primary shadow-lg shadow-primary/50 flex flex-col xl:flex-row items-start gap-6">
-<div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-<div class="flex flex-col items-center gap-2">
-<div class="relative size-24 flex items-center justify-center">
-<svg class="w-full h-full" viewBox="0 0 100 100">
-<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
-<circle class="text-[var(--primary-color)]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="57.805" stroke-linecap="round" stroke-width="8"></circle>
-</svg>
-<span class="absolute material-symbols-outlined text-3xl text-[var(--primary-color)]">timer</span>
-</div>
-<p class="text-2xl font-bold">4.2 <span class="text-lg text-secondary">hrs</span></p>
-<p class="text-secondary">Focus Time</p>
-</div>
-<div class="flex flex-col items-center gap-2">
-<div class="relative size-24 flex items-center justify-center">
-<svg class="w-full h-full" viewBox="0 0 100 100">
-<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
-<circle class="text-[#0BDA73]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="86.708" stroke-linecap="round" stroke-width="8"></circle>
-</svg>
-<span class="absolute material-symbols-outlined text-3xl text-[#0BDA73]">sentiment_satisfied</span>
-</div>
-<p class="text-2xl font-bold">8.2<span class="text-lg text-secondary">/10</span></p>
-<p class="text-secondary">Avg. Mood</p>
-</div>
-<div class="flex flex-col items-center gap-2">
-<div class="relative size-24 flex items-center justify-center">
-<svg class="w-full h-full" viewBox="0 0 100 100">
-<circle class="text-[#2A1F36]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
-<circle class="text-[#3B82F6]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="28.902" stroke-linecap="round" stroke-width="8"></circle>
-</svg>
-<span class="absolute material-symbols-outlined text-3xl text-[#3B82F6]">checklist</span>
-</div>
-<p class="text-2xl font-bold">90<span class="text-lg text-secondary">%</span></p>
-<p class="text-secondary">Tasks Done</p>
-</div>
-</div>
-<div class="w-full xl:w-px h-px xl:h-auto bg-tertiary self-stretch"></div>
-<div class="flex-shrink-0 w-full xl:w-80">
-<div class="flex items-center gap-3 mb-4">
-<span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">auto_awesome</span>
-<h3 class="font-bold text-lg text-primary">Personalized Insights</h3>
-</div>
-<div class="space-y-3">
-<div class="bg-tertiary/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
-<p class="text-sm font-medium text-primary">Your mood seems to dip during long study sessions. Try a 5-minute mindfulness break every hour.</p>
-</div>
-<div class="bg-tertiary/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
-<p class="text-sm font-medium text-primary">You're most focused in the morning. Schedule your toughest tasks before noon.</p>
-</div>
-<div class="bg-tertiary/50 p-3 rounded-lg border border-transparent hover:border-[var(--primary-color)] transition-all duration-300">
-<p class="text-sm font-medium text-primary">Consider reviewing your Biology flashcards. You haven't looked at them in 3 days.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section class="mb-8">
-<h2 class="text-2xl font-bold tracking-tight mb-4">Today's Tasks</h2>
-<div class="bg-secondary rounded-2xl p-6 border border-primary shadow-lg shadow-primary/50">
-</div>
-</section>
-<section>
-<h2 class="text-2xl font-bold tracking-tight mb-4">Current Focus Session</h2>
-<div class="bg-secondary rounded-2xl p-6 flex items-center justify-between gap-6 border border-primary shadow-lg shadow-primary/50">
-<div class="flex flex-col gap-4">
-<p class="text-lg font-bold">Deep Work Session: Biology</p>
-<p class="text-secondary">25 minutes remaining</p>
-<div class="flex items-center gap-4">
-<button class="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-[var(--primary-color)] text-white text-sm font-medium hover:bg-opacity-80 transition-all duration-200 shadow-[0_0_15px_rgba(128,19,236,0.4)]">
-<span class="material-symbols-outlined">pause</span>
-<span>Pause</span>
-</button>
-<button class="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-tertiary text-primary text-sm font-medium hover:bg-opacity-80 transition-all duration-200">
-<span class="material-symbols-outlined">stop</span>
-<span>Stop</span>
-</button>
-</div>
-</div>
-<div class="relative w-40 h-40">
-<svg class="w-full h-full" viewBox="0 0 100 100">
-<circle class="text-tertiary" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-width="8"></circle>
-<circle class="text-[var(--primary-color)]" cx="50" cy="50" fill="transparent" r="46" stroke="currentColor" stroke-dasharray="289.027" stroke-dashoffset="72.256" stroke-linecap="round" stroke-width="8"></circle>
-</svg>
-<div class="absolute inset-0 flex items-center justify-center text-3xl font-bold">75%</div>
-</div>
-</div>
-</section>
-<section class="mt-8">
-<h2 class="text-2xl font-bold tracking-tight mb-4">Mood &amp; Focus Trends</h2>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<div class="bg-secondary rounded-2xl p-6 border border-primary shadow-lg shadow-primary/50">
-<p class="text-base font-medium mb-1">Mood Over Time</p>
-<div class="flex items-baseline gap-2">
-<p class="text-4xl font-bold">7.5<span class="text-lg">/10</span></p>
-<p class="text-[#0bda73] text-sm font-medium flex items-center"><span class="material-symbols-outlined text-base">arrow_upward</span>+5%</p>
-</div>
-<p class="text-secondary text-sm mb-4">Last 7 Days</p>
-<div class="h-48">
-<svg fill="none" height="100%" preserveAspectRatio="none" viewBox="0 0 472 150" width="100%" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V150H0V109Z" fill="url(#paint0_linear_1_2)"></path>
-<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="var(--primary-color)" stroke-linecap="round" stroke-width="3"></path>
-<defs>
-<linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_1_2" x1="236" x2="236" y1="1" y2="150">
-<stop stop-color="var(--primary-color)" stop-opacity="0.3"></stop>
-<stop offset="1" stop-color="var(--primary-color)" stop-opacity="0"></stop>
-</linearGradient>
-</defs>
-</svg>
-</div>
-</div>
-<div class="bg-secondary rounded-2xl p-6 border border-primary shadow-lg shadow-primary/50">
-<p class="text-base font-medium mb-1">Focus Duration</p>
-<div class="flex items-baseline gap-2">
-<p class="text-4xl font-bold">45<span class="text-lg">hrs</span></p>
-<p class="text-[#0bda73] text-sm font-medium flex items-center"><span class="material-symbols-outlined text-base">arrow_upward</span>+10%</p>
-</div>
-<p class="text-secondary text-sm mb-4">This Month</p>
-<div class="grid grid-cols-4 gap-4 items-end h-48 px-3">
-<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 80%;"><span class="sr-only">Week 1: 80%</span></div>
-<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 50%;"><span class="sr-only">Week 2: 50%</span></div>
-<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 70%;"><span class="sr-only">Week 3: 70%</span></div>
-<div class="bg-[var(--primary-color)] rounded-t-md w-full hover:opacity-80 transition-opacity" style="height: 90%;"><span class="sr-only">Week 4: 90%</span></div>
-<p class="text-secondary text-xs font-bold text-center">W1</p>
-<p class="text-secondary text-xs font-bold text-center">W2</p>
-<p class="text-secondary text-xs font-bold text-center">W3</p>
-<p class="text-secondary text-xs font-bold text-center">W4</p>
-</div>
-</div>
-</div>
-</section>
-<section class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-<div>
-<h2 class="text-2xl font-bold tracking-tight mb-4">Quick Access</h2>
-<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-<div class="flex flex-col gap-3 group">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtT0KI4s3kg14ZrFoZLlKMWvodKpolrsdNbKA5uoGRp7wiYb0F8aDhD7hg5sbX6UYxE9wt3YhSoIy4QEUGjauYxTZJtfXLT9CWfN2U3VEHqtzZTocO-b6vM3to2mManmhCxgh3MqZy3GkEdXSEK5eAEZak4S2DXRHa3SoNyNwODNAZq20YRUp9cJJUfpGerZhdq32t8FzhGPiCKEb06loJHPH2_itJgHm547wjiuYushoilS5QCNnTteBrLNLIooqO0xxGQRNrOBU");'></div>
-<div>
-<p class="font-medium">Biology Textbook</p>
-<p class="text-sm text-secondary">Chapter 3</p>
-</div>
-</div>
-<div class="flex flex-col gap-3 group">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDlWmJuy9kK5xh0PwYGhnw7m_6GBmxahdEeusvu4-zcjaQBQkPCTr8owNcJ37klGWNojOzmvos4EJUp_16p4Wyt_VINrmnmgdwWu4JQAZm8QCsw3gtFQWsgMNX5emTXtqqebzh1dTQUyPHZSsZL7ggG8LwnXr9rJ2DoWDgpq_m1YQ7E3griQ60wHtqUAhWsjSOwgKUzCE6Coli2IVJrOM3noqWy1fK1OckCwzJSIIG26MR_Uj5JHaIQ9mehyju0Rw97NaHhqfTTt4U");'></div>
-<div>
-<p class="font-medium">Study Notes</p>
-<p class="text-sm text-secondary">Lecture 5</p>
-</div>
-</div>
-<div class="flex flex-col gap-3 group">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center overflow-hidden shadow-lg shadow-[#120B1A]/50 border-2 border-transparent group-hover:border-[var(--primary-color)] transition-all duration-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAXtoewfqG6jYsk61TuaLW_FExOBaumiQAmGBhn2-3kaQU-oDnJLJU2p5jzdIIpbqw6dVNo_bLdvlLX9PJXFAEqoQMUIkzwdB5FtTNjrJgQogMBOxCXHUy82Viu3YPbPaDEa2XtzDZu6JzKMzPOknZfkydGTx2eR_hb5_v4X23b37PIIq3gRKo_BVuKgAQDd1cwFfSE_WFVgoTYL-W-dZ1bJmu__kHIVL7iHx0WIPJleide-1E_ngOjjApESW5pIDoXLgai9bA22N4");'></div>
-<div>
-<p class="font-medium">Flashcards</p>
-<p class="text-sm text-secondary">Set 1</p>
-</div>
-</div>
-</div>
-<div class="mt-8">
-<h2 class="text-2xl font-bold tracking-tight mb-4">Gamification</h2>
-<div class="bg-secondary rounded-2xl p-6 border border-primary shadow-lg shadow-primary/50">
-<div class="flex justify-between items-center mb-2">
-<p class="font-medium">Focus Points</p>
-<p class="text-2xl font-bold text-[var(--primary-color)]" id="focus-points">0</p>
-</div>
-<div class="flex justify-between items-center">
-<p class="font-medium">Avatar Progress</p>
-<p class="text-lg font-bold" id="avatar-level">Lvl 1</p>
-</div>
-<div class="w-full bg-tertiary rounded-full h-2.5 mt-3">
-<div class="bg-[var(--primary-color)] h-2.5 rounded-full shadow-[0_0_10px_var(--primary-color)]" id="level-progress" style="width: 0%"></div>
-</div>
-</div>
-</div>
-</div>
-<div>
-<h2 class="text-2xl font-bold tracking-tight mb-4">Recent Activity</h2>
-<div class="space-y-4">
-<div class="flex items-center gap-4 bg-secondary p-4 rounded-xl border border-primary shadow-lg shadow-primary/50">
-<div class="text-primary flex items-center justify-center rounded-lg bg-tertiary shrink-0 size-12">
-<span class="material-symbols-outlined text-[var(--primary-color)]">psychology</span>
-</div>
-<div class="flex flex-col justify-center">
-<p class="font-medium">Completed Focus Session</p>
-<p class="text-sm text-secondary">You earned 50 focus points.</p>
-</div>
-<p class="text-xs text-secondary ml-auto">1h ago</p>
-</div>
-<div class="flex items-center gap-4 bg-[#1A1122] p-4 rounded-xl border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
-<div class="text-white flex items-center justify-center rounded-lg bg-[#2A1F36] shrink-0 size-12">
-<span class="material-symbols-outlined text-[var(--primary-color)]">menu_book</span>
-</div>
-<div class="flex flex-col justify-center">
-<p class="font-medium">New Study Materials</p>
-<p class="text-sm text-[#ad92c9]">Biology flashcards were added.</p>
-</div>
-<p class="text-xs text-[#ad92c9] ml-auto">3h ago</p>
-</div>
-<div class="flex items-center gap-4 bg-[#1A1122] p-4 rounded-xl border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50">
-<div class="text-white flex items-center justify-center rounded-lg bg-[#2A1F36] shrink-0 size-12">
-<span class="material-symbols-outlined text-[var(--primary-color)]">emoji_events</span>
-</div>
-<div class="flex flex-col justify-center">
-<p class="font-medium">Achievement Unlocked</p>
-<p class="text-sm text-[#ad92c9]">"Focused Mind" - 10 hours of focus.</p>
-</div>
-<p class="text-xs text-[#ad92c9] ml-auto">1d ago</p>
-</div>
-</div>
-</div>
-</section>
-</main>
-</div>
-</div>
+        // Initial updates
+        updateDisplay();
+        updateProgress();
 
-</body></html>
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarProfile = document.getElementById('navbar-profile');
+            const navbarDropdown = document.getElementById('navbar-dropdown');
+
+            navbarProfile.addEventListener('mouseenter', () => {
+                navbarDropdown.classList.remove('hidden');
+                navbarDropdown.classList.add('block');
+            });
+
+            navbarProfile.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    navbarDropdown.classList.add('hidden');
+                    navbarDropdown.classList.remove('block');
+                }, 300);
+            });
+
+            navbarDropdown.addEventListener('mouseenter', () => {
+                navbarDropdown.classList.remove('hidden');
+                navbarDropdown.classList.add('block');
+            });
+
+            navbarDropdown.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    navbarDropdown.classList.add('hidden');
+                    navbarDropdown.classList.remove('block');
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -105,7 +105,7 @@ authForm.addEventListener('submit', async (e) => {
         // Signed in
         console.log('User signed in:', userCredential.user);
         // Redirect to the dashboard or home page after successful login
-        window.location.href = 'student-planner.html';
+        window.location.href = 'Dashboard.html';
       })
       .catch((error) => {
         console.error('Login error:', error);
@@ -124,7 +124,7 @@ authForm.addEventListener('submit', async (e) => {
       await signUp(email, password, firstname, lastname, age, className, preferredSubject, role);
       console.log('User signed up and profile created');
       // Redirect to the dashboard or home page after successful signup
-      window.location.href = 'student-planner.html';
+      window.location.href = 'Dashboard.html';
     } catch (error) {
       console.error('Signup error:', error);
       errorMessage.textContent = error.message;

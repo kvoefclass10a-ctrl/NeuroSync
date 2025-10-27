@@ -93,16 +93,34 @@
             const widget = cloudinary.createUploadWidget(
                 {
                     cloudName: 'dwlxccz91',
-                    uploadPreset: 'uploadpreset', // Replace with your actual upload preset
+                    uploadPreset: 'unsigned_preset', // Using unsigned preset for direct uploads
                     sources: ['local', 'url', 'camera'],
                     multiple: false,
                     cropping: true,
                     croppingAspectRatio: 1,
                     showSkipCropButton: false,
-                    folder: 'profile_photos',
+                    folder: 'neurosync/profile_photos',
                     resourceType: 'image',
-                    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif'],
+                    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
                     maxFileSize: 5000000, // 5MB
+                    theme: 'minimal',
+                    styles: {
+                        palette: {
+                            window: '#1A1122',
+                            sourceBg: '#2A1F36',
+                            windowBorder: '#8013ec',
+                            tabIcon: '#ad92c9',
+                            inactiveTabIcon: '#5d458c',
+                            menuIcons: '#8013ec',
+                            link: '#8013ec',
+                            action: '#8013ec',
+                            inProgress: '#8013ec',
+                            complete: '#4ade80',
+                            error: '#ef4444',
+                            textDark: '#FFFFFF',
+                            textLight: '#ad92c9'
+                        }
+                    }
                 },
                 (error, result) => {
                     if (!error && result && result.event === 'success') {
@@ -296,7 +314,7 @@
         </div>
         <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
             <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
-            <a href="student-planner.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Dashboard</a>
+            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Dashboard</a>
             <div class="relative group">
                 <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
                     <span>Resources</span>
@@ -304,9 +322,9 @@
                 </button>
                 <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
                     <div class="py-1">
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Study Material</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
                     </div>
                 </div>
             </div>
@@ -317,9 +335,9 @@
                 </button>
                 <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
                     <div class="py-1">
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="Exp_ Getstarted.html">Feedback Us</a>
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
                     </div>
                 </div>
             </div>
@@ -465,7 +483,7 @@
 
             <!-- Back Button -->
             <div class="text-center mt-6">
-                <button onclick="window.location.href='student-planner.html'" class="text-[#ad92c9] hover:text-white transition-colors">
+                <button onclick="window.location.href='Dashboard.html'" class="text-[#ad92c9] hover:text-white transition-colors">
                     ← Back to Dashboard
                 </button>
             </div>

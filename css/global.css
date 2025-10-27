@@ -127,4 +127,120 @@ body {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
+  
+  /* Mobile Navigation */
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .mobile-nav a {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+  
+  /* Mobile Cards */
+  .mobile-card {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+  
+  /* Mobile Forms */
+  .mobile-form {
+    padding: 1rem;
+  }
+  
+  .mobile-form input,
+  .mobile-form textarea,
+  .mobile-form select {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  /* Mobile Grid */
+  .mobile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Mobile Text Sizes */
+  .mobile-text-lg {
+    font-size: 1.125rem;
+  }
+  
+  .mobile-text-xl {
+    font-size: 1.25rem;
+  }
+  
+  .mobile-text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  /* Mobile Spacing */
+  .mobile-p-4 {
+    padding: 1rem;
+  }
+  
+  .mobile-p-6 {
+    padding: 1.5rem;
+  }
+  
+  .mobile-mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-mb-6 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .xs-mobile-p-2 {
+    padding: 0.5rem;
+  }
+  
+  .xs-mobile-text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .xs-mobile-text-base {
+    font-size: 1rem;
+  }
+  
+  .xs-mobile-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Touch-friendly buttons */
+@media (hover: none) and (pointer: coarse) {
+  .touch-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-button:hover {
+    transform: none;
+  }
+  
+  .touch-button:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .landscape-mobile {
+    flex-direction: row;
+  }
+  
+  .landscape-mobile .mobile-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }

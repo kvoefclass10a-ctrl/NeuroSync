@@ -842,6 +842,15 @@
     <audio id="white-noise-sound" loop preload="none">
         <source src="https://www.soundjay.com/misc/sounds/white-noise.mp3" type="audio/mpeg">
     </audio>
+    <audio id="ocean-sound" loop preload="none">
+        <source src="https://www.soundjay.com/misc/sounds/ocean-waves.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="cafe-sound" loop preload="none">
+        <source src="https://www.soundjay.com/misc/sounds/cafe-ambience.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="fire-sound" loop preload="none">
+        <source src="https://www.soundjay.com/misc/sounds/fireplace.mp3" type="audio/mpeg">
+    </audio>
 </head>
 <body class="bg-primary dark">
 <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
@@ -877,7 +886,7 @@
 </div>
 <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
 <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="#">Home</a>
-<a href="dashboard.html" id="dashboard-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">
+<a href="html/Dashboard.html" id="dashboard-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">
 <span>Dashboard</span>
 </a>
 <div class="relative group">
@@ -887,8 +896,9 @@
 </button>
 <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
 <div class="py-1">
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Study Material</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Upload</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="html/mood-selection.html">Mood Tracker</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="html/study-library.html">Study Library</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="html/study-library.html">Upload Material</a>
 </div>
 </div>
 </div>
@@ -899,12 +909,14 @@
 </button>
 <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
 <div class="py-1">
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="Exp_ Getstarted.html">Feedback Us</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">About Us</a>
-<a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#">Support</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="html/feedback.html">Feedback Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
 </div>
 </div>
 </div>
+<a href="html/rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
+<a href="html/profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
 </nav>
 <script>
 function openDropdown(element) {
@@ -1134,16 +1146,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const ambientControls = document.createElement('div');
     ambientControls.className = 'ambient-sounds';
 
+    const rainSound = document.getElementById('rain-sound');
+    const natureSound = document.getElementById('nature-sound');
+    const whiteNoiseSound = document.getElementById('white-noise-sound');
+    const oceanSound = document.getElementById('ocean-sound');
+    const cafeSound = document.getElementById('cafe-sound');
+    const fireSound = document.getElementById('fire-sound');
+
     const sounds = [
-      { id: 'rain', icon: 'water_drop', audio: rainSound },
-      { id: 'nature', icon: 'forest', audio: natureSound },
-      { id: 'noise', icon: 'radio_button_checked', audio: whiteNoiseSound }
+      { id: 'rain', icon: 'water_drop', audio: rainSound, name: 'Rain' },
+      { id: 'nature', icon: 'forest', audio: natureSound, name: 'Forest' },
+      { id: 'ocean', icon: 'waves', audio: oceanSound, name: 'Ocean' },
+      { id: 'cafe', icon: 'local_cafe', audio: cafeSound, name: 'Café' },
+      { id: 'fire', icon: 'local_fire_department', audio: fireSound, name: 'Fireplace' },
+      { id: 'noise', icon: 'radio_button_checked', audio: whiteNoiseSound, name: 'White Noise' }
     ];
 
     sounds.forEach(sound => {
       const button = document.createElement('button');
       button.className = 'sound-button';
       button.innerHTML = `<span class="material-symbols-outlined">${sound.icon}</span>`;
+      button.title = sound.name;
       button.onclick = () => toggleAmbientSound(sound.id, sound.audio);
       ambientControls.appendChild(button);
     });
@@ -1160,7 +1183,14 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.sound-button').forEach(btn => btn.classList.remove('active'));
     } else {
       // Stop any playing sound
-      [rainSound, natureSound, whiteNoiseSound].forEach(audio => {
+      const rainSound = document.getElementById('rain-sound');
+      const natureSound = document.getElementById('nature-sound');
+      const whiteNoiseSound = document.getElementById('white-noise-sound');
+      const oceanSound = document.getElementById('ocean-sound');
+      const cafeSound = document.getElementById('cafe-sound');
+      const fireSound = document.getElementById('fire-sound');
+      
+      [rainSound, natureSound, whiteNoiseSound, oceanSound, cafeSound, fireSound].forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
       });
@@ -1173,7 +1203,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Highlight active button
       const buttons = document.querySelectorAll('.sound-button');
       buttons.forEach((btn, index) => {
-        if (index === ['rain', 'nature', 'noise'].indexOf(soundId)) {
+        if (index === ['rain', 'nature', 'ocean', 'cafe', 'fire', 'noise'].indexOf(soundId)) {
           btn.classList.add('active');
         }
       });
@@ -1373,7 +1403,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Stop ambient sounds
-    [rainSound, natureSound, whiteNoiseSound].forEach(audio => {
+    const rainSound = document.getElementById('rain-sound');
+    const natureSound = document.getElementById('nature-sound');
+    const whiteNoiseSound = document.getElementById('white-noise-sound');
+    const oceanSound = document.getElementById('ocean-sound');
+    const cafeSound = document.getElementById('cafe-sound');
+    const fireSound = document.getElementById('fire-sound');
+    
+    [rainSound, natureSound, whiteNoiseSound, oceanSound, cafeSound, fireSound].forEach(audio => {
       audio.pause();
       audio.currentTime = 0;
     });
@@ -1530,7 +1567,7 @@ auth.onAuthStateChanged(async (user) => {
   } else {
     // Show buttons for non-authenticated users
     document.getElementById('get-started-btn').style.display = '';
-    document.querySelector('a[href="auth.html"]').style.display = '';
+    document.querySelector('a[href="/html/auth.html"]').style.display = '';
     // Hide navbar profile and dashboard link for non-authenticated users
     document.getElementById('navbar-profile').style.display = 'none';
     document.getElementById('dashboard-nav-link').style.display = 'none';
@@ -1664,14 +1701,14 @@ document.getElementById('navbar-sign-out-btn').addEventListener('click', () => {
 <!-- Dropdown Menu -->
 <div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
 <div class="py-1">
-<a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
-<span class="material-symbols-outlined text-base">person</span>
-<span>See Profile</span>
-</a>
-<a href="profile.html?edit=true" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
-<span class="material-symbols-outlined text-base">edit</span>
-<span>Edit Profile</span>
-</a>
+                        <a href="html/profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">person</span>
+                            <span>See Profile</span>
+                        </a>
+                        <a href="html/profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">edit</span>
+                            <span>Edit Profile</span>
+                        </a>
 <button id="navbar-sign-out-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
 <span class="material-symbols-outlined text-base">logout</span>
 <span>Sign Out</span>
@@ -1698,7 +1735,7 @@ document.getElementById('navbar-sign-out-btn').addEventListener('click', () => {
 <h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter text-primary animate-fade-in-down" style='font-family: "Story Script", sans-serif; text-shadow: rgba(147, 51, 234, 0.5) 0px 0px 15px, rgba(147, 51, 234, 0.3) 0px 0px 25px;'>NeuroSync</h1>
 <p class="mt-4 text-lg md:text-xl text-secondary max-w-2xl mx-auto">AI-Powered Focus &amp; Mental Wellbeing Companion for Students</p>
 <div class="mt-10 flex flex-wrap gap-4 justify-center">
-<a class="translucent-button flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 text-lg font-bold" href="auth.html">
+<a class="translucent-button flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-8 text-lg font-bold" href="html/auth.html">
 <span class="truncate">Create Free Account</span>
 </a>
 </div>
