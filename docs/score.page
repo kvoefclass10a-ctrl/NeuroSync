@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroSync - Score</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="hero">
+    <h1>Your Score</h1>
+    <div class="arms">
+      <div>Mood Selection</div>
+      <div>Study Material</div>
+      <div>Feedback Us</div>
+      <div>Dashboard</div>
+      <div>Upload</div>
+      <div>Score</div>
+    </div>
+  </div>
+
+  <div class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-text">NeuroSync</span>
+    </div>
+    <div>Mood</div>
+    <div>Study</div>
+    <div>Feedback</div>
+    <div>Dashboard</div>
+    <div>Upload</div>
+    <div>Score</div>
+    <div class="nav-auth">
+      <button class="auth-btn sign-in">Sign In</button>
+      <button class="auth-btn login">Log In</button>
+    </div>
+  </div>
+
+  <!-- Score Dashboard Sections -->
+  <div class="dashboard-container">
+    <!-- Focus Points -->
+    <section class="dashboard-tab" id="focus-points">
+      <div class="tab-content">
+        <h2>🎯 Focus Points</h2>
+        <div class="score-display">
+          <div class="score-number" id="total-points">0</div>
+          <p>Total Points Earned</p>
+        </div>
+        <div class="points-breakdown">
+          <div class="point-item">
+            <span class="point-icon">⏰</span>
+            <span class="point-value" id="timer-points">0</span>
+            <span class="point-label">Timer Sessions</span>
+          </div>
+          <div class="point-item">
+            <span class="point-icon">📚</span>
+            <span class="point-value" id="study-points">0</span>
+            <span class="point-label">Study Materials</span>
+          </div>
+          <div class="point-item">
+            <span class="point-icon">😊</span>
+            <span class="point-value" id="mood-points">0</span>
+            <span class="point-label">Mood Tracking</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Avatar Progress -->
+    <section class="dashboard-tab" id="avatar-progress">
+      <div class="tab-content">
+        <h2>🌱 Avatar Growth</h2>
+        <div class="avatar-container">
+          <div class="avatar" id="current-avatar">🌱</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="avatar-progress-fill" style="width: 0%;"></div>
+          </div>
+          <p id="avatar-level">Level 1: Seed</p>
+        </div>
+        <div class="avatar-milestones">
+          <div class="milestone" data-level="1">🌱 Seed (0-100 pts)</div>
+          <div class="milestone" data-level="2">🌿 Sprout (100-300 pts)</div>
+          <div class="milestone" data-level="3">🌳 Tree (300-600 pts)</div>
+          <div class="milestone" data-level="4">🌟 Star (600+ pts)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Sessions -->
+    <section class="dashboard-tab" id="recent-sessions">
+      <div class="tab-content">
+        <h2>📊 Recent Focus Sessions</h2>
+        <div class="sessions-list" id="sessions-list">
+          <!-- Sessions will be populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Achievements -->
+    <section class="dashboard-tab" id="achievements">
+      <div class="tab-content">
+        <h2>🏆 Achievements</h2>
+        <div class="achievements-grid" id="achievements-grid">
+          <!-- Achievements will be populated by JS -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="theme-toggle-fixed" id="themeToggleFixed">
+    <button class="theme-toggle" id="themeToggle">
+      <span class="theme-icon">🌙</span>
+    </button>
+  </div>
+
+  <script>
+    // Firebase Configuration and Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+      authDomain: "neurosync-5173b.firebaseapp.com",
+      projectId: "neurosync-5173b",
+      storageBucket: "neurosync-5173b.firebasestorage.app",
+      messagingSenderId: "855780859936",
+      appId: "1:855780859936:web:3044309100db9a61fa1c45",
+      measurementId: "G-75S5GWYEDK"
+    };
+
+    // Initialize Firebase
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      const analytics = firebase.analytics();
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+      console.log('Firebase initialized successfully');
+      
+      // Log app initialization event
+      analytics.logEvent('score_page_loaded');
+      
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
+    // Dark Mode Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+    
+    // Set initial theme
+    if (currentTheme === 'light' || (!currentTheme && !prefersDarkScheme.matches)) {
+      document.body.classList.add('light-mode');
+      themeIcon.textContent = '☀️';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeIcon.textContent = '🌙';
+    }
+    
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      const isLightMode = document.body.classList.toggle('light-mode');
+      
+      if (isLightMode) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar.classList.add('active');
+      } else {
+        navbar.classList.remove('active');
+      }
+    });
+
+    // Function to load user score data
+    async function loadUserScore() {
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          console.log('No user logged in');
+          return;
+        }
+
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          document.getElementById('total-points').textContent = userData.focusPoints || 0;
+          
+          // Update avatar based on points
+          updateAvatar(userData.focusPoints || 0);
+        }
+
+        // Load recent focus sessions
+        const sessionsQuery = await db.collection('focusSessions')
+          .where('userId', '==', user.uid)
+          .orderBy('timestamp', 'desc')
+          .limit(5)
+          .get();
+        
+        const sessionsList = document.getElementById('sessions-list');
+        sessionsList.innerHTML = '';
+        sessionsQuery.forEach(doc => {
+          const session = doc.data();
+          const sessionDiv = document.createElement('div');
+          sessionDiv.className = 'session-item';
+          sessionDiv.innerHTML = `
+            <span class="session-icon">⏰</span>
+            <div class="session-details">
+              <p>${session.duration} minutes</p>
+              <small>${new Date(session.timestamp?.toDate()).toLocaleDateString()}</small>
+            </div>
+          `;
+          sessionsList.appendChild(sessionDiv);
+        });
+
+        // Load achievements (placeholder logic)
+        const achievementsGrid = document.getElementById('achievements-grid');
+        achievementsGrid.innerHTML = '';
+        const achievements = [
+          { name: 'First Timer', icon: '⏰', unlocked: true },
+          { name: 'Study Streak', icon: '🔥', unlocked: false },
+          { name: 'Mood Master', icon: '😊', unlocked: true }
+        ];
+        
+        achievements.forEach(achievement => {
+          const achievementDiv = document.createElement('div');
+          achievementDiv.className = `achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+          achievementDiv.innerHTML = `${achievement.icon} ${achievement.name}`;
+          achievementsGrid.appendChild(achievementDiv);
+        });
+
+      } catch (error) {
+        console.error('Error loading user score:', error);
+      }
+    }
+
+    // Function to update avatar based on points
+    function updateAvatar(points) {
+      const avatar = document.getElementById('current-avatar');
+      const progressFill = document.getElementById('avatar-progress-fill');
+      const avatarLevel = document.getElementById('avatar-level');
+      
+      let level = 1;
+      let progress = 0;
+      let emoji = '🌱';
+      let levelName = 'Seed';
+      
+      if (points >= 600) {
+        level = 4;
+        emoji = '🌟';
+        levelName = 'Star';
+        progress = 100;
+      } else if (points >= 300) {
+        level = 3;
+        emoji = '🌳';
+        levelName = 'Tree';
+        progress = ((points - 300) / 300) * 100;
+      } else if (points >= 100) {
+        level = 2;
+        emoji = '🌿';
+        levelName = 'Sprout';
+        progress = ((points - 100) / 200) * 100;
+      } else {
+        progress = (points / 100) * 100;
+      }
+      
+      avatar.textContent = emoji;
+      progressFill.style.width = `${progress}%`;
+      avatarLevel.textContent = `Level ${level}: ${levelName}`;
+    }
+
+    // Auth state listener
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        loadUserScore();
+      } else {
+        // Redirect to login or show login prompt
+        console.log('User not logged in');
+      }
+    });
+
+    // Navigation functionality (placeholder)
+    document.querySelectorAll('.arms div, .navbar div:not(.nav-logo):not(.nav-auth)').forEach(navItem => {
+      navItem.addEventListener('click', () => {
+        const section = navItem.textContent.toLowerCase().replace(' ', '-');
+        // Navigate to corresponding page or section
+        console.log(`Navigate to ${section}`);
+      });
+    });
+  </script>
+
+  <style>
+    /* Additional styles for score page */
+    .score-display {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .score-number {
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .points-breakdown {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    
+    .point-item {
+      text-align: center;
+      margin: 0.5rem;
+    }
+    
+    .point-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .point-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      display: block;
+    }
+    
+    .point-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .avatar-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .avatar {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    .avatar-milestones {
+      margin-top: 1rem;
+    }
+    
+    .milestone {
+      padding: 0.5rem;
+      margin: 0.3rem 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .session-item {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin-bottom: 0.8rem;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .session-icon {
+      font-size: 1.2rem;
+      margin-right: 0.8rem;
+    }
+    
+    .session-details p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .session-details small {
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+    }
+    
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    
+    .achievement-badge {
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      font-size: 0.9rem;
+    }
+    
+    .achievement-badge.unlocked {
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    .achievement-badge.locked {
+      opacity: 0.5;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .points-breakdown {
+        flex-direction: column;
+      }
+      
+      .achievements-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</body>
+</html>
