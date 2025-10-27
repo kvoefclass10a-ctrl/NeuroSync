@@ -2175,7 +2175,11 @@
         chatWindow.scrollTop = chatWindow.scrollHeight;
       }
 
-      buttons.forEach(button => {
+    buttons.forEach(button => {
+        button.setAttribute('aria-label', `Select ${button.getAttribute('data-mood')} mood`);
+        button.setAttribute('role', 'button');
+        button.setAttribute('tabindex', '0');
+
         button.addEventListener('click', () => {
           // Remove selected class from all buttons
           buttons.forEach(btn => btn.classList.remove('selected'));
@@ -2188,7 +2192,8 @@
           addChatMessage('user', mood);
           setTimeout(() => {
             const tip = Array.isArray(moodTips[mood]) ? moodTips[mood][Math.floor(Math.random() * moodTips[mood].length)] : moodTips[mood];
-            addChatMessage('bot', tip);
+            const activity = Array.isArray(moodActivities[mood]) ? moodActivities[mood][Math.floor(Math.random() * moodActivities[mood].length)] : 'Try engaging in a positive activity.';
+            addChatMessage('bot', `${tip}\n\n💡 Activity suggestion: ${activity}`);
           }, 500);
         });
       });
