@@ -30,25 +30,82 @@
         const db = firebase.firestore();
 
         // Check authentication
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'auth.html';
             } else {
-                loadUserProfile();
+                await loadUserProfile();
                 loadFeedbackHistory();
             }
         });
 
         async function loadUserProfile() {
             const user = auth.currentUser;
+            if (!user) {
+                console.error('No user found');
+                return;
+            }
+            
             try {
+                console.log('Loading profile for user:', user.uid);
                 const doc = await db.collection('Profiles').doc(user.uid).get();
+                
                 if (doc.exists) {
                     const data = doc.data();
-                    document.getElementById('user-name').textContent = `${data.firstname || ''} ${data.lastname || ''}`.trim() || 'User';
+                    console.log('Profile data found:', data);
+                    
+                    const displayName = `${data.firstname || ''} ${data.lastname || ''}`.trim() || user.email.split('@')[0] || 'User';
+                    
+                    // Update navbar name
+                    const userNameElement = document.getElementById('user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = displayName;
+                    }
+                    
+                    // Update user info display
+                    const displayNameElement = document.getElementById('display-name');
+                    const displayEmailElement = document.getElementById('display-email');
+                    const displayClassElement = document.getElementById('display-class');
+                    const displayRoleElement = document.getElementById('display-role');
+                    
+                    if (displayNameElement) displayNameElement.textContent = displayName;
+                    if (displayEmailElement) displayEmailElement.textContent = user.email;
+                    if (displayClassElement) displayClassElement.textContent = data.class || 'Not specified';
+                    if (displayRoleElement) displayRoleElement.textContent = data.role || 'Student';
+                    
+                    console.log('Profile loaded successfully');
+                } else {
+                    console.log('No profile document found, using fallback');
+                    // Fallback if no profile exists
+                    const displayName = user.email.split('@')[0] || 'User';
+                    
+                    const userNameElement = document.getElementById('user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = displayName;
+                    }
+                    
+                    const displayNameElement = document.getElementById('display-name');
+                    const displayEmailElement = document.getElementById('display-email');
+                    const displayClassElement = document.getElementById('display-class');
+                    const displayRoleElement = document.getElementById('display-role');
+                    
+                    if (displayNameElement) displayNameElement.textContent = displayName;
+                    if (displayEmailElement) displayEmailElement.textContent = user.email;
+                    if (displayClassElement) displayClassElement.textContent = 'Not specified';
+                    if (displayRoleElement) displayRoleElement.textContent = 'Student';
                 }
             } catch (error) {
                 console.error('Error loading profile:', error);
+                // Show error in the display
+                const displayNameElement = document.getElementById('display-name');
+                const displayEmailElement = document.getElementById('display-email');
+                const displayClassElement = document.getElementById('display-class');
+                const displayRoleElement = document.getElementById('display-role');
+                
+                if (displayNameElement) displayNameElement.textContent = 'Error loading profile';
+                if (displayEmailElement) displayEmailElement.textContent = user?.email || 'Unknown';
+                if (displayClassElement) displayClassElement.textContent = 'Error';
+                if (displayRoleElement) displayRoleElement.textContent = 'Error';
             }
         }
 
@@ -69,14 +126,23 @@
             }
 
             try {
+                // Get user profile information
+                const profileDoc = await db.collection('Profiles').doc(user.uid).get();
+                const profileData = profileDoc.exists() ? profileDoc.data() : {};
+
                 await db.collection('Feedback').add({
                     userId: anonymous ? null : user.uid,
-                    userName: anonymous ? 'Anonymous' : document.getElementById('user-name').textContent,
+                    userName: anonymous ? 'Anonymous' : `${profileData.firstname || ''} ${profileData.lastname || ''}`.trim() || user.email.split('@')[0],
+                    userEmail: anonymous ? null : user.email,
+                    userClass: anonymous ? null : profileData.class,
+                    userRole: anonymous ? null : profileData.role,
                     rating: parseInt(rating),
                     category: category,
                     message: message.trim(),
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending'
+                    status: 'pending',
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
                 });
 
                 showNotification('Thank you for your feedback! We appreciate your input.', 'success');
@@ -139,10 +205,13 @@
                     </div>
                     <div class="text-yellow-400">${stars}</div>
                 </div>
-                <p class="text-muted text-sm">${feedback.message}</p>
-                <div class="mt-2">
+                <p class="text-muted text-sm mb-3">${feedback.message}</p>
+                <div class="flex items-center justify-between">
                     <span class="px-2 py-1 bg-accent/20 text-accent rounded-full text-xs">
                         ${feedback.status || 'pending'}
+                    </span>
+                    <span class="text-xs text-secondary">
+                        ${feedback.userName || 'Anonymous'}
                     </span>
                 </div>
             `;
@@ -249,7 +318,7 @@
             <button onclick="window.location.href='Dashboard.html'" class="translucent-button flex items-center justify-center rounded-full size-11">
                 <span class="material-symbols-outlined text-2xl">arrow_back</span>
             </button>
-        </div>
+</div>
     </header>
 
     <div class="min-h-screen p-8">
@@ -266,53 +335,127 @@
                     <h2 class="text-2xl font-bold text-primary mb-6">Share Your Feedback</h2>
                     
                     <form onsubmit="submitFeedback(event)" class="space-y-6">
-                        <!-- Rating -->
+                        <!-- User Info Display (Read-only) -->
+                        <div class="bg-gradient-to-r from-tertiary/30 to-tertiary/50 backdrop-blur-sm border border-primary/50 rounded-xl p-6 mb-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-accent text-2xl">person</span>
+                                <h3 class="text-xl font-bold text-primary">Your Information</h3>
+</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">badge</span>
 <div>
-                            <label class="block text-sm font-medium mb-3">Overall Rating *</label>
-                            <div class="star-rating" id="star-rating">
-                                <span class="star" data-rating="1">☆</span>
-                                <span class="star" data-rating="2">☆</span>
-                                <span class="star" data-rating="3">☆</span>
-                                <span class="star" data-rating="4">☆</span>
-                                <span class="star" data-rating="5">☆</span>
+                                            <span class="text-secondary text-sm font-medium">Name</span>
+                                            <div class="text-primary font-semibold" id="display-name">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
 </div>
+</div>
+</div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">school</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Class</span>
+                                            <div class="text-primary font-semibold" id="display-class">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+                                            </div>
+</div>
+</div>
+</div>
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">email</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Email</span>
+                                            <div class="text-primary font-semibold break-all" id="display-email">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+                                            </div>
+</div>
+</div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">person_pin</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Role</span>
+                                            <div class="text-primary font-semibold" id="display-role">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+                        <!-- Rating -->
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">star</span>
+                                Overall Rating *
+                            </label>
+                            <div class="star-rating flex gap-2 justify-center" id="star-rating">
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="1">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="2">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="3">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="4">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="5">☆</span>
+                            </div>
                             <input type="hidden" name="rating" id="rating-input" required>
-</div>
+                        </div>
 
                         <!-- Category -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Category *</label>
-                            <select name="category" required class="w-full px-3 py-2 bg-tertiary border border-primary rounded-lg focus:border-accent focus:outline-none text-primary">
-                                <option value="">Select Category</option>
-                                <option value="General Feedback">General Feedback</option>
-                                <option value="Bug Report">Bug Report</option>
-                                <option value="Feature Request">Feature Request</option>
-                                <option value="Study Materials">Study Materials</option>
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">category</span>
+                                Feature/Category *
+                            </label>
+                            <select name="category" required class="w-full px-4 py-3 bg-tertiary/80 border border-primary/50 rounded-xl focus:border-accent focus:outline-none text-primary font-medium transition-all duration-200 hover:bg-tertiary">
+                                <option value="">Select Feature/Category</option>
                                 <option value="Focus Timer">Focus Timer</option>
                                 <option value="Mood Tracker">Mood Tracker</option>
+                                <option value="Study Library">Study Library</option>
+                                <option value="Rewards System">Rewards System</option>
+                                <option value="Dashboard">Dashboard</option>
+                                <option value="Profile Management">Profile Management</option>
                                 <option value="User Interface">User Interface</option>
                                 <option value="Performance">Performance</option>
-                                <option value="Other">Other</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="General Feedback">General Feedback</option>
                             </select>
-</div>
+                        </div>
 
                         <!-- Message -->
-<div>
-                            <label class="block text-sm font-medium mb-2">Your Message *</label>
-                            <textarea name="message" rows="5" required placeholder="Please describe your feedback in detail..." 
-                                      class="w-full px-3 py-2 bg-tertiary border border-primary rounded-lg focus:border-accent focus:outline-none text-primary placeholder-color resize-none"></textarea>
-</div>
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">message</span>
+                                Your Feedback *
+                            </label>
+                            <textarea name="message" rows="5" required placeholder="Please share your thoughts, suggestions, or report any issues..." 
+                                      class="w-full px-4 py-3 bg-tertiary/80 border border-primary/50 rounded-xl focus:border-accent focus:outline-none text-primary placeholder-color resize-none font-medium transition-all duration-200 hover:bg-tertiary"></textarea>
+                        </div>
 
                         <!-- Anonymous Option -->
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" name="anonymous" id="anonymous" class="rounded border-primary bg-tertiary text-accent focus:ring-accent">
-                            <label for="anonymous" class="text-sm text-secondary">Submit anonymously</label>
-</div>
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" name="anonymous" id="anonymous" class="w-5 h-5 rounded border-primary bg-tertiary text-accent focus:ring-accent focus:ring-2">
+                                <label for="anonymous" class="text-primary font-medium flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-accent">visibility_off</span>
+                                    Submit anonymously
+                                </label>
+                            </div>
+                            <p class="text-secondary text-sm mt-2 ml-8">Your personal information will be hidden from administrators</p>
+                        </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="w-full translucent-button px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">
-                            Submit Feedback
-                        </button>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-gradient-to-r from-accent to-accent-secondary hover:from-accent-secondary hover:to-accent text-primary px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-200 shadow-lg shadow-accent/30 flex items-center justify-center gap-3">
+                                <span class="material-symbols-outlined text-xl">send</span>
+                                Submit Feedback
+                            </button>
+                        </div>
                     </form>
 </div>
 

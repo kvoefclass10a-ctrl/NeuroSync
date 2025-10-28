@@ -63,11 +63,11 @@ auth.onAuthStateChanged(async (user) => {
         : user.displayName || user.email.split('@')[0] || 'User';
       document.getElementById('navbar-name').textContent = displayName;
 
-                // Update navbar class and role
+      // Update navbar class and role
                 const classRole = userProfile.class && userProfile.role
                     ? `${userProfile.class} • ${userProfile.role}`
                     : userProfile.role || 'Student';
-                document.getElementById('navbar-class-role').textContent = classRole;
+      document.getElementById('navbar-class-role').textContent = classRole;
 
                 // Show teacher dashboard link for teachers
                 if (userProfile.role === 'Teacher') {
@@ -300,7 +300,7 @@ async function loadRewardsData(userId) {
             }).catch((error) => {
                 console.error('Sign out error:', error);
             });
-        }
+}
 </script>
 <style type="text/tailwindcss">
         :root {
