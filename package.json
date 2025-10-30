@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "cloudinary": "^2.8.0",
     "firebase": "^12.2.1"
   }
