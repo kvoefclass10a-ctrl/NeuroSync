@@ -1,0 +1,443 @@
+/* ========================================
+   MOBILE OPTIMIZATION STYLESHEET
+   Mobile-First Responsive Design
+   ======================================== */
+
+/* MOBILE-FIRST APPROACH: Base styles apply to mobile */
+
+/* ========================================
+   1. TYPOGRAPHY & SIZING
+   ======================================== */
+
+/* Ensure readable font sizes on mobile */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  h1 {
+    font-size: 24px !important;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-size: 20px !important;
+    margin-bottom: 12px;
+  }
+  
+  h3 {
+    font-size: 18px !important;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  button, .btn {
+    font-size: 14px;
+    padding: 10px 16px;
+    min-height: 44px; /* Touch-friendly button size */
+    border-radius: 8px;
+  }
+  
+  input, textarea, select {
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+    padding: 12px;
+    min-height: 44px;
+  }
+}
+
+/* ========================================
+   2. SPACING & PADDING
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Reduce padding on containers */
+  .container, [class*="container"] {
+    padding: 12px !important;
+    margin: 0 !important;
+  }
+  
+  /* Reduce margins on sections */
+  section {
+    margin: 16px 0 !important;
+    padding: 16px !important;
+  }
+  
+  /* Adjust card spacing */
+  .card, [class*="card"] {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  /* Reduce gap in grids */
+  .grid, [class*="grid"] {
+    gap: 8px !important;
+  }
+  
+  .flex-gap, [class*="gap"] {
+    gap: 8px !important;
+  }
+}
+
+/* ========================================
+   3. LAYOUT & GRID
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Stack grid layouts on mobile */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Stack flex layouts */
+  .flex-row {
+    flex-direction: column;
+  }
+  
+  /* Full-width elements */
+  [class*="w-"] {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Ensure forms are full width */
+  form, .form-group {
+    width: 100%;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ========================================
+   4. NAVIGATION & MENUS
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Stack navigation vertically */
+  nav, .navbar, .nav-menu {
+    flex-direction: column;
+    padding: 8px 0;
+  }
+  
+  nav a, .nav-link {
+    padding: 12px 16px;
+    display: block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+  
+  /* Hide horizontal navigation, show mobile menu */
+  .nav-desktop {
+    display: none !important;
+  }
+  
+  .nav-mobile {
+    display: block !important;
+  }
+  
+  /* Mobile hamburger menu */
+  .hamburger, .menu-toggle {
+    display: block !important;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 8px;
+  }
+}
+
+/* ========================================
+   5. IMAGES & MEDIA
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Responsive images */
+  img, picture {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* Fix image containers */
+  [class*="img"], [class*="image"] {
+    max-width: 100%;
+  }
+  
+  /* Responsive videos */
+  iframe, video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ========================================
+   6. TOUCH TARGETS
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Ensure touch targets are at least 44x44px */
+  a, button, input[type="button"], input[type="submit"],
+  [role="button"], .clickable {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+  
+  /* Add spacing between interactive elements */
+  a + a, button + button,
+  a + button, button + a {
+    margin-left: 8px;
+  }
+}
+
+/* ========================================
+   7. MODALS & DIALOGS
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Full-width modals on mobile */
+  .modal, .dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header, .dialog-header {
+    padding: 12px;
+  }
+  
+  .modal-body, .dialog-body {
+    padding: 12px;
+  }
+  
+  .modal-footer, .dialog-footer {
+    padding: 12px;
+    flex-direction: column;
+  }
+  
+  .modal-footer button, .dialog-footer button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+/* ========================================
+   8. TABLES
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Stack table on mobile */
+  table {
+    font-size: 12px;
+  }
+  
+  table thead {
+    display: none;
+  }
+  
+  table tbody, table tr, table td {
+    display: block;
+    width: 100%;
+  }
+  
+  table tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  table td {
+    padding: 8px 12px;
+    text-align: right;
+    position: relative;
+    padding-left: 50%;
+  }
+  
+  table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 6px;
+    font-weight: 600;
+    text-align: left;
+  }
+}
+
+/* ========================================
+   9. OVERFLOW & SCROLLING
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Prevent horizontal overflow */
+  body, html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Handle horizontal scrolling content */
+  .horizontal-scroll, [class*="scroll-x"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 0;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ========================================
+   10. SAFE AREA (Notch Support)
+   ======================================== */
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  
+  nav, .fixed-header {
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+  
+  .fixed-footer {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* ========================================
+   11. BREAKPOINT-SPECIFIC FIXES
+   ======================================== */
+
+/* Extra small devices (320px - 480px) */
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  
+  h1 {
+    font-size: 20px !important;
+  }
+  
+  h2 {
+    font-size: 18px !important;
+  }
+  
+  .px-4, [class*="px-"] {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .mx-auto {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+}
+
+/* Small devices (481px - 768px) */
+@media (max-width: 768px) and (min-width: 481px) {
+  /* Adjust for small tablets */
+  .grid-cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ========================================
+   12. PERFORMANCE & ANIMATIONS
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Optimize for slower connections */
+@media (max-width: 640px) {
+  img {
+    max-width: 100%;
+  }
+}
+
+/* ========================================
+   13. DARK MODE MOBILE OPTIMIZATION
+   ======================================== */
+
+@media (max-width: 768px) {
+  .dark {
+    color-scheme: dark;
+  }
+  
+  .light {
+    color-scheme: light;
+  }
+}
+
+/* ========================================
+   14. COMMON TAILWIND MOBILE FIXES
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Override default Tailwind spacing on mobile */
+  .md\:p-6, .md\:p-8, .lg\:p-8 {
+    padding: 12px !important;
+  }
+  
+  /* Stack rows */
+  .flex-row {
+    flex-direction: column;
+  }
+  
+  /* Full-width on mobile */
+  .md\:w-1\/2, .lg\:w-1\/3 {
+    width: 100% !important;
+  }
+  
+  /* Text alignment */
+  .text-center {
+    text-align: center;
+  }
+}
+
+/* ========================================
+   15. LANDSCAPE MODE OPTIMIZATION
+   ======================================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape mode */
+  body {
+    padding: 8px;
+  }
+  
+  nav {
+    padding: 4px 8px;
+  }
+  
+  h1 {
+    font-size: 18px;
+  }
+  
+  button {
+    padding: 6px 12px;
+  }
+}
