@@ -34,8 +34,8 @@ const db = firebase.firestore();
 
         let userProfile = null;
 
-// Get current user and update UI
-auth.onAuthStateChanged(async (user) => {
+        // Get current user and update UI
+        auth.onAuthStateChanged(async (user) => {
   if (user) {
                 await loadUserProfile(user);
                 await loadDashboardData(user.uid);
@@ -46,11 +46,30 @@ auth.onAuthStateChanged(async (user) => {
 
         async function loadUserProfile(user) {
     try {
-      const doc = await db.collection('Profiles').doc(user.uid).get();
-                userProfile = doc.exists() ? doc.data() : {};
+      const docRef = db.collection('Profiles').doc(user.uid);
+      const docSnap = await docRef.get();
+                userProfile = docSnap.exists ? docSnap.data() : {};
+                console.log('User profile data:', userProfile);
+
+      // Show navbar profile section
+      const navbarProfile = document.getElementById('navbar-profile');
+      if (navbarProfile) navbarProfile.style.display = 'flex';
+
+      // Update side menu profile photo
+      const sidePhotoDiv = document.getElementById('side-profile-photo');
+      if (sidePhotoDiv) {
+                if (userProfile.photoUrl) {
+                    sidePhotoDiv.style.backgroundImage = `url("${userProfile.photoUrl}")`;
+        sidePhotoDiv.innerHTML = '';
+      } else {
+        sidePhotoDiv.style.backgroundImage = 'none';
+        sidePhotoDiv.innerHTML = '<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>';
+      }
+      }
 
       // Update navbar profile photo
       const navbarPhotoDiv = document.getElementById('navbar-profile-photo');
+      if (navbarPhotoDiv) {
                 if (userProfile.photoUrl) {
                     navbarPhotoDiv.style.backgroundImage = `url("${userProfile.photoUrl}")`;
         navbarPhotoDiv.innerHTML = '';
@@ -58,18 +77,27 @@ auth.onAuthStateChanged(async (user) => {
         navbarPhotoDiv.style.backgroundImage = 'none';
         navbarPhotoDiv.innerHTML = '<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>';
       }
+      }
 
-                // Update navbar name
-                const displayName = userProfile.firstname && userProfile.lastname
-                    ? `${userProfile.firstname} ${userProfile.lastname}`
-        : user.displayName || user.email.split('@')[0] || 'User';
-      document.getElementById('navbar-name').textContent = displayName;
+                // Update side menu name
+                const displayName = `${userProfile.firstname || ''} ${userProfile.lastname || ''}`.trim() || user.displayName || user.email.split('@')[0] || '';
+      const sideName = document.getElementById('side-name');
+      if (sideName) sideName.textContent = displayName || 'User';
+                console.log('Display name:', displayName);
 
-      // Update navbar class and role
-                const classRole = userProfile.class && userProfile.role
-                    ? `${userProfile.class} • ${userProfile.role}`
-                    : userProfile.role || 'Student';
-      document.getElementById('navbar-class-role').textContent = classRole;
+      // Update navbar name
+      const navbarName = document.getElementById('navbar-name');
+      if (navbarName) navbarName.textContent = displayName || 'User';
+
+      // Update side menu class
+                const userClass = userProfile.class || 'Student';
+      const sideClass = document.getElementById('side-class-role');
+      if (sideClass) sideClass.textContent = userClass;
+                console.log('User class:', userClass);
+
+      // Update navbar class
+      const navbarClass = document.getElementById('navbar-class-role');
+      if (navbarClass) navbarClass.textContent = userClass;
 
                 // Show teacher dashboard link for teachers
                 if (userProfile.role === 'Teacher') {
@@ -337,60 +365,114 @@ async function loadRewardsData(userId) {
         .bg-tertiary { background-color: #2A1F36; }
     </style>
 </head>
-<body class="bg-primary text-white">
-    <!-- Navigation Header -->
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
-        <div class="flex items-center gap-3 text-primary">
-            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
-            </svg>
-            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
-        </div>
-        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
-            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
-            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 bg-accent text-primary">Dashboard</a>
-            <a href="teacher-dashboard.html" id="teacher-dashboard-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">Teacher Dashboard</a>
-            <div class="relative group">
-                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-                    <span>Resources</span>
-                    <span class="material-symbols-outlined text-base">expand_more</span>
-                </button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-                    <div class="py-1">
+<body class="bg-primary text-primary">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+<div class="flex items-center gap-3 text-primary">
+<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+</div>
+<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+<a href="Dashboard.html" id="dashboard-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" style="display: none;">
+<span>Dashboard</span>
+</a>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Resources</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
-                    </div>
-                </div>
-            </div>
-            <div class="relative group">
-                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-                    <span>Company</span>
-                    <span class="material-symbols-outlined text-base">expand_more</span>
-                </button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-                    <div class="py-1">
+</div>
+</div>
+</div>
+<div class="relative group">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+<span>Company</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
-                    </div>
-                </div>
-            </div>
-            <a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
-            <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
-        </nav>
-        <div class="flex items-center gap-4">
-            <div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative">
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
-                    <span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
-                </div>
-                <div class="flex flex-col">
-                    <div class="text-white text-sm font-medium" id="navbar-name">User</div>
-                    <div class="text-[#ad92c9] text-xs" id="navbar-class-role">Student</div>
-                </div>
-                <!-- Dropdown Menu -->
-                <div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
-                    <div class="py-1">
+</div>
+</div>
+</div>
+<a href="rewards.html" id="rewards-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" style="display: none;">Rewards</a>
+<a href="profile.html" id="profile-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" style="display: none;">Profile</a>
+</nav>
+<script>
+function openDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.remove('hidden');
+    dropdown.classList.add('block');
+  }
+}
+
+function closeDropdown(element) {
+  const dropdown = element.querySelector('.absolute');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+    dropdown.classList.remove('block');
+  }
+}
+
+// Also add click functionality for better UX
+document.addEventListener('DOMContentLoaded', function() {
+  const dropdownButtons = document.querySelectorAll('.relative.group button');
+  dropdownButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.parentElement.querySelector('.absolute');
+      if (dropdown) {
+        if (dropdown.classList.contains('hidden')) {
+          // Close other dropdowns first
+          document.querySelectorAll('.absolute').forEach(d => {
+            d.classList.add('hidden');
+            d.classList.remove('block');
+          });
+          // Open this dropdown
+          dropdown.classList.remove('hidden');
+          dropdown.classList.add('block');
+        } else {
+          // Close this dropdown
+          dropdown.classList.add('hidden');
+          dropdown.classList.remove('block');
+        }
+      }
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative.group')) {
+      document.querySelectorAll('.absolute').forEach(dropdown => {
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('block');
+      });
+    }
+  });
+});
+</script>
+<div class="flex items-center gap-4">
+<div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
+<span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
+</div>
+<div class="flex flex-col">
+<div class="text-white text-sm font-medium" id="navbar-name">User</div>
+<div class="text-[#ad92c9] text-xs" id="navbar-class-role">Student</div>
+</div>
+<!-- Dropdown Menu -->
+<div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
+<div class="py-1">
                         <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
                             <span class="material-symbols-outlined text-base">person</span>
                             <span>See Profile</span>
@@ -399,20 +481,78 @@ async function loadRewardsData(userId) {
                             <span class="material-symbols-outlined text-base">edit</span>
                             <span>Edit Profile</span>
                         </a>
-                        <button onclick="signOut()" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
-                            <span class="material-symbols-outlined text-base">logout</span>
-                            <span>Sign Out</span>
-                        </button>
-                    </div>
+<button id="navbar-sign-out-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
+<span class="material-symbols-outlined text-base">logout</span>
+<span>Sign Out</span>
+</button>
+</div>
+</div>
+</div>
+<button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11 hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">dark_mode</span>
+</button>
+<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11" id="mobile-menu-btn">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+
+    <!-- Side Menu -->
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-64 bg-secondary/95 backdrop-blur-md border-r border-primary z-50">
+        <div class="p-6">
+            <!-- User Profile Box -->
+            <div onclick="window.location.href='profile.html'" class="flex items-center gap-3 mb-8 p-4 bg-tertiary/50 rounded-lg border border-primary/30 cursor-pointer hover:bg-tertiary/70 transition-colors">
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="side-profile-photo">
+                    <span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
+                </div>
+                <div class="flex flex-col">
+                    <div class="text-white text-sm font-medium" id="side-name">User</div>
+                    <div class="text-[#ad92c9] text-xs" id="side-class-role">Student</div>
                 </div>
             </div>
-            <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
-                <span class="material-symbols-outlined text-2xl">menu</span>
-            </button>
-        </div>
-    </header>
 
-    <div class="min-h-screen p-8">
+            <!-- Menu Items -->
+            <nav class="space-y-2">
+                <a href="rewards.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">emoji_events</span>
+                    <span>Rewards</span>
+                </a>
+                <a href="profile.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">person</span>
+                    <span>Profile</span>
+                </a>
+                <a href="study-library.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">library_books</span>
+                    <span>Study Library</span>
+                </a>
+                <a href="mood-selection.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">mood</span>
+                    <span>Mood Tracker</span>
+                </a>
+                <a href="study-library.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">upload</span>
+                    <span>Upload Study Material</span>
+                </a>
+                <a href="feedback.html" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-primary/20 hover:text-primary transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-accent">feedback</span>
+                    <span>Feedback Us</span>
+                </a>
+            </nav>
+
+            <!-- Sign Out Button -->
+            <div class="absolute bottom-6 left-6 right-6">
+                <button onclick="signOut()" class="w-full flex items-center gap-3 px-4 py-3 text-secondary hover:bg-red-500/20 hover:text-red-400 transition-colors rounded-lg">
+                    <span class="material-symbols-outlined text-red-400">logout</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 invisible transition-opacity duration-300 ease-in-out z-40"></div>
+
+    <div class="min-h-screen p-8 ml-64">
         <div class="max-w-7xl mx-auto">
             <!-- Welcome Section -->
             <div class="mb-8">
@@ -688,33 +828,104 @@ async function loadRewardsData(userId) {
         updateDisplay();
         updateProgress();
 
-        // Dropdown functionality
+        // Side Menu functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const navbarProfile = document.getElementById('navbar-profile');
-            const navbarDropdown = document.getElementById('navbar-dropdown');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sideMenu = document.getElementById('side-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('span');
 
-            navbarProfile.addEventListener('mouseenter', () => {
-                navbarDropdown.classList.remove('hidden');
-                navbarDropdown.classList.add('block');
+            function toggleMenu() {
+                const isOpen = !sideMenu.classList.contains('-translate-x-full');
+                if (isOpen) {
+                    sideMenu.classList.add('-translate-x-full');
+                    menuOverlay.classList.add('opacity-0', 'invisible');
+                } else {
+                    sideMenu.classList.remove('-translate-x-full');
+                    menuOverlay.classList.remove('opacity-0', 'invisible');
+                }
+            }
+
+            mobileMenuBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', toggleMenu);
+
+            // Close menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !sideMenu.classList.contains('-translate-x-full')) {
+                    toggleMenu();
+                }
             });
 
-            navbarProfile.addEventListener('mouseleave', () => {
-                setTimeout(() => {
-                    navbarDropdown.classList.add('hidden');
-                    navbarDropdown.classList.remove('block');
-                }, 300);
+            // Hide mobile menu button since side menu is now always visible
+            mobileMenuBtn.style.display = 'none';
+
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', function() {
+                const root = document.documentElement;
+                const isDark = localStorage.getItem('theme') !== 'light';
+
+                if (isDark) {
+                    // Switch to light theme
+                    root.style.setProperty('--bg-primary', '#FFFFFF');
+                    root.style.setProperty('--bg-secondary', '#F0F9FF');
+                    root.style.setProperty('--bg-tertiary', '#E0F2FE');
+                    root.style.setProperty('--text-primary', '#0F172A');
+                    root.style.setProperty('--text-secondary', '#334155');
+                    root.style.setProperty('--border-primary', '#E0F2FE');
+                    themeIcon.textContent = 'light_mode';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    // Switch to dark theme
+                    root.style.setProperty('--bg-primary', '#120B1A');
+                    root.style.setProperty('--bg-secondary', '#1A1122');
+                    root.style.setProperty('--bg-tertiary', '#2A1F36');
+                    root.style.setProperty('--text-primary', '#FFFFFF');
+                    root.style.setProperty('--text-secondary', '#ad92c9');
+                    root.style.setProperty('--border-primary', '#2A1F36');
+                    themeIcon.textContent = 'dark_mode';
+                    localStorage.setItem('theme', 'dark');
+                }
             });
 
-            navbarDropdown.addEventListener('mouseenter', () => {
-                navbarDropdown.classList.remove('hidden');
-                navbarDropdown.classList.add('block');
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.style.setProperty('--bg-primary', '#FFFFFF');
+                document.documentElement.style.setProperty('--bg-secondary', '#F0F9FF');
+                document.documentElement.style.setProperty('--bg-tertiary', '#E0F2FE');
+                document.documentElement.style.setProperty('--text-primary', '#0F172A');
+                document.documentElement.style.setProperty('--text-secondary', '#334155');
+                document.documentElement.style.setProperty('--border-primary', '#E0F2FE');
+                themeIcon.textContent = 'light_mode';
+            } else {
+                document.documentElement.style.setProperty('--bg-primary', '#120B1A');
+                document.documentElement.style.setProperty('--bg-secondary', '#1A1122');
+                document.documentElement.style.setProperty('--bg-tertiary', '#2A1F36');
+                document.documentElement.style.setProperty('--text-primary', '#FFFFFF');
+                document.documentElement.style.setProperty('--text-secondary', '#ad92c9');
+                document.documentElement.style.setProperty('--border-primary', '#2A1F36');
+                themeIcon.textContent = 'dark_mode';
+            }
+
+            // Navbar dropdown functionality
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = this.nextElementSibling;
+                    // Hide other dropdowns
+                    document.querySelectorAll('.dropdown-toggle + div').forEach(d => {
+                        if (d !== dropdown) d.classList.add('hidden');
+                    });
+                    dropdown.classList.toggle('hidden');
+                });
             });
 
-            navbarDropdown.addEventListener('mouseleave', () => {
-                setTimeout(() => {
-                    navbarDropdown.classList.add('hidden');
-                    navbarDropdown.classList.remove('block');
-                }, 300);
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-toggle + div').forEach(d => d.classList.add('hidden'));
             });
         });
     </script>

@@ -370,23 +370,51 @@
 <link rel="stylesheet" href="../css/mobile-optimizations.css"/>
 </head>
 <body>
-  <!-- Header/Navbar copied from index.html -->
-  <div class="navbar" id="navbar">
-  <div class="nav-logo">
-    <img src="logo.png" alt="Logo" class="logo-text">
-  </div>
-  <div><a href="../index.html" style="color: inherit; text-decoration: none;">Home</a></div>
-  <div><a href="mood-selection.html" style="color: var(--accent-color); text-decoration: underline;">Mood</a></div>
-    <div><a href="study-library.html" style="color: inherit; text-decoration: none;">Study</a></div>
-    <div><a href="feedback.html" style="color: inherit; text-decoration: none;">Feedback</a></div>
-    <div><a href="Dashboard.html" style="color: inherit; text-decoration: none;">Dashboard</a></div>
-    <div><a href="study-library.html" style="color: inherit; text-decoration: none;">Upload</a></div>
-    <div><a href="rewards.html" style="color: inherit; text-decoration: none;">Score</a></div>
-    <div class="nav-auth">
-      <button class="auth-btn sign-in">Sign In</button>
-      <button class="auth-btn login">Log In</button>
-    </div>
-  </div>
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-primary">
+            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+            </svg>
+            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+        </div>
+        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+
+
+        </nav>
+        <div class="flex items-center gap-4">
+            <div id="navbar-profile" class="hidden sm:flex items-center gap-3 cursor-pointer relative" style="display: none;">
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_0_15px_rgba(128,19,236,0.5)]" id="navbar-profile-photo">
+                    <span class="material-symbols-outlined text-xl text-[var(--primary-color)] flex items-center justify-center w-full h-full">person</span>
+                </div>
+                <div class="flex flex-col">
+                    <div class="text-white text-sm font-medium" id="navbar-name">User</div>
+                    <div class="text-[#ad92c9] text-xs" id="navbar-class-role">Student</div>
+                </div>
+                <!-- Dropdown Menu -->
+                <div id="navbar-dropdown" class="absolute top-full right-0 mt-2 w-48 rounded-md shadow-lg bg-[#1A1122] backdrop-blur-sm border border-[#2A1F36] ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
+                    <div class="py-1">
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">person</span>
+                            <span>See Profile</span>
+                        </a>
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors">
+                            <span class="material-symbols-outlined text-base">edit</span>
+                            <span>Edit Profile</span>
+                        </a>
+                        <button onclick="signOut()" class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#362348] transition-colors w-full text-left">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
+    </header>
 
   <!-- Mood Selection Section -->
   <section class="chatbot-container" style="margin: 0; max-width: 100vw; width: 100vw; height: 100vh; background: #fff; border-radius: 0; padding: 1rem 1rem 0 1rem; box-shadow: none; display: flex; flex-direction: column;">

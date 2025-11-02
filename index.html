@@ -917,8 +917,8 @@
 </div>
 </div>
 </div>
-<a href="html/rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
-<a href="html/profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
+<a href="html/rewards.html" id="rewards-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" style="display: none;">Rewards</a>
+<a href="html/profile.html" id="profile-nav-link" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" style="display: none;">Profile</a>
 </nav>
 <script>
 function openDropdown(element) {
@@ -1522,11 +1522,13 @@ auth.onAuthStateChanged(async (user) => {
   if (user) {
     // Hide the Get Started button and Create Free Account button for authenticated users
     document.getElementById('get-started-btn').style.display = 'none';
-    document.querySelector('a[href="auth.html"]').style.display = 'none';
+    document.querySelector('a[href="html/auth.html"]').style.display = 'none';
 
     // Show navbar profile and dashboard link for authenticated users
     document.getElementById('navbar-profile').style.display = 'flex';
     document.getElementById('dashboard-nav-link').style.display = 'flex';
+    document.getElementById('rewards-nav-link').style.display = 'flex';
+    document.getElementById('profile-nav-link').style.display = 'flex';
 
     // Load profile data
     try {
@@ -1569,10 +1571,12 @@ auth.onAuthStateChanged(async (user) => {
   } else {
     // Show buttons for non-authenticated users
     document.getElementById('get-started-btn').style.display = '';
-    document.querySelector('a[href="/html/auth.html"]').style.display = '';
+    document.querySelector('a[href="html/auth.html"]').style.display = '';
     // Hide navbar profile and dashboard link for non-authenticated users
     document.getElementById('navbar-profile').style.display = 'none';
     document.getElementById('dashboard-nav-link').style.display = 'none';
+    document.getElementById('rewards-nav-link').style.display = 'none';
+    document.getElementById('profile-nav-link').style.display = 'none';
   }
 });
 
