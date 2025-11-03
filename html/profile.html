@@ -94,10 +94,16 @@
         }
 
         function openCloudinaryWidget() {
+            // Check if cloudinary is loaded
+            if (typeof cloudinary === 'undefined') {
+                showPopup('Cloudinary is not loaded. Please refresh the page and try again.', 'error');
+                return;
+            }
+
             const widget = cloudinary.createUploadWidget(
                 {
                     cloudName: 'dwlxccz91',
-                    uploadPreset: 'unsigned_preset', // Using unsigned preset for direct uploads
+                    uploadPreset: 'unsigned_preset',
                     sources: ['local', 'url', 'camera'],
                     multiple: false,
                     cropping: true,
@@ -135,11 +141,21 @@
                         showPopup('Photo uploaded successfully!', 'success');
                     } else if (error) {
                         console.error('Upload error:', error);
-                        showPopup('Error uploading photo. Please try again.', 'error');
+                        let errorMessage = 'Error uploading photo. Please try again.';
+                        if (error && error.message) {
+                            errorMessage += ' Details: ' + error.message;
+                        }
+                        showPopup(errorMessage, 'error');
                     }
                 }
             );
-            widget.open();
+
+            try {
+                widget.open();
+            } catch (widgetError) {
+                console.error('Widget open error:', widgetError);
+                showPopup('Failed to open upload widget. Please try again.', 'error');
+            }
         }
 
         let isEditMode = false;
