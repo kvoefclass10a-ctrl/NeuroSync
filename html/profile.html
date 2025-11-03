@@ -85,6 +85,9 @@
                     document.getElementById('subjectValue').textContent = 'Not set';
                     document.getElementById('roleValue').textContent = 'Student';
                 }
+
+                // Check if profile is incomplete and show notice
+                checkProfileCompleteness(data);
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
@@ -205,11 +208,10 @@
 
                 await db.collection('Profiles').doc(user.uid).set(profileData, { merge: true });
 
-                showPopup('Profile saved successfully!', 'success');
-                // Reload profile to update display
-                loadProfile(user.uid);
-                toggleEditMode(); // Exit edit mode after save
-                cloudinaryUrl = null; // Reset for next upload
+        showPopup('Profile saved successfully!', 'success');
+        // Reload profile to update display
+        loadProfile(user.uid);
+        cloudinaryUrl = null; // Reset for next upload
             } catch (error) {
                 console.error('Error saving profile:', error);
                 showPopup('Error saving profile. Please try again.', 'error');
@@ -280,6 +282,15 @@
                 }
             });
         });
+
+        function checkProfileCompleteness(data) {
+            const notice = document.getElementById('profileNotice');
+            if (!data || !data.firstname || !data.lastname || !data.age || !data.class) {
+                notice.style.display = 'block';
+            } else {
+                notice.style.display = 'none';
+            }
+        }
     </script>
     <style type="text/tailwindcss">
         :root {
@@ -356,12 +367,9 @@
         </div>
     </header>
 
-    <!-- Edit Button in top right -->
-    <div class="absolute top-16 right-4 z-10">
-        <button id="editButton" onclick="toggleEditMode()" class="translucent-button rounded-full px-4 py-2 flex items-center">
-            <span class="material-symbols-outlined text-base mr-1">edit</span>
-            Edit
-        </button>
+    <!-- Profile Incomplete Notice -->
+    <div id="profileNotice" class="bg-yellow-500 text-black p-4 text-center font-semibold" style="display: none;">
+        Please fill out your profile information first to get the best experience with NeuroSync.
     </div>
 
     <!-- Popup Notification -->
@@ -371,9 +379,16 @@
 
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-[#1A1122] rounded-2xl p-8 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50 w-full max-w-md">
-            <div class="text-center mb-8">
+            <div class="text-center mb-8 relative">
                 <h1 class="text-3xl font-bold tracking-tight mb-2">Profile</h1>
                 <p class="text-[#ad92c9]">View your personal information</p>
+                <!-- Edit Button in profile box -->
+                <div class="absolute top-0 right-0">
+                    <button id="editButton" onclick="toggleEditMode()" class="translucent-button rounded-full px-4 py-2 flex items-center">
+                        <span class="material-symbols-outlined text-base mr-1">edit</span>
+                        Edit
+                    </button>
+                </div>
             </div>
 
             <form onsubmit="saveProfile(event)" class="space-y-6">

@@ -1,6 +1,6 @@
 // Firebase SDK imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -23,6 +23,23 @@ const db = getFirestore(app);
 
 // Make auth available globally if needed
 window.firebaseAuth = { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword };
+
+// Google Sign-In functionality
+const googleSignInButton = document.getElementById('google-signin');
+
+googleSignInButton.addEventListener('click', async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    console.log('User signed in with Google:', user);
+    // Redirect to the dashboard or home page after successful login
+    window.location.href = 'Dashboard.html';
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    errorMessage.textContent = error.message;
+  }
+});
 
 // Password toggle functionality
 const togglePasswordButton = document.getElementById('toggle-password');
@@ -96,16 +113,16 @@ authForm.addEventListener('submit', async (e) => {
         console.error('Login error:', error);
         errorMessage.textContent = error.message;
       });
-  } else {
-    // Handle Sign Up
-    try {
-      await signUp(email, password);
-      console.log('User signed up successfully');
-      // Redirect to the dashboard or home page after successful signup
-      window.location.href = 'Dashboard.html';
-    } catch (error) {
-      console.error('Signup error:', error);
-      errorMessage.textContent = error.message;
+    } else {
+      // Handle Sign Up
+      try {
+        await signUp(email, password);
+        console.log('User signed up successfully');
+        // Redirect to profile page after successful signup
+        window.location.href = 'profile.html';
+      } catch (error) {
+        console.error('Signup error:', error);
+        errorMessage.textContent = error.message;
+      }
     }
-  }
 });
