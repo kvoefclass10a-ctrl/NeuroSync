@@ -34,11 +34,17 @@ const db = firebase.firestore();
 
         let userProfile = null;
 
+        // Utility function to check if profile is complete
+        function isProfileComplete(profile) {
+            return profile && profile.firstname && profile.lastname && profile.age && profile.class;
+        }
+
         // Get current user and update UI
         auth.onAuthStateChanged(async (user) => {
   if (user) {
                 await loadUserProfile(user);
                 await loadDashboardData(user.uid);
+                checkProfileCompletion();
             } else {
                 window.location.href = 'auth.html';
             }
@@ -321,6 +327,59 @@ async function loadRewardsData(userId) {
                 'Excited': '🤩'
             };
             return emojiMap[mood] || '😐';
+        }
+
+        // Check profile completion and disable features if incomplete
+        function checkProfileCompletion() {
+            if (!isProfileComplete(userProfile)) {
+                // Disable focus timer buttons
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('pause-btn').disabled = true;
+                document.getElementById('reset-btn').disabled = true;
+                document.querySelectorAll('#time-15, #time-25, #time-30, #time-45').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                });
+
+                // Disable mood tracker buttons
+                document.querySelectorAll('.translucent-button[onclick*="mood-selection.html"]').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    btn.onclick = () => {
+                        alert('Please complete your profile first to access mood tracking.');
+                        window.location.href = 'profile.html';
+                    };
+                });
+
+                // Disable study library buttons
+                document.querySelectorAll('.translucent-button[onclick*="study-library.html"]').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    btn.onclick = () => {
+                        alert('Please complete your profile first to access study library.');
+                        window.location.href = 'profile.html';
+                    };
+                });
+
+                // Show completion message
+                const welcomeSection = document.querySelector('.mb-8');
+                const completionMessage = document.createElement('div');
+                completionMessage.className = 'bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4';
+                completionMessage.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-yellow-400">warning</span>
+                        <div>
+                            <p class="text-yellow-400 font-medium">Profile Incomplete</p>
+                            <p class="text-yellow-200 text-sm">Please complete your profile (firstname, lastname, age, and class) to access all features.</p>
+                            <a href="profile.html" class="text-yellow-300 underline hover:text-yellow-100">Complete Profile</a>
+                        </div>
+                    </div>
+                `;
+                welcomeSection.insertBefore(completionMessage, welcomeSection.firstChild);
+            }
         }
 
         // Navbar sign out functionality
