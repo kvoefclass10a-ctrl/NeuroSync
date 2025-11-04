@@ -13,8 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
-    <!-- Cloudinary Upload Widget -->
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <!-- Firebase Storage -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-storage-compat.js"></script>
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -31,9 +31,10 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        // Cloudinary configuration
-        let cloudinaryUrl = null;
+        // Photo upload configuration
+        let photoUrl = null;
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
@@ -87,59 +88,78 @@
                 }
 
                 // Check if profile is incomplete and show notice
-                checkProfileCompleteness(data);
+                const profileData = doc.exists ? doc.data() : {};
+                checkProfileCompleteness(profileData);
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
         }
 
-        function openCloudinaryWidget() {
-            const widget = cloudinary.createUploadWidget(
-                {
-                    cloudName: 'dwlxccz91',
-                    uploadPreset: 'unsigned_preset', // Using unsigned preset for direct uploads
-                    sources: ['local', 'url', 'camera'],
-                    multiple: false,
-                    cropping: true,
-                    croppingAspectRatio: 1,
-                    showSkipCropButton: false,
-                    folder: 'neurosync/profile_photos',
-                    resourceType: 'image',
-                    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
-                    maxFileSize: 5000000, // 5MB
-                    theme: 'minimal',
-                    styles: {
-                        palette: {
-                            window: '#1A1122',
-                            sourceBg: '#2A1F36',
-                            windowBorder: '#8013ec',
-                            tabIcon: '#ad92c9',
-                            inactiveTabIcon: '#5d458c',
-                            menuIcons: '#8013ec',
-                            link: '#8013ec',
-                            action: '#8013ec',
-                            inProgress: '#8013ec',
-                            complete: '#4ade80',
-                            error: '#ef4444',
-                            textDark: '#FFFFFF',
-                            textLight: '#ad92c9'
+        async function uploadPhoto() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            // Hide the input element off-screen instead of display none for better browser compatibility
+            input.style.position = 'absolute';
+            input.style.left = '-9999px';
+            input.style.top = '-9999px';
+            input.style.opacity = '0';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Validate file size (5MB max)
+                if (file.size > 5000000) {
+                    showPopup('File size must be less than 5MB.', 'error');
+                    return;
+                }
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showPopup('Please select an image file.', 'error');
+                    return;
+                }
+
+                try {
+                    showPopup('Uploading photo...', 'success');
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    const storageRef = storage.ref();
+                    const photoRef = storageRef.child(`profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+
+                    const uploadTask = photoRef.put(file);
+
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Progress can be shown here if needed
+                        },
+                        (error) => {
+                            console.error('Upload error:', error);
+                            showPopup('Error uploading photo. Please try again.', 'error');
+                        },
+                        async () => {
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            photoUrl = downloadURL;
+                            document.getElementById('photoPreview').src = photoUrl;
+                            document.getElementById('photoPreview').style.display = 'block';
+                            document.getElementById('defaultAvatar').style.display = 'none';
+                            showPopup('Photo uploaded successfully!', 'success');
                         }
-                    }
-                },
-                (error, result) => {
-                    if (!error && result && result.event === 'success') {
-                        cloudinaryUrl = result.info.secure_url;
-                        document.getElementById('photoPreview').src = cloudinaryUrl;
-                        document.getElementById('photoPreview').style.display = 'block';
-                        document.getElementById('defaultAvatar').style.display = 'none';
-                        showPopup('Photo uploaded successfully!', 'success');
-                    } else if (error) {
-                        console.error('Upload error:', error);
-                        showPopup('Error uploading photo. Please try again.', 'error');
+                    );
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showPopup('Error uploading photo. Please try again.', 'error');
+                } finally {
+                    // Remove the input element after use
+                    if (document.body.contains(input)) {
+                        document.body.removeChild(input);
                     }
                 }
-            );
-            widget.open();
+            };
+            // Append to body to ensure it works in all browsers
+            document.body.appendChild(input);
+            input.click();
         }
 
         let isEditMode = false;
@@ -202,7 +222,7 @@
                     class: classValue,
                     preferredSubject: document.getElementById('preferredSubject').value.trim(),
                     role,
-                    photoUrl: cloudinaryUrl || null, // Use Cloudinary URL if uploaded
+                    photoUrl: photoUrl || null, // Use uploaded photo URL if available
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
@@ -211,7 +231,7 @@
         showPopup('Profile saved successfully!', 'success');
         // Reload profile to update display
         loadProfile(user.uid);
-        cloudinaryUrl = null; // Reset for next upload
+        photoUrl = null; // Reset for next upload
             } catch (error) {
                 console.error('Error saving profile:', error);
                 showPopup('Error saving profile. Please try again.', 'error');
@@ -400,7 +420,7 @@
                             <span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">person</span>
                         </div>
                     </div>
-                    <button id="photoLabel" type="button" onclick="openCloudinaryWidget()" class="translucent-button rounded-full px-4 py-2 cursor-pointer text-sm" style="display: none;">
+                    <button id="photoLabel" type="button" onclick="uploadPhoto()" class="translucent-button rounded-full px-4 py-2 cursor-pointer text-sm" style="display: none;">
                         <span class="material-symbols-outlined text-base mr-1">photo_camera</span>
                         Change Photo
                     </button>
