@@ -1,19 +1,11 @@
-# Mobile Optimization for Mood Selection Page
-
-## Plan Overview
-Optimize the mood-selection.html page for mobile devices by consolidating inline styles into external CSS and ensuring responsive design.
+# TODO: Fix Mood Image Paths in mood-selection.html
 
 ## Tasks
-- [ ] Move mobile-specific inline styles from mood-selection.html to mood-selection.css
-- [ ] Organize mobile styles under responsive breakpoints in mood-selection.css
-- [ ] Ensure mood-selection.css complements mobile-optimizations.css
-- [ ] Adjust mood grid and chat interface for better mobile stacking
-- [ ] Optimize touch targets (minimum 44px) and prevent horizontal scrolling
-- [ ] Add safe area support for notched devices
-- [ ] Remove conflicting inline styles from mood-selection.html
-- [ ] Ensure proper CSS link order in HTML
+- [x] Update all img src attributes in mood buttons from "Feelings images/" to "../assets/images/Emotional/"
+- [x] Verify that images load correctly after changes
 
-## Followup Steps
-- [ ] Test page on various mobile screen sizes using browser dev tools
-- [ ] Verify touch interactions work smoothly
-- [ ] Check for layout shifts or overflow issues
+## Details
+- File: html/mood-selection.html
+- Issue: Incorrect image paths preventing mood pictures from displaying
+- Solution: Replace "Feelings images/" with "../assets/images/Emotional/" in all mood button img tags
+- Number of buttons: Approximately 30 (positive, negative, neutral moods)
