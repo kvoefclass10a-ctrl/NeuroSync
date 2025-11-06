@@ -76,6 +76,9 @@ function saveProfile() {
   });
 }
 
+// Make saveProfile available globally
+window.saveProfile = saveProfile;
+
 // Load profile on page load
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
