@@ -1,11 +1,4 @@
-# TODO: Fix Mood Image Paths in mood-selection.html
-
-## Tasks
-- [x] Update all img src attributes in mood buttons from "Feelings images/" to "../assets/images/Emotional/"
-- [x] Verify that images load correctly after changes
-
-## Details
-- File: html/mood-selection.html
-- Issue: Incorrect image paths preventing mood pictures from displaying
-- Solution: Replace "Feelings images/" with "../assets/images/Emotional/" in all mood button img tags
-- Number of buttons: Approximately 30 (positive, negative, neutral moods)
+- [x] Increase navbar logo icon size from h-5 w-5 to h-6 w-6
+- [x] Increase navbar logo text size from text-xl to text-2xl
+- [x] Increase navbar logo icon size in mood-selection.html from h-5 w-5 to h-6 w-6
+- [x] Increase navbar logo text size in mood-selection.html from text-xl to text-2xl
