@@ -66,16 +66,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  /* Replace or set these paddings to smaller size */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
-.navbar a {
-  color: var(--dark-text-secondary);
-  text-decoration: none;
-  transition: color 0.3s ease;
+/* Logo size control */
+.logo-svg, svg.h-6.w-6 {
+  width: 24px !important;
+  height: 24px !important;
 }
 
-.navbar a:hover {
-  color: var(--dark-accent);
+@media (max-width: 768px) {
+  .logo-svg, svg.h-6.w-6 {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 /* Enhanced Mood Selection Styles */
