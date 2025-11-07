@@ -1,527 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
-    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <title>Profile - NeuroSync</title>
-    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
-    <!-- Cloudinary Upload Widget -->
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
-            authDomain: "neurosync-5173b.firebaseapp.com",
-            projectId: "neurosync-5173b",
-            storageBucket: "neurosync-5173b.firebasestorage.app",
-            messagingSenderId: "855780859936",
-            appId: "1:855780859936:web:3044309100db9a61fa1c45",
-            measurementId: "G-75S5GWYEDK"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Cloudinary configuration
-        let cloudinaryUrl = null;
-
-        // Check authentication
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = 'auth.html';
-            } else {
-                loadProfile(user.uid);
-            }
-        });
-
-        async function loadProfile(uid) {
-            console.log('Loading profile for UID:', uid);
-            try {
-                const doc = await db.collection('Profiles').doc(uid).get();
-                console.log('Document exists:', doc.exists);
-                if (doc.exists) {
-                    const data = doc.data();
-                    console.log('Profile data:', data);
-
-                    // Populate display elements
-                    document.getElementById('fullName').textContent = `${data.firstname || ''} ${data.lastname || ''}`.trim() || 'Not set';
-                    document.getElementById('ageValue').textContent = data.age || 'Not set';
-                    document.getElementById('classValue').textContent = data.class || 'Not set';
-                    document.getElementById('subjectValue').textContent = data.preferredSubject || 'Not set';
-                    document.getElementById('roleValue').textContent = data.role || 'Student';
-
-                    // Populate form fields for editing
-                    document.getElementById('firstName').value = data.firstname || '';
-                    document.getElementById('lastName').value = data.lastname || '';
-                    document.getElementById('age').value = data.age || '';
-                    document.getElementById('class').value = data.class || '';
-                    document.getElementById('preferredSubject').value = data.preferredSubject || '';
-                    document.getElementById('role').value = data.role || 'Student';
-
-                    if (data.photoUrl) {
-                        document.getElementById('photoPreview').src = data.photoUrl;
-                        document.getElementById('photoPreview').style.display = 'block';
-                        document.getElementById('defaultAvatar').style.display = 'none';
-                    } else {
-                        document.getElementById('photoPreview').style.display = 'none';
-                        document.getElementById('defaultAvatar').style.display = 'flex';
-                    }
-                } else {
-                    console.log('No profile document found');
-                    // Set default display values
-                    document.getElementById('fullName').textContent = 'Not set';
-                    document.getElementById('ageValue').textContent = 'Not set';
-                    document.getElementById('classValue').textContent = 'Not set';
-                    document.getElementById('subjectValue').textContent = 'Not set';
-                    document.getElementById('roleValue').textContent = 'Student';
-                }
-
-                // Check if profile is incomplete and show notice
-                checkProfileCompleteness(data);
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
-        }
-
-        function openCloudinaryWidget() {
-            // Check if cloudinary is loaded
-            if (typeof cloudinary === 'undefined') {
-                showPopup('Cloudinary is not loaded. Please refresh the page and try again.', 'error');
-                return;
-            }
-
-            const widget = cloudinary.createUploadWidget(
-                {
-                    cloudName: 'dwlxccz91',
-                    uploadPreset: 'unsigned_preset',
-                    sources: ['local', 'url', 'camera'],
-                    multiple: false,
-                    cropping: true,
-                    croppingAspectRatio: 1,
-                    showSkipCropButton: false,
-                    folder: 'neurosync/profile_photos',
-                    resourceType: 'image',
-                    clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
-                    maxFileSize: 5000000, // 5MB
-                    theme: 'minimal',
-                    styles: {
-                        palette: {
-                            window: '#1A1122',
-                            sourceBg: '#2A1F36',
-                            windowBorder: '#8013ec',
-                            tabIcon: '#ad92c9',
-                            inactiveTabIcon: '#5d458c',
-                            menuIcons: '#8013ec',
-                            link: '#8013ec',
-                            action: '#8013ec',
-                            inProgress: '#8013ec',
-                            complete: '#4ade80',
-                            error: '#ef4444',
-                            textDark: '#FFFFFF',
-                            textLight: '#ad92c9'
-                        }
-                    }
-                },
-                (error, result) => {
-                    if (!error && result && result.event === 'success') {
-                        cloudinaryUrl = result.info.secure_url;
-                        document.getElementById('photoPreview').src = cloudinaryUrl;
-                        document.getElementById('photoPreview').style.display = 'block';
-                        document.getElementById('defaultAvatar').style.display = 'none';
-                        showPopup('Photo uploaded successfully!', 'success');
-                    } else if (error) {
-                        console.error('Upload error:', error);
-                        let errorMessage = 'Error uploading photo. Please try again.';
-                        if (error && error.message) {
-                            errorMessage += ' Details: ' + error.message;
-                        }
-                        showPopup(errorMessage, 'error');
-                    }
-                }
-            );
-
-            try {
-                widget.open();
-            } catch (widgetError) {
-                console.error('Widget open error:', widgetError);
-                showPopup('Failed to open upload widget. Please try again.', 'error');
-            }
-        }
-
-        let isEditMode = false;
-
-        // Check URL parameters for edit mode
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('edit') === 'true') {
-            toggleEditMode();
-        }
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const displayInfo = document.querySelector('.space-y-4');
-            const editForm = document.getElementById('editForm');
-            const saveButton = document.getElementById('saveButton');
-            const editButton = document.getElementById('editButton');
-            const photoLabel = document.getElementById('photoLabel');
-
-            if (isEditMode) {
-                displayInfo.style.display = 'none';
-                editForm.style.display = 'block';
-                saveButton.style.display = 'block';
-                editButton.innerHTML = '<span class="material-symbols-outlined text-base mr-1">close</span>Cancel';
-                photoLabel.style.display = 'inline-block';
-            } else {
-                displayInfo.style.display = 'block';
-                editForm.style.display = 'none';
-                saveButton.style.display = 'none';
-                editButton.innerHTML = '<span class="material-symbols-outlined text-base mr-1">edit</span>Edit';
-                photoLabel.style.display = 'none';
-            }
-        }
-
-        async function saveProfile(event) {
-            event.preventDefault();
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const age = parseInt(document.getElementById('age').value);
-            const classValue = document.getElementById('class').value.trim();
-            const role = document.getElementById('role').value;
-
-            // Validation
-            if (!firstName || !lastName || !age || !classValue) {
-                showPopup('Please fill in all required fields.', 'error');
-                return;
-            }
-            if (age < 5 || age > 100) {
-                showPopup('Please enter a valid age between 5 and 100.', 'error');
-                return;
-            }
-
-            try {
-                const profileData = {
-                    firstname: firstName,
-                    lastname: lastName,
-                    age,
-                    class: classValue,
-                    preferredSubject: document.getElementById('preferredSubject').value.trim(),
-                    role,
-                    photoUrl: cloudinaryUrl || null, // Use Cloudinary URL if uploaded
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                await db.collection('Profiles').doc(user.uid).set(profileData, { merge: true });
-
-        showPopup('Profile saved successfully!', 'success');
-        // Reload profile to update display
-        loadProfile(user.uid);
-        cloudinaryUrl = null; // Reset for next upload
-            } catch (error) {
-                console.error('Error saving profile:', error);
-                showPopup('Error saving profile. Please try again.', 'error');
-            }
-        }
-
-        function showPopup(message, type) {
-            const popup = document.getElementById('popup');
-            const popupMessage = document.getElementById('popupMessage');
-            popupMessage.textContent = message;
-            popup.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 3000);
-        }
-
-        // Dropdown functionality
-        function openDropdown(element) {
-            const dropdown = element.querySelector('div.absolute');
-            if (dropdown) {
-                dropdown.classList.remove('hidden');
-                dropdown.classList.add('block');
-            }
-        }
-
-        function closeDropdown(element) {
-            const dropdown = element.querySelector('div.absolute');
-            if (dropdown) {
-                dropdown.classList.add('hidden');
-                dropdown.classList.remove('block');
-            }
-        }
-
-        // Add click functionality for dropdowns
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdownButtons = document.querySelectorAll('.relative.group button');
-            dropdownButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const dropdown = this.parentElement.querySelector('.absolute');
-                    if (dropdown) {
-                        if (dropdown.classList.contains('hidden')) {
-                            // Close other dropdowns first
-                            document.querySelectorAll('.absolute').forEach(d => {
-                                d.classList.add('hidden');
-                                d.classList.remove('block');
-                            });
-                            // Open this dropdown
-                            dropdown.classList.remove('hidden');
-                            dropdown.classList.add('block');
-                        } else {
-                            // Close this dropdown
-                            dropdown.classList.add('hidden');
-                            dropdown.classList.remove('block');
-                        }
-                    }
-                });
-            });
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.relative.group')) {
-                    document.querySelectorAll('.absolute').forEach(dropdown => {
-                        dropdown.classList.add('hidden');
-                        dropdown.classList.remove('block');
-                    });
-                }
-            });
-        });
-
-        function checkProfileCompleteness(data) {
-            const notice = document.getElementById('profileNotice');
-            if (!data || !data.firstname || !data.lastname || !data.age || !data.class) {
-                notice.style.display = 'block';
-            } else {
-                notice.style.display = 'none';
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        :root {
-            --primary-color: #8013ec;
-        }
-        .translucent-button {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            color: #FFFFFF;
-            transition: all 0.3s ease;
-        }
-        .translucent-button:hover {
-            background-color: rgba(147, 51, 234, 0.8);
-            border: 1px solid rgba(147, 51, 234, 1);
-            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
-            color: #FFFFFF;
-        }
-        .text-primary { color: #FFFFFF; }
-        .text-secondary { color: #ad92c9; }
-        .accent-primary { color: var(--primary-color); }
-        .border-primary { border-color: #2A1F36; }
-    </style>
-<link rel="stylesheet" href="../css/mobile-optimizations.css"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroSync Profile</title>
+  <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <link rel="stylesheet" href="../css/mobile-optimizations.css"/>
 </head>
-<body class="bg-[#120B1A] text-white">
-    <!-- Navigation Header -->
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
-        <div class="flex items-center gap-3 text-primary">
-            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
-            </svg>
-            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
-        </div>
-        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
-            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
-            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Dashboard</a>
-            <div class="relative group">
-                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-                    <span>Resources</span>
-                    <span class="material-symbols-outlined text-base">expand_more</span>
-                </button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-                    <div class="py-1">
+<body class="bg-[#110d19] text-white">
+<div class="relative flex size-full min-h-screen flex-col bg-[#110d19] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+<div class="flex items-center gap-3 text-primary">
+<svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+<h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+</div>
+<nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+<a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Focus</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-40 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="dashboard.html">Dashboard</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="rewards.html">Rewards</a>
+</div>
+</div>
+</div>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Resources</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
-                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
-                    </div>
-                </div>
-            </div>
-            <div class="relative group">
-                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
-                    <span>Company</span>
-                    <span class="material-symbols-outlined text-base">expand_more</span>
-                </button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
-                    <div class="py-1">
+</div>
+</div>
+</div>
+<div class="relative group" onmouseleave="closeDropdown(this)" onmouseenter="openDropdown(this)">
+<button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1" onmouseenter="openDropdown(this.parentElement)">
+<span>Company</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+<div class="py-1">
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
                         <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
-                    </div>
-                </div>
-            </div>
-            <a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
-            <a href="feedback.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Feedback</a>
-        </nav>
-        <div class="flex items-center gap-4">
-            <button id="theme-toggle" class="translucent-button flex items-center justify-center rounded-full size-11 hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-2xl">dark_mode</span>
-            </button>
-            <button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
-                <span class="material-symbols-outlined text-2xl">menu</span>
-            </button>
-        </div>
-    </header>
+</div>
+</div>
+</div>
+<a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex translucent-button min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 text-base font-bold transition-transform">
+<span class="truncate">Get Started</span>
+</button>
+<button class="xl:hidden translucent-button flex items-center justify-center rounded-full size-11">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+<script type="module" src="../js/navbar.js"></script>
+<main class="flex flex-1 items-center justify-center py-12 md:py-0">
+<div class="mx-auto w-full max-w-md rounded-2xl bg-[#1a1122] p-8 shadow-2xl shadow-black/40">
+<div class="mb-2 text-center">
+<div class="inline-block rounded-full bg-gradient-to-br from-[var(--primary-500)] to-[var(--primary-700)] p-0.5">
+<div class="rounded-full bg-[#1a1122] p-2">
+<svg class="h-6 w-6 text-[var(--primary-400)]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+<circle cx="9" cy="7" r="4"></circle>
+<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+</svg>
+</div>
+</div>
+</div>
+<h2 class="mb-2 text-center text-3xl font-bold tracking-tighter">Your Profile</h2>
+<p class="mb-8 text-center text-sm text-gray-400">Manage your personal information.</p>
+<form class="space-y-4" id="profile-form">
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="firstName">First Name</label>
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="firstName" placeholder="Enter your first name" type="text" readonly/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="lastName">Last Name</label>
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="lastName" placeholder="Enter your last name" type="text" readonly/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="age">Age</label>
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="age" placeholder="Enter your age" type="number" readonly/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="classGrade">Class/Grade</label>
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="classGrade" placeholder="Enter your class or grade" type="text" readonly/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="role">Role</label>
+<select class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="role" disabled>
+<option value="Student">Student</option>
+<option value="Teacher">Teacher</option>
+<option value="Parent">Parent</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-300" for="photoUrl">Photo URL</label>
+<input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="photoUrl" placeholder="Enter photo URL" type="url" readonly/>
+</div>
+<div class="flex gap-4 mt-6">
+<button id="edit-button" class="flex-1 rounded-lg bg-[var(--primary-600)] py-3 text-sm font-bold text-white shadow-lg shadow-[var(--primary-600)]/20 transition-all hover:bg-[var(--primary-700)] hover:shadow-xl hover:shadow-[var(--primary-700)]/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-600)] focus:ring-offset-[#1a1122]" type="button">
+Edit Profile
+</button>
+<button id="save-button" class="flex-1 rounded-lg bg-green-600 py-3 text-sm font-bold text-white shadow-lg shadow-green-600/20 transition-all hover:bg-green-700 hover:shadow-xl hover:shadow-green-700/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 focus:ring-offset-[#1a1122]" type="button" style="display: none;">
+Save Changes
+</button>
+</div>
+<div id="message" class="mt-4 text-center text-sm"></div>
+</form>
+</div>
+</main>
+</div>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+<!-- Firebase Storage -->
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-storage-compat.js"></script>
+<!-- Cloudinary Widget -->
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+<script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+  authDomain: "neurosync-5173b.firebaseapp.com",
+  projectId: "neurosync-5173b",
+  storageBucket: "neurosync-5173b.firebasestorage.app",
+  messagingSenderId: "855780859936",
+  appId: "1:855780859936:web:3044309100db9a61fa1c45",
+  measurementId: "G-75S5GWYEDK"
+};
 
-    <!-- Profile Incomplete Notice -->
-    <div id="profileNotice" class="bg-yellow-500 text-black p-4 text-center font-semibold" style="display: none;">
-        Please fill out your profile information first to get the best experience with NeuroSync.
-    </div>
+// Initialize Firebase if not already done
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+</script>
+<script src="../js/profile.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('edit-button').addEventListener('click', function() {
+    // Enable editing
+    const inputs = document.querySelectorAll('#profile-form input, #profile-form select');
+    inputs.forEach(input => {
+      input.removeAttribute('readonly');
+      input.removeAttribute('disabled');
+    });
+    document.getElementById('edit-button').style.display = 'none';
+    document.getElementById('save-button').style.display = 'block';
+    document.getElementById('message').textContent = 'Editing mode enabled.';
+    document.getElementById('message').style.color = 'yellow';
+  });
 
-    <!-- Popup Notification -->
-    <div id="popup" class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 bg-green-500 text-white" style="display: none;">
-        <span id="popupMessage"></span>
-    </div>
+  document.getElementById('save-button').addEventListener('click', function() {
+    // Save profile
+    saveProfile();
+    // Disable editing
+    const inputs = document.querySelectorAll('#profile-form input, #profile-form select');
+    inputs.forEach(input => {
+      input.setAttribute('readonly', 'true');
+      if (input.tagName === 'SELECT') {
+        input.setAttribute('disabled', 'true');
+      }
+    });
+    document.getElementById('edit-button').style.display = 'block';
+    document.getElementById('save-button').style.display = 'none';
+    document.getElementById('message').textContent = 'Profile saved successfully!';
+    document.getElementById('message').style.color = 'green';
+  });
+});
+</script>
+</div>
 
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-[#1A1122] rounded-2xl p-8 border border-[#2A1F36] shadow-lg shadow-[#120B1A]/50 w-full max-w-md">
-            <div class="text-center mb-8 relative">
-                <h1 class="text-3xl font-bold tracking-tight mb-2">Profile</h1>
-                <p class="text-[#ad92c9]">View your personal information</p>
-                <!-- Edit Button in profile box -->
-                <div class="absolute top-0 right-0">
-                    <button id="editButton" onclick="toggleEditMode()" class="translucent-button rounded-full px-4 py-2 flex items-center">
-                        <span class="material-symbols-outlined text-base mr-1">edit</span>
-                        Edit
-                    </button>
-                </div>
-            </div>
-
-            <form onsubmit="saveProfile(event)" class="space-y-6">
-                <!-- Profile Photo -->
-                <div class="flex flex-col items-center">
-                    <div class="relative mb-4">
-                        <img id="photoPreview" src="" alt="Profile Photo" class="w-24 h-24 rounded-full object-cover border-2 border-[var(--primary-color)] hidden">
-                        <div class="w-24 h-24 rounded-full bg-[#2A1F36] flex items-center justify-center border-2 border-[var(--primary-color)]" id="defaultAvatar">
-                            <span class="material-symbols-outlined text-3xl text-[var(--primary-color)]">person</span>
-                        </div>
-                    </div>
-                    <button id="photoLabel" type="button" onclick="openCloudinaryWidget()" class="translucent-button rounded-full px-4 py-2 cursor-pointer text-sm" style="display: none;">
-                        <span class="material-symbols-outlined text-base mr-1">photo_camera</span>
-                        Change Photo
-                    </button>
-                </div>
-
-                <!-- Profile Info Display -->
-                <div class="space-y-4">
-                    <div class="bg-[#2A1F36] rounded-lg p-4 border border-[#362348]">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm text-[#ad92c9]">Name</span>
-                            <span class="text-sm text-[#ad92c9]" id="displayName"></span>
-                        </div>
-                        <div class="text-white font-medium" id="fullName"></div>
-                    </div>
-
-                    <div class="bg-[#2A1F36] rounded-lg p-4 border border-[#362348]">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm text-[#ad92c9]">Age</span>
-                            <span class="text-sm text-[#ad92c9]" id="displayAge"></span>
-                        </div>
-                        <div class="text-white font-medium" id="ageValue"></div>
-                    </div>
-
-                    <div class="bg-[#2A1F36] rounded-lg p-4 border border-[#362348]">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm text-[#ad92c9]">Class/Grade</span>
-                            <span class="text-sm text-[#ad92c9]" id="displayClass"></span>
-                        </div>
-                        <div class="text-white font-medium" id="classValue"></div>
-                    </div>
-
-                    <div class="bg-[#2A1F36] rounded-lg p-4 border border-[#362348]">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm text-[#ad92c9]">Preferred Subject</span>
-                            <span class="text-sm text-[#ad92c9]" id="displaySubject"></span>
-                        </div>
-                        <div class="text-white font-medium" id="subjectValue"></div>
-                    </div>
-
-                    <div class="bg-[#2A1F36] rounded-lg p-4 border border-[#362348]">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm text-[#ad92c9]">Role</span>
-                            <span class="text-sm text-[#ad92c9]" id="displayRole"></span>
-                        </div>
-                        <div class="text-white font-medium" id="roleValue"></div>
-                    </div>
-                </div>
-
-                <!-- Hidden Form Fields for Editing -->
-                <div id="editForm" style="display: none;">
-                    <!-- First Name -->
-                    <div>
-                        <label for="firstName" class="block text-sm font-medium mb-2">First Name *</label>
-                        <input type="text" id="firstName" required class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                    </div>
-
-                    <!-- Last Name -->
-                    <div>
-                        <label for="lastName" class="block text-sm font-medium mb-2">Last Name *</label>
-                        <input type="text" id="lastName" required class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                    </div>
-
-                    <!-- Age -->
-                    <div>
-                        <label for="age" class="block text-sm font-medium mb-2">Age *</label>
-                        <input type="number" id="age" min="5" max="100" required class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                    </div>
-
-                    <!-- Class -->
-                    <div>
-                        <label for="class" class="block text-sm font-medium mb-2">Class/Grade *</label>
-                        <input type="text" id="class" placeholder="e.g., 10th Grade, College Freshman" required class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                    </div>
-
-                    <!-- Preferred Subject -->
-                    <div>
-                        <label for="preferredSubject" class="block text-sm font-medium mb-2">Preferred Subject</label>
-                        <input type="text" id="preferredSubject" placeholder="e.g., Mathematics, Science" class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                    </div>
-
-                    <!-- Role -->
-                    <div>
-                        <label for="role" class="block text-sm font-medium mb-2">Role *</label>
-                        <select id="role" required class="w-full px-3 py-2 bg-[#2A1F36] border border-[#2A1F36] rounded-lg focus:border-[var(--primary-color)] focus:outline-none text-white">
-                            <option value="Student">Student</option>
-                            <option value="Teacher">Teacher</option>
-                            <option value="Parent">Parent</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <button id="saveButton" type="submit" class="w-full translucent-button rounded-full h-12 font-bold transition-transform hover:scale-105" style="display: none;">
-                    Save Profile
-                </button>
-            </form>
-
-            <!-- Back Button -->
-            <div class="text-center mt-6">
-                <button onclick="window.location.href='Dashboard.html'" class="text-[#ad92c9] hover:text-white transition-colors">
-                    ← Back to Dashboard
-                </button>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-
+</body></html>
