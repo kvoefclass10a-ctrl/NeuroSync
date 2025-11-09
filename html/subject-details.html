@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -6,15 +6,15 @@
     <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <title>Study Library - NeuroSync</title>
+    <title>Subject Details - NeuroSync</title>
     <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
     <script type="module">
-        import { initStudyLibrary } from '../js/study-library.js';
+        import { initSubjectDetails } from '../js/subject-details.js';
 
-        // Initialize study library (bypassing authentication for local testing)
-        initStudyLibrary();
+        // Initialize subject details
+        initSubjectDetails();
     </script>
     <style type="text/tailwindcss">
         :root {
@@ -85,54 +85,55 @@
             <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
         </nav>
         <div class="flex items-center gap-4">
-            <button onclick="window.location.href='Dashboard.html'" class="translucent-button flex items-center justify-center rounded-full size-11">
+            <button onclick="window.location.href='study-library.html'" class="translucent-button flex items-center justify-center rounded-full size-11">
                 <span class="material-symbols-outlined text-2xl">arrow_back</span>
             </button>
         </div>
     </header>
 
     <div class="min-h-screen p-8">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-7xl mx-auto">
             <!-- Header Section -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold tracking-tight mb-2">Study Library</h1>
-                <p class="text-secondary">Access curated study materials and share your own resources</p>
+                <h1 id="subject-title" class="text-4xl font-bold tracking-tight mb-2">Subject Details</h1>
+                <p class="text-secondary">Access study materials and resources</p>
             </div>
 
-            <!-- Search and Filter Section -->
-            <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6 mb-8">
-                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <!-- Search Bar -->
+            <!-- Search and Controls -->
+            <div class="bg-primary/20 backdrop-blur-sm rounded-xl p-4 mb-6 border border-primary/30">
+                <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
                     <div class="flex-1 max-w-md">
                         <div class="relative">
-                            <input type="text" id="search-input" placeholder="Search materials..." 
-                                   class="w-full px-4 py-3 bg-tertiary border border-primary rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent"
-                                   onkeyup="searchMaterials()">
-                            <span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
+                            <input type="text" id="modal-search" placeholder="Search files in subject..."
+                                   class="w-full px-4 py-3 bg-secondary/50 border border-primary/40 rounded-lg text-black placeholder-secondary/70 focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300 text-sm">
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary/70 text-lg">search</span>
                         </div>
                     </div>
-
-                    <!-- Filter Buttons -->
-                    <div class="flex flex-wrap gap-2">
-                        <button id="filter-all" onclick="filterMaterials('all')" class="filter-btn bg-accent text-primary px-4 py-2 rounded-full text-sm font-medium transition-colors">All</button>
-                        <button id="filter-Mathematics" onclick="filterMaterials('Mathematics')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">Math</button>
-                        <button id="filter-Science" onclick="filterMaterials('Science')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">Science</button>
-                        <button id="filter-History" onclick="filterMaterials('History')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">History</button>
-                        <button id="filter-English" onclick="filterMaterials('English')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">English</button>
+                    <div class="flex items-center gap-4 text-sm text-secondary">
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">description</span>
+                            <span id="file-count">0 files</span>
+                        </span>
+                        <div class="flex gap-2">
+                            <button id="view-toggle-grid" class="p-2 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-colors" title="Grid View">
+                                <span class="material-symbols-outlined text-sm">grid_view</span>
+                            </button>
+                            <button id="view-toggle-list" class="p-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors" title="List View">
+                                <span class="material-symbols-outlined text-sm">list</span>
+                            </button>
+                        </div>
                     </div>
-
-
                 </div>
             </div>
 
-            <!-- Materials Grid -->
-            <div id="materials-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Materials will be loaded here -->
+            <!-- Files Container -->
+            <div id="files-container" class="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-accent/30 scrollbar-track-transparent pr-2">
+                <div class="space-y-8">
+                    <!-- Files will be loaded here -->
                 </div>
             </div>
+        </div>
     </div>
-
-
 
     <!-- Dropdown functionality -->
     <script>
@@ -170,4 +171,3 @@
     </script>
 </body>
 </html>
-
