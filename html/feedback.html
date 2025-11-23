@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<title>Feedback - NeuroSync</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+<script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFQ36vxZ5qWhxXXptKe_sXlFVZxzRtCBY",
+            authDomain: "neurosync-5173b.firebaseapp.com",
+            projectId: "neurosync-5173b",
+            storageBucket: "neurosync-5173b.firebasestorage.app",
+            messagingSenderId: "855780859936",
+            appId: "1:855780859936:web:3044309100db9a61fa1c45",
+            measurementId: "G-75S5GWYEDK"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Check authentication
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+            } else {
+                await loadUserProfile();
+                loadFeedbackHistory();
+            }
+        });
+
+        async function loadUserProfile() {
+            const user = auth.currentUser;
+            if (!user) {
+                console.error('No user found');
+                return;
+            }
+            
+            try {
+                console.log('Loading profile for user:', user.uid);
+                const doc = await db.collection('Profiles').doc(user.uid).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    console.log('Profile data found:', data);
+                    
+                    const displayName = `${data.firstname || ''} ${data.lastname || ''}`.trim() || user.email.split('@')[0] || 'User';
+                    
+                    // Update navbar name
+                    const userNameElement = document.getElementById('user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = displayName;
+                    }
+                    
+                    // Update user info display
+                    const displayNameElement = document.getElementById('display-name');
+                    const displayEmailElement = document.getElementById('display-email');
+                    const displayClassElement = document.getElementById('display-class');
+                    const displayRoleElement = document.getElementById('display-role');
+                    
+                    if (displayNameElement) displayNameElement.textContent = displayName;
+                    if (displayEmailElement) displayEmailElement.textContent = user.email;
+                    if (displayClassElement) displayClassElement.textContent = data.class || 'Not specified';
+                    if (displayRoleElement) displayRoleElement.textContent = data.role || 'Student';
+                    
+                    console.log('Profile loaded successfully');
+                } else {
+                    console.log('No profile document found, using fallback');
+                    // Fallback if no profile exists
+                    const displayName = user.email.split('@')[0] || 'User';
+                    
+                    const userNameElement = document.getElementById('user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = displayName;
+                    }
+                    
+                    const displayNameElement = document.getElementById('display-name');
+                    const displayEmailElement = document.getElementById('display-email');
+                    const displayClassElement = document.getElementById('display-class');
+                    const displayRoleElement = document.getElementById('display-role');
+                    
+                    if (displayNameElement) displayNameElement.textContent = displayName;
+                    if (displayEmailElement) displayEmailElement.textContent = user.email;
+                    if (displayClassElement) displayClassElement.textContent = 'Not specified';
+                    if (displayRoleElement) displayRoleElement.textContent = 'Student';
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                // Show error in the display
+                const displayNameElement = document.getElementById('display-name');
+                const displayEmailElement = document.getElementById('display-email');
+                const displayClassElement = document.getElementById('display-class');
+                const displayRoleElement = document.getElementById('display-role');
+                
+                if (displayNameElement) displayNameElement.textContent = 'Error loading profile';
+                if (displayEmailElement) displayEmailElement.textContent = user?.email || 'Unknown';
+                if (displayClassElement) displayClassElement.textContent = 'Error';
+                if (displayRoleElement) displayRoleElement.textContent = 'Error';
+            }
+        }
+
+        async function submitFeedback(event) {
+            event.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const formData = new FormData(event.target);
+            const rating = formData.get('rating');
+            const category = formData.get('category');
+            const message = formData.get('message');
+            const anonymous = formData.get('anonymous') === 'on';
+
+            if (!rating || !message.trim()) {
+                showNotification('Please provide a rating and message', 'error');
+                return;
+            }
+
+            try {
+                // Get user profile information
+                const profileDoc = await db.collection('Profiles').doc(user.uid).get();
+                const profileData = profileDoc.exists() ? profileDoc.data() : {};
+
+                await db.collection('Feedback').add({
+                    userId: anonymous ? null : user.uid,
+                    userName: anonymous ? 'Anonymous' : `${profileData.firstname || ''} ${profileData.lastname || ''}`.trim() || user.email.split('@')[0],
+                    userEmail: anonymous ? null : user.email,
+                    userClass: anonymous ? null : profileData.class,
+                    userRole: anonymous ? null : profileData.role,
+                    rating: parseInt(rating),
+                    category: category,
+                    message: message.trim(),
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending',
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                });
+
+                showNotification('Thank you for your feedback! We appreciate your input.', 'success');
+                event.target.reset();
+                loadFeedbackHistory();
+
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                showNotification('Error submitting feedback. Please try again.', 'error');
+            }
+        }
+
+        async function loadFeedbackHistory() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const snapshot = await db.collection('Feedback')
+                    .where('userId', '==', user.uid)
+                    .orderBy('submittedAt', 'desc')
+                    .limit(10)
+                    .get();
+
+                const container = document.getElementById('feedback-history');
+                container.innerHTML = '';
+
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <span class="material-symbols-outlined text-4xl text-secondary mb-4">feedback</span>
+                            <p class="text-secondary">No feedback submitted yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const feedback = doc.data();
+                    const feedbackCard = createFeedbackCard(feedback);
+                    container.appendChild(feedbackCard);
+                });
+
+            } catch (error) {
+                console.error('Error loading feedback history:', error);
+            }
+        }
+
+        function createFeedbackCard(feedback) {
+            const card = document.createElement('div');
+            card.className = 'bg-secondary/50 backdrop-blur-sm border border-primary rounded-lg p-4';
+            
+            const date = feedback.submittedAt ? new Date(feedback.submittedAt.toDate()).toLocaleDateString() : 'Unknown';
+            const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+            
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <h4 class="font-bold text-primary">${feedback.category}</h4>
+                        <p class="text-sm text-secondary">${date}</p>
+                    </div>
+                    <div class="text-yellow-400">${stars}</div>
+                </div>
+                <p class="text-muted text-sm mb-3">${feedback.message}</p>
+                <div class="flex items-center justify-between">
+                    <span class="px-2 py-1 bg-accent/20 text-accent rounded-full text-xs">
+                        ${feedback.status || 'pending'}
+                    </span>
+                    <span class="text-xs text-secondary">
+                        ${feedback.userName || 'Anonymous'}
+                    </span>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #8013ec;
+        }
+        .translucent-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .translucent-button:hover {
+            background-color: rgba(147, 51, 234, 0.8);
+            border: 1px solid rgba(147, 51, 234, 1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+            color: #FFFFFF;
+        }
+        .text-primary { color: #FFFFFF; }
+        .text-secondary { color: #ad92c9; }
+        .accent-primary { color: var(--primary-color); }
+        .border-primary { border-color: #2A1F36; }
+        .bg-primary { background-color: #120B1A; }
+        .bg-secondary { background-color: #1A1122; }
+        .bg-tertiary { background-color: #2A1F36; }
+        
+        .star-rating {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .star {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4a5568;
+            transition: color 0.2s;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+        }
+    </style>
+<link rel="stylesheet" href="../css/mobile-optimizations.css"/>
+</head>
+<body class="bg-primary text-white">
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-primary">
+            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+            </svg>
+            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+        </div>
+        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Dashboard</a>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Resources</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
+                    </div>
+</div>
+</div>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Company</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
+</div>
+</div>
+</div>
+            <a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
+            <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
+        </nav>
+<div class="flex items-center gap-4">
+            <button onclick="window.location.href='Dashboard.html'" class="translucent-button flex items-center justify-center rounded-full size-11">
+                <span class="material-symbols-outlined text-2xl">arrow_back</span>
+            </button>
+</div>
+    </header>
+
+    <div class="min-h-screen p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header Section -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold tracking-tight mb-2">Feedback & Support</h1>
+                <p class="text-secondary">Help us improve NeuroSync by sharing your thoughts and experiences</p>
+</div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Feedback Form -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Share Your Feedback</h2>
+                    
+                    <form onsubmit="submitFeedback(event)" class="space-y-6">
+                        <!-- User Info Display (Read-only) -->
+                        <div class="bg-gradient-to-r from-tertiary/30 to-tertiary/50 backdrop-blur-sm border border-primary/50 rounded-xl p-6 mb-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-accent text-2xl">person</span>
+                                <h3 class="text-xl font-bold text-primary">Your Information</h3>
+</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">badge</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Name</span>
+                                            <div class="text-primary font-semibold" id="display-name">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+</div>
+</div>
+</div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">school</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Class</span>
+                                            <div class="text-primary font-semibold" id="display-class">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+                                            </div>
+</div>
+</div>
+</div>
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">email</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Email</span>
+                                            <div class="text-primary font-semibold break-all" id="display-email">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+                                            </div>
+</div>
+</div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-accent text-lg">person_pin</span>
+<div>
+                                            <span class="text-secondary text-sm font-medium">Role</span>
+                                            <div class="text-primary font-semibold" id="display-role">
+                                                <span class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-accent mr-2"></span>
+                                                Loading...
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+                        <!-- Rating -->
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">star</span>
+                                Overall Rating *
+                            </label>
+                            <div class="star-rating flex gap-2 justify-center" id="star-rating">
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="1">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="2">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="3">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="4">☆</span>
+                                <span class="star text-4xl cursor-pointer hover:scale-110 transition-transform" data-rating="5">☆</span>
+                            </div>
+                            <input type="hidden" name="rating" id="rating-input" required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">category</span>
+                                Feature/Category *
+                            </label>
+                            <select name="category" required class="w-full px-4 py-3 bg-tertiary/80 border border-primary/50 rounded-xl focus:border-accent focus:outline-none text-primary font-medium transition-all duration-200 hover:bg-tertiary">
+                                <option value="">Select Feature/Category</option>
+                                <option value="Focus Timer">Focus Timer</option>
+                                <option value="Mood Tracker">Mood Tracker</option>
+                                <option value="Study Library">Study Library</option>
+                                <option value="Rewards System">Rewards System</option>
+                                <option value="Dashboard">Dashboard</option>
+                                <option value="Profile Management">Profile Management</option>
+                                <option value="User Interface">User Interface</option>
+                                <option value="Performance">Performance</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="General Feedback">General Feedback</option>
+                            </select>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <label class="block text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">message</span>
+                                Your Feedback *
+                            </label>
+                            <textarea name="message" rows="5" required placeholder="Please share your thoughts, suggestions, or report any issues..." 
+                                      class="w-full px-4 py-3 bg-tertiary/80 border border-primary/50 rounded-xl focus:border-accent focus:outline-none text-primary placeholder-color resize-none font-medium transition-all duration-200 hover:bg-tertiary"></textarea>
+                        </div>
+
+                        <!-- Anonymous Option -->
+                        <div class="bg-gradient-to-r from-tertiary/20 to-tertiary/30 backdrop-blur-sm border border-primary/30 rounded-xl p-6">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" name="anonymous" id="anonymous" class="w-5 h-5 rounded border-primary bg-tertiary text-accent focus:ring-accent focus:ring-2">
+                                <label for="anonymous" class="text-primary font-medium flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-accent">visibility_off</span>
+                                    Submit anonymously
+                                </label>
+                            </div>
+                            <p class="text-secondary text-sm mt-2 ml-8">Your personal information will be hidden from administrators</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-gradient-to-r from-accent to-accent-secondary hover:from-accent-secondary hover:to-accent text-primary px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-200 shadow-lg shadow-accent/30 flex items-center justify-center gap-3">
+                                <span class="material-symbols-outlined text-xl">send</span>
+                                Submit Feedback
+                            </button>
+                        </div>
+                    </form>
+</div>
+
+                <!-- Feedback History -->
+                <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Your Feedback History</h2>
+                    <div id="feedback-history" class="space-y-4">
+                        <!-- Feedback history will be loaded here -->
+</div>
+</div>
+</div>
+
+            <!-- Contact Information -->
+            <div class="mt-8 bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-primary mb-4">Other Ways to Reach Us</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-4xl text-accent mb-3">email</span>
+                        <h3 class="font-bold text-primary mb-2">Email Support</h3>
+                        <p class="text-secondary text-sm">support@neurosync.com</p>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-4xl text-accent mb-3">help</span>
+                        <h3 class="font-bold text-primary mb-2">Help Center</h3>
+                        <p class="text-secondary text-sm">Browse our FAQ and guides</p>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-4xl text-accent mb-3">schedule</span>
+                        <h3 class="font-bold text-primary mb-2">Response Time</h3>
+                        <p class="text-secondary text-sm">We typically respond within 24 hours</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+    <!-- Star Rating Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star');
+            const ratingInput = document.getElementById('rating-input');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', function() {
+                    const rating = index + 1;
+                    ratingInput.value = rating;
+                    
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.textContent = '★';
+                            s.classList.add('active');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseenter', function() {
+                    const rating = index + 1;
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.textContent = '★';
+                        } else {
+                            s.textContent = '☆';
+                        }
+                    });
+                });
+            });
+            
+            document.getElementById('star-rating').addEventListener('mouseleave', function() {
+                const currentRating = parseInt(ratingInput.value) || 0;
+                stars.forEach((s, i) => {
+                    if (i < currentRating) {
+                        s.textContent = '★';
+                    } else {
+                        s.textContent = '☆';
+                    }
+                });
+            });
+        });
+
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownButtons = document.querySelectorAll('.relative.group button');
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = this.parentElement.querySelector('.absolute');
+                    if (dropdown) {
+                        if (dropdown.classList.contains('hidden')) {
+                            document.querySelectorAll('.absolute').forEach(d => {
+                                d.classList.add('hidden');
+                                d.classList.remove('block');
+                            });
+                            dropdown.classList.remove('hidden');
+                            dropdown.classList.add('block');
+                        } else {
+                            dropdown.classList.add('hidden');
+                            dropdown.classList.remove('block');
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.relative.group')) {
+                    document.querySelectorAll('.absolute').forEach(dropdown => {
+                        dropdown.classList.add('hidden');
+                        dropdown.classList.remove('block');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

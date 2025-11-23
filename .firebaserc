@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "neurosync-5173b"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

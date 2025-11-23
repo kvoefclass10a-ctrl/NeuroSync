@@ -1,0 +1,173 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700&amp;family=Story+Script%3Awght%40400" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <title>Study Library - NeuroSync</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script type="module">
+        import { initStudyLibrary } from '../js/study-library.js';
+
+        // Initialize study library (bypassing authentication for local testing)
+        initStudyLibrary();
+    </script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #8013ec;
+        }
+        .translucent-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .translucent-button:hover {
+            background-color: rgba(147, 51, 234, 0.8);
+            border: 1px solid rgba(147, 51, 234, 1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.7);
+            color: #FFFFFF;
+        }
+        .text-primary { color: #FFFFFF; }
+        .text-secondary { color: #ad92c9; }
+        .accent-primary { color: var(--primary-color); }
+        .border-primary { border-color: #2A1F36; }
+        .bg-primary { background-color: #120B1A; }
+        .bg-secondary { background-color: #1A1122; }
+        .bg-tertiary { background-color: #2A1F36; }
+    </style>
+<link rel="stylesheet" href="../css/mobile-optimizations.css"/>
+</head>
+<body class="bg-primary text-white">
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary px-4 sm:px-6 lg:px-10 py-3 bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <div class="flex items-center gap-3 text-primary">
+            <svg class="h-7 w-7 accent-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+            </svg>
+            <h2 class="text-primary text-xl font-bold tracking-tight" style='font-family: "Story Script", sans-serif;'>NeuroSync</h2>
+        </div>
+        <nav class="hidden xl:flex items-center gap-2 text-sm text-secondary">
+            <a class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors" href="../index.html">Home</a>
+            <a href="Dashboard.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1">Dashboard</a>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Resources</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="mood-selection.html">Mood Tracker</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Study Library</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="study-library.html">Upload Material</a>
+                    </div>
+                </div>
+            </div>
+            <div class="relative group">
+                <button class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors flex items-center gap-1 dropdown-toggle">
+                    <span>Company</span>
+                    <span class="material-symbols-outlined text-base">expand_more</span>
+                </button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-secondary/80 backdrop-blur-sm border border-primary ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                    <div class="py-1">
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="feedback.html">Feedback Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#about">About Us</a>
+                        <a class="block px-4 py-2 text-sm text-secondary hover:bg-primary/50 hover:text-primary transition-colors" href="#support">Support</a>
+                    </div>
+                </div>
+            </div>
+            <a href="rewards.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Rewards</a>
+            <a href="profile.html" class="translucent-button rounded-full px-4 py-2 hover:text-primary transition-colors">Profile</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='Dashboard.html'" class="translucent-button flex items-center justify-center rounded-full size-11">
+                <span class="material-symbols-outlined text-2xl">arrow_back</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="min-h-screen p-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold tracking-tight mb-2">Study Library</h1>
+                <p class="text-secondary">Access curated study materials and share your own resources</p>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="bg-secondary/50 backdrop-blur-sm border border-primary rounded-xl p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <!-- Search Bar -->
+                    <div class="flex-1 max-w-md">
+                        <div class="relative">
+                            <input type="text" id="search-input" placeholder="Search materials..." 
+                                   class="w-full px-4 py-3 bg-tertiary border border-primary rounded-lg text-primary placeholder-color focus:ring-accent focus:border-accent"
+                                   onkeyup="searchMaterials()">
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-2">
+                        <button id="filter-all" onclick="filterMaterials('all')" class="filter-btn bg-accent text-primary px-4 py-2 rounded-full text-sm font-medium transition-colors">All</button>
+                        <button id="filter-Mathematics" onclick="filterMaterials('Mathematics')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">Math</button>
+                        <button id="filter-Science" onclick="filterMaterials('Science')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">Science</button>
+                        <button id="filter-History" onclick="filterMaterials('History')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">History</button>
+                        <button id="filter-English" onclick="filterMaterials('English')" class="filter-btn text-muted px-4 py-2 rounded-full text-sm font-medium transition-colors">English</button>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Materials Grid -->
+            <div id="materials-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Materials will be loaded here -->
+                </div>
+            </div>
+    </div>
+
+
+
+    <!-- Dropdown functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownButtons = document.querySelectorAll('.relative.group button');
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = this.parentElement.querySelector('.absolute');
+                    if (dropdown) {
+                        if (dropdown.classList.contains('hidden')) {
+                            document.querySelectorAll('.absolute').forEach(d => {
+                                d.classList.add('hidden');
+                                d.classList.remove('block');
+                            });
+                            dropdown.classList.remove('hidden');
+                            dropdown.classList.add('block');
+                        } else {
+                            dropdown.classList.add('hidden');
+                            dropdown.classList.remove('block');
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.relative.group')) {
+                    document.querySelectorAll('.absolute').forEach(dropdown => {
+                        dropdown.classList.add('hidden');
+                        dropdown.classList.remove('block');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

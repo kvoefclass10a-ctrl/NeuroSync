@@ -1,0 +1,101 @@
+{
+  "Science": {
+    "Biology": {
+      "Chapterwise question answer": [
+        "chapter-05-life-processes-test-paper-01_n0twco.pdf",
+        "chapter-06-control-and-coordination-test-paper-01_kcozbq.pdf",
+        "chapter-07-how-do-organisms-reproduce-test-paper-01_ykzhsm.pdf",
+        "chapter-08-heredity-and-evolution-test-paper-01_erv7kj.pdf",
+        "chapter-13-our-environment-test-paper-02_wynswi.pdf"
+      ],
+      "Notes": [
+        "control_and_coordination_fkmx4x.pdf",
+        "Heredity_ejrttj.pdf",
+        "life_process_mvbj19.pdf",
+        "Our_Environment_tkcsp8.pdf",
+        "re_pro_j1en66.pdf"
+      ]
+    },
+    "Chemistry": {
+      "chapterwise question answer": [
+        "chapter-01-chemical-reactions-and-equations-test-paper-01_vfhjrv.pdf",
+        "chapter-02-acid-base-and-salt-test-paper-01_ihlhcp.pdf",
+        "chapter-03-metals-and-non-metals-test-paper-01_abzciy.pdf",
+        "chapter-04-carbon-and-its-compound-test-paper-01_vxelbe.pdf"
+      ],
+      "Notes": [
+        "acid_base_and_salt_vfy5ku.pdf",
+        "Carbon_and_compound_njucdd.pdf",
+        "Chemical_reaction_and_equation_zfsli9.pdf",
+        "Metal_non_metal_brrwtd.pdf"
+      ]
+    },
+    "Physics": {
+      "Chapterwise Question answer": [
+        "chapter-9-light-reflection-and-refraction-test-paper-01_b0nsam.pdf",
+        "chapter-10-human-eye-and-the-colourful-world-test-paper_agxccj.pdf",
+        "chapter-11-electricity-and-its-effects-test-paper-01_vx0sfm.pdf",
+        "chapter-12-magnetic-effects-of-electric-current-test-pap_qvder1.pdf"
+      ],
+      "Notes": [
+        "Class_10th_lights_25-26_KV_OEF_KANPUR_zigmv4.pdf",
+        "electricity_ifdq0w.pdf",
+        "eye_gntcgg.pdf",
+        "magnet_wtagdi.pdf"
+      ]
+    },
+    "Question paper": [
+      "10th_English_Communicative_24-25_KV_OEF_Kanpur_mhjegm.pdf",
+      "10th_Hindi_A_24-25_KV_OEF_Kanpur_loxjbj.pdf",
+      "10th_Information_Technology_24-25_KV_OEF_Kanpur_o9ofie.pdf",
+      "10th_Mathematics_Standard_24-25_KV_OEF_Kanpur_qfq4qr.pdf",
+      "10th_Science_24-25_KV_OEF_Kanpur_ota08g.pdf",
+      "10th_Social_Science_24-25_KV_OEF_Kanpur_o1gpcq.pdf"
+    ],
+    "Sample paper": [
+      "10th_Computer_Application_25-26_KV_OEF_Kanpur_aq6sln.pdf",
+      "10th_English_Communicative_25-26_KV_OEF_Kanpur_uxp5yn.pdf",
+      "10th_Hindi_A_25-26_KV_OEF_Kanpur_zf7sbm.pdf",
+      "10th_Maths_Basic_25-26_KV_OEF_Kanpur_qlurzq.pdf",
+      "10th_Maths_Standard_25-26_KV_OEF_Kanpur_ndegfv.pdf",
+      "10th_Sanakrit_25-26_KV_OEF_Kanpur_zapfua.pdf",
+      "10th_Science_25-26_KV_OEF_Kanpur_pbxk76.pdf",
+      "10th_Social_Science_25-26_KV_OEF_Kanpur_ckbur2.pdf"
+    ]
+  },
+  "Social science": {
+    "Civics": {
+      "Notes": [
+        "Federalism_Prashant_Kirad_abyn7s.pdf",
+        "Gender_Religion_and_Caste_Prashant_Kirad_mrmkv5.pdf",
+        "Outcomes_of_Democracy_Prashant_Kirad_xu8sx7.pdf",
+        "Political_Parties_Prashant_Kirad_1_qejj4g.pdf",
+        "Political_Parties_Prashant_Kirad_av5xvk.pdf",
+        "Power_Sharing_Prashant_Kirad_lokptb.pdf"
+      ]
+    },
+    "Economy": [
+      "Development_Prashant_Kirad_xzc3d9.pdf",
+      "Globalisation_and_Indian_economy_Prashant_Kirad_mkuse2.pdf",
+      "Money_Credit_Prashant_Kirad_xtamdc.pdf",
+      "Sectors_of_Indian_economy_Prashant_Kirad_dgxqj1.pdf"
+    ],
+    "Geography": {
+      "Notes": [
+        "Agriculture_Prashant_Kirad_kzu3gh.pdf",
+        "Agriculture_Prashant_Kirad_zdbtsp.pdf",
+        "Forest_and_wildlife_resources_Prashant_Kirad_omf6fz.pdf",
+        "Resources_and_Development_Prashant_Kirad_gv2clx.pdf",
+        "Water_resources_Prashant_Kirad_xzq483.pdf"
+      ]
+    },
+    "History": {
+      "Notes": [
+        "Making_of_a_global_world_Prashant_Kirad_skrxwk.pdf",
+        "Print_Culture_and_the_Modern_World_Prashant_Kirad_oze6x3.pdf",
+        "The_Nationalism_in_India_Prashant_Kirad_dzc27a.pdf",
+        "The_Rise_of_Nationalism_in_Europe_Prashant_Kirad_xkly8z.pdf"
+      ]
+    }
+  }
+}

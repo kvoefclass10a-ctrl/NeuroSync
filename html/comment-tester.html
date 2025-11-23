@@ -1,0 +1,304 @@
+now<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroSync - Comment Tester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #764ba2;
+      margin-bottom: 30px;
+      font-family: 'Story Script', cursive;
+      font-size: 2.5em;
+    }
+    .comment-form {
+      margin-bottom: 30px;
+    }
+    .comment-form input, .comment-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .comment-form button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+    .comment-form button:hover {
+      transform: scale(1.05);
+    }
+    .comments-list {
+      margin-top: 30px;
+    }
+    .comment-item {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .comment-author {
+      font-weight: bold;
+      color: #764ba2;
+    }
+    .comment-text {
+      margin: 10px 0;
+    }
+    .comment-timestamp {
+      font-size: 12px;
+      color: #666;
+    }
+    .comment-actions {
+      margin-top: 10px;
+    }
+    .comment-actions button {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+    .comment-actions button:hover {
+      background: #d32f2f;
+    }
+    .test-buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .test-buttons button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0 5px;
+    }
+    .test-buttons button:hover {
+      background: #45a049;
+    }
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    .success { color: #4caf50; }
+    .error { color: #f44336; }
+  </style>
+<link rel="stylesheet" href="../css/mobile-optimizations.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Comment Tester</h1>
+
+    <div id="status" class="status"></div>
+
+    <div class="comment-form">
+      <h2>Add a Comment</h2>
+      <input type="text" id="name" placeholder="Your name" required>
+      <input type="text" id="postId" placeholder="Post ID" required>
+      <textarea id="comment-text" placeholder="Write your comment here..." rows="4" required></textarea>
+      <input type="text" id="userId" placeholder="User ID" required>
+      <button onclick="addComment()">Add Comment</button>
+    </div>
+
+    <div class="test-buttons">
+      <button onclick="loadComments()">Load Comments</button>
+      <button onclick="clearComments()">Clear All Comments</button>
+      <button onclick="testFirestoreConnection()">Test Firestore Connection</button>
+    </div>
+
+    <div class="comments-list" id="comments-list">
+      <!-- Comments will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUOLqtOTz1xxGMXj-u9cRu01Si94vB0H4",
+      authDomain: "neurosyncc-e5831.firebaseapp.com",
+      projectId: "neurosyncc-e5831",
+      storageBucket: "neurosyncc-e5831.firebasestorage.app",
+      messagingSenderId: "1049098642837",
+      appId: "1:1049098642837:web:8bac91a5ec19efd60dc29c"
+    };
+
+    // Initialize Firebase
+    let app, db;
+    try {
+      app = firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      console.log('Firebase initialized successfully');
+      updateStatus('Firebase connected successfully', 'success');
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+      updateStatus('Firebase connection failed: ' + error.message, 'error');
+    }
+
+    function updateStatus(message, type) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = 'status ' + type;
+    }
+
+    async function addComment() {
+      const name = document.getElementById('name').value.trim();
+      const postId = document.getElementById('postId').value.trim();
+      const text = document.getElementById('comment-text').value.trim();
+      const userId = document.getElementById('userId').value.trim();
+
+      if (!name || !postId || !text || !userId) {
+        updateStatus('Please fill in all fields', 'error');
+        return;
+      }
+
+      try {
+        await db.collection('comments').add({
+          name: name,
+          postId: postId,
+          text: text,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          userId: userId
+        });
+
+        updateStatus('Comment added successfully!', 'success');
+        document.getElementById('name').value = '';
+        document.getElementById('postId').value = '';
+        document.getElementById('comment-text').value = '';
+        document.getElementById('userId').value = '';
+        loadComments(); // Refresh the list
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        updateStatus('Error adding comment: ' + error.message, 'error');
+      }
+    }
+
+    async function loadComments() {
+      try {
+        const querySnapshot = await db.collection('comments')
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        const commentsList = document.getElementById('comments-list');
+        commentsList.innerHTML = '';
+
+        if (querySnapshot.empty) {
+          commentsList.innerHTML = '<p>No comments yet. Add one above!</p>';
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const comment = doc.data();
+          const commentDiv = document.createElement('div');
+          commentDiv.className = 'comment-item';
+          commentDiv.innerHTML = `
+            <div class="comment-author">Name: ${comment.name}</div>
+            <div class="comment-postId">Post ID: ${comment.postId}</div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-timestamp">${comment.timestamp ? comment.timestamp.toDate().toLocaleString() : 'Just now'}</div>
+            <div class="comment-userId">User ID: ${comment.userId}</div>
+            <div class="comment-actions">
+              <button onclick="deleteComment('${doc.id}')">Delete</button>
+            </div>
+          `;
+          commentsList.appendChild(commentDiv);
+        });
+
+        updateStatus(`Loaded ${querySnapshot.size} comments`, 'success');
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        updateStatus('Error loading comments: ' + error.message, 'error');
+      }
+    }
+
+    async function deleteComment(commentId) {
+      try {
+        await db.collection('comments').doc(commentId).delete();
+        updateStatus('Comment deleted successfully', 'success');
+        loadComments(); // Refresh the list
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+        updateStatus('Error deleting comment: ' + error.message, 'error');
+      }
+    }
+
+    async function clearComments() {
+      if (!confirm('Are you sure you want to delete all comments? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const querySnapshot = await db.collection('comments').get();
+        const batch = db.batch();
+
+        querySnapshot.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        updateStatus('All comments cleared successfully', 'success');
+        loadComments(); // Refresh the list
+      } catch (error) {
+        console.error('Error clearing comments:', error);
+        updateStatus('Error clearing comments: ' + error.message, 'error');
+      }
+    }
+
+    async function testFirestoreConnection() {
+      try {
+        // Try to read from a test collection
+        const testDoc = await db.collection('test').doc('connection').get();
+        updateStatus('Firestore connection test successful', 'success');
+      } catch (error) {
+        console.error('Firestore connection test failed:', error);
+        updateStatus('Firestore connection test failed: ' + error.message, 'error');
+      }
+    }
+
+    // Load comments on page load
+    window.addEventListener('load', loadComments);
+  </script>
+</body>
+</html>
+

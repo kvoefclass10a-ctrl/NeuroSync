@@ -1,16 +1,10 @@
 {
-  "firestore": {
-    "database": "(default)",
-    "location": "asia-south1",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+  "emulators": {
+    "dataconnect": {
+      "dataDir": "dataconnect/.dataconnect/pgliteData"
+    }
   },
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+  "dataconnect": {
+    "source": "dataconnect"
   }
 }
