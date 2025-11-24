@@ -73,21 +73,18 @@
 <script type="module" src="../js/navbar.js"></script>
 <main class="flex flex-1 items-center justify-center py-12 md:py-0">
 <div class="mx-auto w-full max-w-md rounded-2xl bg-[#1a1122] p-8 shadow-2xl shadow-black/40">
-<div class="mb-2 text-center">
-<div class="inline-block rounded-full bg-gradient-to-br from-[var(--primary-500)] to-[var(--primary-700)] p-0.5">
-<div class="rounded-full bg-[#1a1122] p-2">
-<svg class="h-6 w-6 text-[var(--primary-400)]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-<circle cx="9" cy="7" r="4"></circle>
-<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-</svg>
-</div>
-</div>
-</div>
 <h2 class="mb-2 text-center text-3xl font-bold tracking-tighter">Your Profile</h2>
 <p class="mb-8 text-center text-sm text-gray-400">Manage your personal information.</p>
 <form class="space-y-4" id="profile-form">
+<div class="relative flex justify-center mb-4 w-24 h-24 mx-auto">
+  <img src="" alt="Profile Photo" id="profile-photo-preview" class="rounded-full object-cover w-24 h-24 ring-2 ring-white" />
+  <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-xs font-semibold select-none pointer-events-none">
+    Profile Photo
+  </span>
+  <button id="change-photo-button" title="Change Photo" class="absolute top-1/2 left-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--primary-600)] text-white shadow-lg shadow-[var(--primary-600)]/20 transition-all hover:bg-[var(--primary-700)] hover:shadow-xl hover:shadow-[var(--primary-700)]/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-600)] focus:ring-offset-[#1a1122]">
+    &#9998;
+  </button>
+</div>
 <div class="space-y-2">
 <label class="text-sm font-medium text-gray-300" for="firstName">First Name</label>
 <input class="form-input w-full rounded-lg border border-[#362348] bg-[#110d19] p-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-[var(--primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/50" id="firstName" placeholder="Enter your first name" type="text" readonly/>
@@ -156,17 +153,26 @@ if (!firebase.apps.length) {
 <script src="../js/profile.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('edit-button').addEventListener('click', function() {
+document.getElementById('edit-button').addEventListener('click', function() {
+    console.log('Edit button clicked');
     // Enable editing
     const inputs = document.querySelectorAll('#profile-form input, #profile-form select');
     inputs.forEach(input => {
       input.removeAttribute('readonly');
       input.removeAttribute('disabled');
+      console.log(`Enabled input: id=${input.id}, readonly=${input.hasAttribute('readonly')}, disabled=${input.hasAttribute('disabled')}`);
     });
     document.getElementById('edit-button').style.display = 'none';
     document.getElementById('save-button').style.display = 'block';
     document.getElementById('message').textContent = 'Editing mode enabled.';
     document.getElementById('message').style.color = 'yellow';
+
+    // Set focus to first input
+    if(inputs.length > 0) {
+      inputs[0].tabIndex = 0;
+      inputs[0].focus();
+      console.log(`Focused input: id=${inputs[0].id}`);
+    }
   });
 
   document.getElementById('save-button').addEventListener('click', function() {
@@ -184,6 +190,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('save-button').style.display = 'none';
     document.getElementById('message').textContent = 'Profile saved successfully!';
     document.getElementById('message').style.color = 'green';
+  });
+
+  document.getElementById('change-photo-button').addEventListener('click', function() {
+    openUploadWidget();
   });
 });
 </script>
